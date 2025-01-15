@@ -5,21 +5,8 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.FireCommand;
-import frc.robot.commands.SpinUpCommand;
-import frc.robot.subsystems.climber.ClimberAscendCommand;
-import frc.robot.subsystems.climber.ClimberDescendCommand;
-import frc.robot.subsystems.climber.ClimberSubsystem;
-import frc.robot.subsystems.drive.swerve.DriveSubsystem;
-import frc.robot.subsystems.drive.swerve.SwerveDriveZero;
-import frc.robot.subsystems.intake.IntakeCommand;
-import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.intake.OuttakeCommand;
-import frc.robot.subsystems.launcherElevation.ElevateToPosition;
-import frc.robot.subsystems.launcherElevation.HomeElevation;
-import frc.robot.subsystems.launcherElevation.LauncherElevationSubsystem;
-import frc.robot.subsystems.launcherFiring.LauncherFiringSubsystem;
-import frc.robot.subsystems.limitSwitchStateMonitor.SensorStateMonitorSubsystem;
+import frc.robot.drive.swerve.DriveSubsystem;
+import frc.robot.drive.swerve.SwerveDriveZero;
 import java.util.List;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -49,11 +36,6 @@ public class RobotContainer
 {
     // The robot's subsystems and commands are defined here...
     private final DriveSubsystem drive;
-    private final IntakeSubsystem intake;
-    private final LauncherFiringSubsystem launcher;
-    private final LauncherElevationSubsystem elevation;
-    private final ClimberSubsystem climber;
-    private final SensorStateMonitorSubsystem sensorStateMonitor;
     
     // Replace with CommandPS4Controller or CommandJoystick if needed
     public static final CommandPS4Controller m_driverController =
@@ -69,15 +51,6 @@ public class RobotContainer
     {
         // create subsystems
         drive = new DriveSubsystem();
-        sensorStateMonitor = new SensorStateMonitorSubsystem();
-        intake = new IntakeSubsystem(sensorStateMonitor);
-        climber = new ClimberSubsystem(sensorStateMonitor);
-        elevation = new LauncherElevationSubsystem(sensorStateMonitor);
-        launcher = new LauncherFiringSubsystem(sensorStateMonitor);
-        NamedCommands.registerCommand("HomeElevation", Commands.sequence(new HomeElevation(elevation)));
-        NamedCommands.registerCommand("ShootNote", Commands.sequence(new FireCommand(launcher, intake)));
-        NamedCommands.registerCommand("IntakeNote", Commands.sequence(new IntakeCommand(intake)));
-        NamedCommands.registerCommand("OutTakeNote", Commands.sequence(new IntakeCommand(intake)));
 
         // Configure the trigger bindings
         configureBindings();
@@ -110,19 +83,13 @@ public class RobotContainer
         // cancelling on release.
         // m_driverController.button(1).whileTrue(m_exampleSubsystem.exampleMethodCommand());
         
-        m_driverController.L2().whileTrue(new OuttakeCommand(intake));
-        m_driverController.R2().whileTrue(new IntakeCommand(intake));
         m_driverController.share().and(m_driverController.options()).onTrue(new SwerveDriveZero(drive));
         // m_coDriverController.L1().whileTrue(
             
 
 
         // The Ascend and Descend are opposite. Ascend goes down and Decend goes up.
-        m_coDriverController.cross().whileTrue(new ClimberAscendCommand(climber));
-        m_coDriverController.triangle().whileTrue(new ClimberDescendCommand(climber));
-        m_coDriverController.L2().onTrue(new SpinUpCommand(launcher)).onFalse(Commands.run(()->launcher.StopAllMotors(),launcher));
-        m_coDriverController.circle().whileTrue(new FireCommand(launcher,intake));
-        m_coDriverController.pov(0).whileTrue(new HomeElevation(elevation));
+
         SmartDashboard.putData("On-the-fly path", Commands.runOnce(() -> {
             Pose2d currentPose = drive.getPose();
             
@@ -131,9 +98,10 @@ public class RobotContainer
             Pose2d endPos = new Pose2d(currentPose.getTranslation().plus(new Translation2d(2.0, 0.0)), new Rotation2d());
 
             List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(startPos, endPos);
-            PathPlannerPath path = new PathPlannerPath(bezierPoints, 
-            new PathConstraints(2.50, 2.50, Units.degreesToRadians(180), Units.degreesToRadians(180)),  
-            new GoalEndState(0.0, currentPose.getRotation()));
+            PathPlannerPath path = new PathPlannerPath(
+                new PathConstraints(2.50, 2.50, Units.degreesToRadians(180), Units.degreesToRadians(180)), 
+                new GoalEndState(0.0, currentPose.getRotation()), 
+                bezierPoints);
             // Prevent this path from being flipped on the red alliance, since the given positions are already correct
             path.preventFlipping = true;
 

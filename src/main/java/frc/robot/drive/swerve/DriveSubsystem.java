@@ -2,11 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.drive.swerve;
+package frc.robot.drive.swerve;
 
-import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
-
+import com.studica.frc.AHRS;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -45,7 +44,7 @@ public class DriveSubsystem extends SubsystemBase
                     SwerveConstants.DriveConstants.kBackRightChassisAngularOffset);
 
     // The gyro sensor
-    AHRS ahrs = new AHRS(SPI.Port.kMXP);
+    AHRS ahrs = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
     // Slew rate filter variables for controlling lateral acceleration
     private double m_currentRotation = 0.0;
@@ -61,10 +60,15 @@ public class DriveSubsystem extends SubsystemBase
     // Odometry class for tracking robot pose
     SwerveDriveOdometry m_odometry =
             new SwerveDriveOdometry(SwerveConstants.DriveConstants.kDriveKinematics,
-                    Rotation2d.fromDegrees(-ahrs.getAngle()).plus(new Rotation2d(Math.PI)), new SwerveModulePosition[]
-                    {m_frontLeft.getPosition(), m_frontRight.getPosition(),
-                            m_rearLeft.getPosition(), m_rearRight.getPosition()
-                    });
+                    Rotation2d.fromDegrees(
+                        -ahrs.getAngle()).plus(new Rotation2d(Math.PI)), 
+                        new SwerveModulePosition[]{
+                            m_frontLeft.getPosition(),
+                            m_frontRight.getPosition(),
+                            m_rearLeft.getPosition(),
+                            m_rearRight.getPosition()
+                        }
+                    );
 
     /** Creates a new DriveSubsystem. */
     public DriveSubsystem()
@@ -121,10 +125,16 @@ public class DriveSubsystem extends SubsystemBase
      */
     public void resetOdometry(Pose2d pose)
     {
-        m_odometry.resetPosition(Rotation2d.fromDegrees(-ahrs.getAngle()), new SwerveModulePosition[]
-        {m_frontLeft.getPosition(), m_frontRight.getPosition(), m_rearLeft.getPosition(),
+        m_odometry.resetPosition(
+            Rotation2d.fromDegrees(-ahrs.getAngle()), 
+            new SwerveModulePosition[]{
+                m_frontLeft.getPosition(), 
+                m_frontRight.getPosition(), 
+                m_rearLeft.getPosition(),
                 m_rearRight.getPosition()
-        }, pose);
+            }, 
+            pose
+        );
     }
 
     /**

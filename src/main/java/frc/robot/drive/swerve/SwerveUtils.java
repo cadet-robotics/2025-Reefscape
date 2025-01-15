@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drive.swerve;
+package frc.robot.drive.swerve;
 
 public class SwerveUtils
 {
