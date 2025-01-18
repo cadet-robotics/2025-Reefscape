@@ -53,4 +53,7 @@ public final class Configs {
                     .positionWrappingInputRange(0, turningFactor);
         }
     }
+    public final class AccessoryMotorSubsystem {
+        public static final SparkMaxConfig()
+    }
 }
