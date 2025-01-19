@@ -1,7 +1,6 @@
 // https://github.com/Greater-Rochester-Robotics/GRRBase/blob/main/src/main/java/org/team340/lib/util/command/GRRSubsystem.java
 package frc.robot.lib.custom;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.lib.custom.CCommand;
 
 public class CSubsystem implements Subsystem {
     

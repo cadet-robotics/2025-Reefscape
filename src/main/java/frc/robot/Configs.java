@@ -54,6 +54,11 @@ public final class Configs {
         }
     }
     public final class AccessoryMotorSubsystem {
-        public static final SparkMaxConfig()
+        public static final SparkMaxConfig motor_config = new SparkMaxConfig();
+
+        static {
+            motor_config
+                .idleMode(IdleMode.kBrake);
+        }
     }
 }
