@@ -27,14 +27,14 @@ public class AccessoryMotorSubsystem extends CSubsystem {
 
     // Start the motor
     public Command StartMotor( double speed ) {
-        return cCommand("AccessoryMotorSubsystem.StartMotor")
+        return cCommand_("AccessoryMotorSubsystem.StartMotor")
             .onExecute( ()->{
                 motor.set( speed );
             }
         );
     }
     public Command StopMotor() {
-        return cCommand("AccessoryMotorSubsystem.StopMotor")
+        return cCommand_("AccessoryMotorSubsystem.StopMotor")
             .onExecute( ()->{
                 motor.stopMotor();
             }
