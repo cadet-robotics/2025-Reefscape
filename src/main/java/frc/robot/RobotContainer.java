@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -24,6 +25,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import java.io.BufferedWriter;
 import java.util.List;
 
 /*
@@ -73,6 +76,18 @@ public class RobotContainer {
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
+    // HOW TO MAKE A BUTTON DO STUFF 
+    new JoystickButton(m_driverController, Button.kCircle.value )
+        .whileTrue( 
+            new RunCommand( () -> {
+                m_robotDrive.resetOdometry(m_robotDrive.getPose());
+                m_robotDrive.zeroHeading();
+                m_robotDrive.resetEncoders();
+            },
+            m_robotDrive
+        )
+    );
+ 
   }
 
   /**
