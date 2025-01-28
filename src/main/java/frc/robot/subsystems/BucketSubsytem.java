@@ -20,7 +20,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class BucketSubsytem extends CSubsystem {
 
-    // Creating a sparkmax
+    // Creating a sparkmax to control the motor
+    // Snowblower motors must be set as "kBrushed"
     private final SparkMax m_snowblower = new SparkMax( Constants.BucketSubsytem.kSnowblowerMotor, MotorType.kBrushed );
     // Creating the Encoder
     private final Encoder m_snowblowerEncoder = new Encoder( Constants.BucketSubsytem.kSnowblowerEncoderA, Constants.BucketSubsytem.kSnowblowerEncoderB );
