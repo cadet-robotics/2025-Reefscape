@@ -16,18 +16,21 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-import java.io.BufferedWriter;
+// import java.io.BufferedWriter;
 import java.util.List;
+
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.BucketSubsytem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -38,6 +41,8 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final IntakeSubsystem m_intake = new IntakeSubsystem();
+  private final BucketSubsytem m_bucket = new BucketSubsytem();
 
   // The driver's controller
   PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
@@ -75,7 +80,9 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Button.kR1.value)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
-            m_robotDrive));
+            m_robotDrive
+        )
+    );
     // HOW TO MAKE A BUTTON DO STUFF 
     new JoystickButton(m_driverController, Button.kCircle.value )
         .whileTrue( 
@@ -83,12 +90,24 @@ public class RobotContainer {
                 m_robotDrive.resetOdometry(m_robotDrive.getPose());
                 m_robotDrive.zeroHeading();
                 m_robotDrive.resetEncoders();
-            },
-            m_robotDrive
+            }
         )
     );
- 
-  }
+    new JoystickButton(m_driverController, Button.kR2.value )
+        .whileTrue( m_intake.IntakeIn() );
+        
+    new JoystickButton(m_driverController, Button.kL2.value )
+        .whileTrue( m_intake.IntakeOut() );
+
+    new JoystickButton(m_driverController, Button.kSquare.value )
+        .whileTrue( m_intake.StopIntake() );
+
+    new JoystickButton(m_driverController, Button.kR1.value )
+        .whileTrue( m_bucket.Testing2() );
+
+    new JoystickButton(m_driverController, Button.kL1.value )
+        .whileTrue( m_bucket.Testing1() );
+}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

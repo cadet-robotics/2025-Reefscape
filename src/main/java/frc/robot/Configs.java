@@ -54,11 +54,22 @@ public final class Configs {
         }
     }
     public final class AccessoryMotorSubsystem {
-        public static final SparkMaxConfig motor_config = new SparkMaxConfig();
+        public static final SparkMaxConfig kRightMotorConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig kLeftMotorConfig = new SparkMaxConfig();
 
         static {
-            motor_config
+            kLeftMotorConfig
                 .idleMode(IdleMode.kBrake);
+            kRightMotorConfig
+                .idleMode(IdleMode.kBrake)
+                .inverted( true );
+        }
+    }
+    public final class BucketSubsystem {
+        public static final SparkMaxConfig kSnowblowerConfig = new SparkMaxConfig();
+        static {
+                kSnowblowerConfig
+                        .idleMode(IdleMode.kBrake);
         }
     }
 }
