@@ -72,4 +72,11 @@ public final class Configs {
                         .idleMode(IdleMode.kBrake);
         }
     }
+    public final class HorzontalExtenderSubsystem {
+        public static final SparkMaxConfig kSnowblowerConfig = new SparkMaxConfig();
+        static {
+                kSnowblowerConfig
+                        .idleMode(IdleMode.kBrake);
+        }
+    } 
 }

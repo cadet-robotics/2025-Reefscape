@@ -106,8 +106,14 @@ public final class Constants {
     public static final double speed = 0.10;
   }
   public static final class BucketSubsytem {
-    public static final int kSnowblower = 21;
+    public static final int kSnowblowerMotor = 21;
     public static final double SnowblowerSpeed = 0.10;
-
+  }
+  // TODO : find the correct port numbers for all items 
+  public static final class HorzontalExtenderSubsystem {
+    public static final int kSnowblowerMotor = 21;
+    public static final double kExtendSpeed = 0.10;
+    public static final int kFrontLimitSwitch = 40;
+    public static final int kBackLimitSwitch = 40;
   }
 }

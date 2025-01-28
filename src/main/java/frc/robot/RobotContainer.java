@@ -4,33 +4,35 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.PS4Controller.Button;
+
+import edu.wpi.first.math.MathUtil;
+import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
 // import java.io.BufferedWriter;
 import java.util.List;
 
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.BucketSubsytem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.HorzontalExtenderSubsystem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -39,13 +41,15 @@ import frc.robot.subsystems.BucketSubsytem;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final IntakeSubsystem m_intake = new IntakeSubsystem();
   private final BucketSubsytem m_bucket = new BucketSubsytem();
+  private final IntakeSubsystem m_intake = new IntakeSubsystem();
+  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final HorzontalExtenderSubsystem m_horizontalExtender = new HorzontalExtenderSubsystem();
 
   // The driver's controller
-  PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
+  private final PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -77,36 +81,18 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive
-        )
-    );
-    // HOW TO MAKE A BUTTON DO STUFF 
-    new JoystickButton(m_driverController, Button.kCircle.value )
-        .whileTrue( 
-            new RunCommand( () -> {
-                m_robotDrive.resetOdometry(m_robotDrive.getPose());
-                m_robotDrive.zeroHeading();
-                m_robotDrive.resetEncoders();
-            }
-        )
-    );
-    new JoystickButton(m_driverController, Button.kR2.value )
-        .whileTrue( m_intake.IntakeIn() );
-        
-    new JoystickButton(m_driverController, Button.kL2.value )
-        .whileTrue( m_intake.IntakeOut() );
+    
+    // Swerve Drive buttons
+    m_robotDrive.buttonBindings(m_driverController);
 
-    new JoystickButton(m_driverController, Button.kSquare.value )
-        .whileTrue( m_intake.StopIntake() );
+    // Intake buttons
+    m_intake.buttonBindings(m_driverController);
 
-    new JoystickButton(m_driverController, Button.kR1.value )
-        .whileTrue( m_bucket.Testing2() );
+    // Bucket System
+    m_bucket.buttonBindings(m_driverController);
 
-    new JoystickButton(m_driverController, Button.kL1.value )
-        .whileTrue( m_bucket.Testing1() );
+    // Horizontal Extender buttons
+    m_horizontalExtender.createButtons(m_driverController);
 }
 
   /**

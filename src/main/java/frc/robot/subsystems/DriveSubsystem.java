@@ -17,9 +17,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -79,6 +84,24 @@ public class DriveSubsystem extends SubsystemBase {
         }
     );
   }
+  public void buttonBindings( PS4Controller m_driverController ) {
+    // setX
+    // new JoystickButton(m_driverController, Button.kR1.value)
+    //     .whileTrue(new RunCommand(
+    //         () -> m_robotDrive.setX(),
+    //         m_robotDrive
+    //     )
+    // );
+    // Reset gyro
+    new JoystickButton(m_driverController, Button.kOptions.value )
+        .whileTrue( 
+            new RunCommand( () -> {
+                resetOdometry(getPose());
+                zeroHeading();
+                resetEncoders();
+            }
+        )
+    );
 
   /**
    * Returns the currently-estimated pose of the robot.

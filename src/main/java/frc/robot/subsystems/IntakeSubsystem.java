@@ -3,6 +3,10 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.lib.custom.CSubsystem;
@@ -32,6 +36,15 @@ public class IntakeSubsystem extends CSubsystem {
     public SparkMax Left() { return m_l_motor; }
     public SparkMax Right() { return m_r_motor; }
 
+    public void buttonBindings( PS4Controller m_driverController ) {
+        // Intake
+        new JoystickButton(m_driverController, Button.kR1.value )
+            .whileTrue( IntakeIn() );
+
+        // Outtake
+        new JoystickButton(m_driverController, Button.kL1.value )
+            .whileTrue( IntakeOut() );
+    }
     // Start the motor
     public CCommand IntakeIn() {
         return cCommand_("AccessoryMotorSubsystem.IntakeIn")
