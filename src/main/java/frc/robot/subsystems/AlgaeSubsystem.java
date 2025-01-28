@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-
 public class AlgaeSubsystem extends CSubsystem {
     
     // Make a new motor with a specified port and type
@@ -24,6 +23,7 @@ public class AlgaeSubsystem extends CSubsystem {
 
     // Make a new instance of the AccessoryMotorSubsystem and configure the motor
     public AlgaeSubsystem() {
+
        // Changing the brake type on the left motor
         m_leftAlgaeMotor.configure( 
             Configs.AccessoryMotorSubsystem.kLeftMotorConfig,
@@ -58,13 +58,11 @@ public class AlgaeSubsystem extends CSubsystem {
             .onExecute( ()->{
                 m_leftAlgaeMotor.set( -Constants.IntakeSubsystem.speed );
                 m_rightAlgaeMotor.set( -Constants.IntakeSubsystem.speed );
-            }
-        )
+            })
             .onEnd( () -> {
                 m_leftAlgaeMotor.stopMotor();
                 m_rightAlgaeMotor.stopMotor();
-            }
-        );
+            });
     }
     // Spins the motors outwards until the command stops running
     public CCommand IntakeOut() {
@@ -72,13 +70,11 @@ public class AlgaeSubsystem extends CSubsystem {
             .onExecute( ()->{
                 m_leftAlgaeMotor.set( Constants.IntakeSubsystem.speed );
                 m_rightAlgaeMotor.set( Constants.IntakeSubsystem.speed );
-            }
-        )
+            })
             .onEnd( () -> {
                 m_leftAlgaeMotor.stopMotor();
                 m_rightAlgaeMotor.stopMotor();
-            }
-        );
+            });
     }
 
     // Spins the motors inwards until the command stops running
@@ -87,7 +83,6 @@ public class AlgaeSubsystem extends CSubsystem {
             .onExecute( ()->{
                 m_leftAlgaeMotor.stopMotor();
                 m_rightAlgaeMotor.stopMotor();
-            }
-        );
+            });
     }
 }

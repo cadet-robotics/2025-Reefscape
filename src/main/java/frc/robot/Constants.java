@@ -34,6 +34,7 @@ public final class Constants {
     public static final double kWheelBase = Units.inchesToMeters(29.5);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
+
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
         new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
         new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
@@ -57,6 +58,7 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 16;
 
     public static final boolean kGyroReversed = true;
+    
   }
 
   public static final class ModuleConstants {
@@ -69,6 +71,7 @@ public final class Constants {
     public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
     public static final double kWheelDiameterMeters = 0.0762;
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
+
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
     // teeth on the bevel pinion
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
@@ -106,7 +109,7 @@ public final class Constants {
     
     public static final double speed = 0.10;
   }
-  public static final class BucketSubsytem {
+public static final class BucketSubsytem {
 
     // TODO: Find encoder ports for the snowblower encoder
     public static final int kSnowblowerMotor = 21;

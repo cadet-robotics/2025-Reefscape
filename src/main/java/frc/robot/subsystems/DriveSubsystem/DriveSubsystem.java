@@ -4,29 +4,38 @@
 
 package frc.robot.subsystems;
 
+// Gyro
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
+// 
+import frc.robot.custom.CCommand;
+import frc.robot.custom.CSubsystem;
+import frc.robot.Constants.DriveConstants;
+
+// Swerve Drive
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+
+// 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.DriveConstants;
+
+// Button Matpping
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-public class DriveSubsystem extends SubsystemBase {
+public class DriveSubsystem extends CSubsystem {
+
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
@@ -64,6 +73,27 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    // Setting up PathPlanner
+    AutoBuilder.configure(
+          this::getPose,
+          this::resetPose,
+          this::getRobotRelativeSpeeds,
+          ( speeds, feedforwards ) -> driveRobotRelative( speeds ),
+          new PPHolnomicDriveController(
+             new PIDConstants( 5.0, 0.0, 0.0 ),
+             new PIDConstatns( 5.0, 0.0, 0.0 )
+          ),
+          config,
+          () -> {
+             var allience = Driverstation.getAlliance();
+             if ( allience.isPresent() ) {
+                return allience.get() == Driverstation.Alliance.Red;
+             }
+             return false;
+          },
+          this
+      )
+             
     // Usage reporting for MAXSwerve template
     m_gyro.reset();
     m_gyro.setAngleAdjustment(180.0);
@@ -96,11 +126,7 @@ public class DriveSubsystem extends SubsystemBase {
     // Reset gyro
     new JoystickButton(m_driverController, Button.kOptions.value )
         .whileTrue( 
-            new RunCommand( () -> {
-                resetOdometry(getPose());
-                zeroHeading();
-                resetEncoders();
-            })
+              GyroReset();
         );
   }
 
@@ -164,11 +190,23 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Sets the wheels into an X formation to prevent movement.
    */
-  public void setX() {
-    m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-    m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-    m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+  public CCommand GyroReset() {
+     return cCommand_()
+        .onExecute( () -> {
+             resetOdometry(getPose());
+             zeroHeading();
+             resetEncoders();
+        });
+  }
+
+  public CCommand WheelX() {
+     return cCommand_( "DriveSubsystem.WheelX" )
+        .onExecute( () -> {
+          m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+          m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+          m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+          m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+        });
   }
 
   /**
