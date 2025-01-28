@@ -92,6 +92,7 @@ public class DriveSubsystem extends SubsystemBase {
     //         m_robotDrive
     //     )
     // );
+
     // Reset gyro
     new JoystickButton(m_driverController, Button.kOptions.value )
         .whileTrue( 
@@ -99,9 +100,11 @@ public class DriveSubsystem extends SubsystemBase {
                 resetOdometry(getPose());
                 zeroHeading();
                 resetEncoders();
-            }
-        )
-    );
+            })
+        );
+  }
+
+
 
   /**
    * Returns the currently-estimated pose of the robot.

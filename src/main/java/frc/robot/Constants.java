@@ -106,14 +106,38 @@ public final class Constants {
     public static final double speed = 0.10;
   }
   public static final class BucketSubsytem {
+
+    // TODO: Find encoder ports for the snowblower encoder
     public static final int kSnowblowerMotor = 21;
     public static final double SnowblowerSpeed = 0.10;
+
+    public static final int kSnowblowerEncoderA = 40;
+    public static final int kSnowblowerEncoderB = 40;
+
+    // TODO: Find the correct distance per pulse for the snowblower encoder and the positions 
+    public static final double kSnowblowerEncoderDistancePerPulse = 0.01;
+
+    public static final double kStartPosition = 0.0;
+    public static final double kDumpPosition = 0.0;
+    public static final double kLoadPosition = 0.0;
   }
   // TODO : find the correct port numbers for all items 
   public static final class HorzontalExtenderSubsystem {
-    public static final int kSnowblowerMotor = 21;
+    public static final int kSnowblowerMotor = 40;
     public static final double kExtendSpeed = 0.10;
     public static final int kFrontLimitSwitch = 40;
     public static final int kBackLimitSwitch = 40;
+  }
+  public static final class ElevatorSubsystem {
+    // TODO: Find ports and values for all
+    public static final int kElevatorMotor = 40;
+    public static final double kElevatorSpeed = 0.10;
+    public static final int kElevatorEncoderA = 40;
+    public static final int kElevatorEncoderB = 40;
+    public static final int kElevatorBrake = 40;
+    public static final double kElevatorEncoderDistancePerPulse = 0.00;
+
+    public static String[] LevelNames = { "AlgaeFloor", "ScoreAlgae", "Trough", "PreClimb", "Intake", "ReefLevel2", "ReefLevel3", "AlgaeTop", "ReefTop" };
+    public static double[] LevelHeights = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
   }
 }
