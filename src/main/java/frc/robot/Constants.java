@@ -99,9 +99,10 @@ public final class Constants {
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
   }
-  public static final class IntakeSubsystem {
-    public static final int kLeftAccessoryMotorPort = 19;
-    public static final int kRightAccessoryMotorPort = 18;
+  public static final class AlgaeSubsystem {
+
+    public static final int kLeftAlgaeMotor = 19;
+    public static final int kRightAlgaeMotor = 18;
     
     public static final double speed = 0.10;
   }

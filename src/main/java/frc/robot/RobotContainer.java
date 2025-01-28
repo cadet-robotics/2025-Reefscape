@@ -29,9 +29,9 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 // import java.io.BufferedWriter;
 import java.util.List;
 
+import frc.robot.subsystems.AlgaeSubsytem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.BucketSubsytem;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.HorzontalExtenderSubsystem;
 
 /*
@@ -44,7 +44,7 @@ public class RobotContainer {
 
   // The robot's subsystems
   private final BucketSubsytem m_bucket = new BucketSubsytem();
-  private final IntakeSubsystem m_intake = new IntakeSubsystem();
+  private final AlgaeSubsytem m_algaeSubsystem = new AlgaeSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final HorzontalExtenderSubsystem m_horizontalExtender = new HorzontalExtenderSubsystem();
 
@@ -86,7 +86,7 @@ public class RobotContainer {
     m_robotDrive.buttonBindings(m_driverController);
 
     // Intake buttons
-    m_intake.buttonBindings(m_driverController);
+    m_algaeSubsytem.buttonBindings(m_driverController);
 
     // Bucket System
     m_bucket.buttonBindings(m_driverController);

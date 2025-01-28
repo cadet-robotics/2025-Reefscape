@@ -1,14 +1,14 @@
 package frc.robot.subsystems;
 
-import frc.robot.lib.custom.CSubsystem;
 import frc.robot.lib.custom.CCommand;
+import frc.robot.lib.custom.CSubsystem;
 
 import frc.robot.Constants;
 import frc.robot.Configs;
 
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -30,16 +30,17 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
         );
     }
 
+    // Creates the button bindings for the subsystem
     public void createButtons( PS4Controller m_driverController) {
 
-        // Extend
+        // Extend ( Circle ) 
         new JoystickButton(m_driverController, Button.kCircle.value )
             .and( () -> !frontLimitSwitchPressing()  )
             .whileTrue(
                 Extend()
             );
 
-        // Retract
+        // Retract ( Cross )
         new JoystickButton(m_driverController, Button.kCross.value )
             .and( () -> !backLimitSwitchPressing() )
             .whileTrue(
@@ -47,10 +48,12 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
             );
     }
 
+    // Access the motor
     public SparkMax getHorizontalExtenderMotor() {
         return m_horizontalExtenderMotor;
     }
 
+    // Funcions to access the state of the limit state
     public Boolean frontLimitSwitchPressing() {
         return m_frontLimitSwitch.get();
     }
@@ -62,10 +65,11 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
     public CCommand Extend() {
         return cCommand_( "HorzontalExtenderSubsystem.Extend" )
             .onExecute( () -> {
+               if ( frontLimitSwitchPressing() ) {
+                  m_horizontalExtenderMotor.stopMotor();
+                  return;
+               }
                 m_horizontalExtenderMotor.set( Constants.HorzontalExtenderSubsystem.kExtendSpeed );
-                if ( frontLimitSwitchPressing() ) {
-                    m_horizontalExtenderMotor.stopMotor();
-                }
             })
             .onEnd( () -> {
                 m_horizontalExtenderMotor.stopMotor();
@@ -75,10 +79,11 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
     public CCommand Retract() {
         return cCommand_( "HorzontalExtenderSubsystem.Retract" )
             .onExecute( () -> {
+               if ( backLimitSwitchPressing() ) {
+                  m_horizontalExtenderMotor.stopMotor();
+                  return;
+               }
                 m_horizontalExtenderMotor.set( -Constants.HorzontalExtenderSubsystem.kExtendSpeed );
-                if ( backLimitSwitchPressing() ) {
-                    m_horizontalExtenderMotor.stopMotor();
-                }
             })
             .onEnd( () -> {
                 m_horizontalExtenderMotor.stopMotor();
