@@ -10,13 +10,15 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+// import edu.wpi.first.wpilibj.PS4Controller.Button;
+// import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class ElevatorSubsystem extends CSubsystem {
+
 
    // Motor Setup
     private static final SparkMax m_elevatorMotor = new SparkMax( 
@@ -38,14 +40,12 @@ public class ElevatorSubsystem extends CSubsystem {
 
     // Top Limit Switch Setup
     private static final DigitalInput m_topLimitSwitch = new DigitalInput( 
-          Constants.ElevatorSubsystem.kTopLimitSwitchA, 
-          Constants.ElevatorSubsystem.kTopLimitSwitchB 
+          Constants.ElevatorSubsystem.kTopLimitSwitch
     );
 
     // Bottom Limit Switch Setup
     private static final DigitalInput m_bottomLimitSwitch = new DigitalInput( 
-          Constants.ElevatorSubsystem.kBottomLimitSwitchA, 
-          Constants.ElevatorSubsystem.kBottomLimitSwitchB 
+          Constants.ElevatorSubsystem.kBottomLimitSwitch
     );
 
     // The number corresponding to the level of the elevator
@@ -78,10 +78,10 @@ public class ElevatorSubsystem extends CSubsystem {
     public Servo getElevatorBrake() {
         return m_elevatorBrake;
     }
-    public DigtalInput getTopLimitSwitch() {
+    public DigitalInput getTopLimitSwitch() {
        return m_topLimitSwitch;
     }
-    public DigtalInput getBottomLimitSwitch() {
+    public DigitalInput getBottomLimitSwitch() {
        return m_bottomLimitSwitch;
     }
     

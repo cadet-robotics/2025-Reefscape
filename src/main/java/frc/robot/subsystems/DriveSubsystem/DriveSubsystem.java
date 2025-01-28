@@ -2,37 +2,38 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.DriveSubsystem;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 // Gyro
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
-// 
-import frc.robot.custom.CCommand;
-import frc.robot.custom.CSubsystem;
-import frc.robot.Constants.DriveConstants;
-
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
 // Swerve Drive
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-
-// 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 // Button Matpping
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+// 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.DriveConstants;
+// 
+import frc.robot.lib.custom.CCommand;
+import frc.robot.lib.custom.CSubsystem;
 
 public class DriveSubsystem extends CSubsystem {
 
@@ -74,25 +75,33 @@ public class DriveSubsystem extends CSubsystem {
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     // Setting up PathPlanner
+    RobotConfig config = null;
+    try{
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
     AutoBuilder.configure(
           this::getPose,
-          this::resetPose,
-          this::getRobotRelativeSpeeds,
+          this::resetOdometry,
+          this::getChassisSpeeds,
           ( speeds, feedforwards ) -> driveRobotRelative( speeds ),
-          new PPHolnomicDriveController(
+          new PPHolonomicDriveController(
              new PIDConstants( 5.0, 0.0, 0.0 ),
-             new PIDConstatns( 5.0, 0.0, 0.0 )
+             new PIDConstants( 5.0, 0.0, 0.0 )
           ),
           config,
           () -> {
-             var allience = Driverstation.getAlliance();
+            // Check to swap 180 degrees based on color
+             var allience = DriverStation.getAlliance();
              if ( allience.isPresent() ) {
-                return allience.get() == Driverstation.Alliance.Red;
+                return allience.get() == DriverStation.Alliance.Red;
              }
              return false;
           },
           this
-      )
+      );
              
     // Usage reporting for MAXSwerve template
     m_gyro.reset();
@@ -114,6 +123,26 @@ public class DriveSubsystem extends CSubsystem {
         }
     );
   }
+  public void driveRobotRelative(ChassisSpeeds speeds) {
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+      swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    m_frontRight.setDesiredState(swerveModuleStates[1]);
+    m_rearLeft.setDesiredState(swerveModuleStates[2]);
+    m_rearRight.setDesiredState(swerveModuleStates[3]);
+  }
+
+  public ChassisSpeeds getChassisSpeeds() {
+    SwerveModuleState[] states = new SwerveModuleState[] {
+      m_frontLeft.getState(),
+      m_frontRight.getState(),
+      m_rearLeft.getState(),
+      m_rearRight.getState()
+    };
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(states);
+  }
+
   public void buttonBindings( PS4Controller m_driverController ) {
     // setX
     // new JoystickButton(m_driverController, Button.kR1.value)
@@ -126,7 +155,7 @@ public class DriveSubsystem extends CSubsystem {
     // Reset gyro
     new JoystickButton(m_driverController, Button.kOptions.value )
         .whileTrue( 
-              GyroReset();
+              GyroReset()
         );
   }
 
@@ -191,7 +220,7 @@ public class DriveSubsystem extends CSubsystem {
    * Sets the wheels into an X formation to prevent movement.
    */
   public CCommand GyroReset() {
-     return cCommand_()
+     return cCommand_( "DriveSubsystem.GyroReset" )
         .onExecute( () -> {
              resetOdometry(getPose());
              zeroHeading();

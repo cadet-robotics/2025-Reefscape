@@ -4,36 +4,35 @@
 
 package frc.robot;
 
-// import java.io.BufferedWriter;
-import java.util.List;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.PS4Controller.Button;
 
-// Constants
+import edu.wpi.first.math.MathUtil;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-
-// Importing the subsystems
-import frc.robot.subsystems.AlgaeSubsytem;
-import frc.robot.subsystems.BucketSubsytem;
-import frc.robot.subsystems.HorzontalExtenderSubsystem;
-import frc.robot.subsystems.DriveSubSystem.DriveSubsystem;
-
-// controller and button bindings
-import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+
+// import java.io.BufferedWriter;
+import java.util.List;
+
+import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
+import frc.robot.subsystems.BucketSubsytem;
+import frc.robot.subsystems.AlgaeSubsystem;
+import frc.robot.subsystems.HorzontalExtenderSubsystem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -45,7 +44,7 @@ public class RobotContainer {
 
   // The robot's subsystems
   private final BucketSubsytem m_bucket = new BucketSubsytem();
-  private final AlgaeSubsytem m_algaeSubsystem = new AlgaeSubsystem();
+  private final AlgaeSubsystem m_intake = new AlgaeSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final HorzontalExtenderSubsystem m_horizontalExtender = new HorzontalExtenderSubsystem();
 
@@ -69,9 +68,7 @@ public class RobotContainer {
                 MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                 MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true),
-            m_robotDrive
-        )
-     );
+            m_robotDrive));
   }
 
   /**
@@ -79,7 +76,7 @@ public class RobotContainer {
    * created by
    * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its
    * subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link PS4Controller}), and then calling
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling
    * passing it to a
    * {@link JoystickButton}.
    */
@@ -89,7 +86,7 @@ public class RobotContainer {
     m_robotDrive.buttonBindings(m_driverController);
 
     // Intake buttons
-    m_algaeSubsytem.buttonBindings(m_driverController);
+    m_intake.buttonBindings(m_driverController);
 
     // Bucket System
     m_bucket.buttonBindings(m_driverController);
@@ -119,8 +116,7 @@ public class RobotContainer {
         List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
         // End 3 meters straight ahead of where we started, facing forward
         new Pose2d(3, 0, new Rotation2d(0)),
-        config
-    );
+        config);
 
     var thetaController = new ProfiledPIDController(
         AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);

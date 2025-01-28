@@ -140,6 +140,8 @@ public static final class BucketSubsytem {
     public static final int kElevatorEncoderB = 40;
     public static final int kElevatorBrake = 40;
     public static final double kElevatorEncoderDistancePerPulse = 0.00;
+    public static final int kTopLimitSwitch = 40;
+    public static final int kBottomLimitSwitch = 40;
 
     public static String[] LevelNames = { "AlgaeFloor", "ScoreAlgae", "Trough", "PreClimb", "Intake", "ReefLevel2", "ReefLevel3", "AlgaeTop", "ReefTop" };
     public static double[] LevelHeights = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };

@@ -1,5 +1,3 @@
-// TODO: Setup encoders for the snowblower motor
-
 package frc.robot.subsystems;
 
 import frc.robot.lib.custom.CCommand;
