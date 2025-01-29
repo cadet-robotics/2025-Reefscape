@@ -94,20 +94,17 @@ public class ElevatorSubsystem extends CSubsystem {
     public void buttonBindings( PS4Controller m_driverController ) {}
 
     // This function should bring the elevator to the currently seleted level and is called after a level change
-    public CCommand ToLevel() {
-        return cCommand_( "ElevatorSubsystem.ToLevel" )
-            .onExecute( () -> {
-                if ( m_elevatorEncoder.getDistance() > Constants.ElevatorSubsystem.LevelHeights[level] ) {
-                    m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevatorSpeed );
-                } else if ( m_elevatorEncoder.getDistance() < Constants.ElevatorSubsystem.LevelHeights[level] ) {
-                    m_elevatorMotor.set( Constants.ElevatorSubsystem.kElevatorSpeed );
-                } else {
-                    m_elevatorMotor.stopMotor();
-                    return;
-                }
-            });
+    @Override
+    public void periodic() {
+        if ( m_elevatorEncoder.getDistance() > Constants.ElevatorSubsystem.LevelHeights[level] ) {
+            m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevatorSpeed );
+        } else if ( m_elevatorEncoder.getDistance() < Constants.ElevatorSubsystem.LevelHeights[level] ) {
+            m_elevatorMotor.set( Constants.ElevatorSubsystem.kElevatorSpeed );
+        } else {
+            m_elevatorMotor.stopMotor();
+        }
     }
-
+     
     // Increase the elevator level by one if it's not already at the max level ( 8 )
     public CCommand ElevatorLevelUp() {
         return cCommand_( "ElevatorSubsystem.ElevatorLevelUp" )
@@ -115,9 +112,6 @@ public class ElevatorSubsystem extends CSubsystem {
                 if ( level < 8 ) {
                     level = level + 1;
                 }
-            })
-            .onEnd( () -> {
-               ToLevel();
             });
     }
     // Decrease the elevator level by one if it's not already at the bottom level
@@ -127,9 +121,6 @@ public class ElevatorSubsystem extends CSubsystem {
                 if ( level > 0 ) {
                     level = level - 1;
                 }
-            })
-            .onEnd( () -> {
-                ToLevel();
             });
     }
 
