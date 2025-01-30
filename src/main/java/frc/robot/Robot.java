@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj.SampleRobot;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -14,12 +15,10 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends  {
   private Command m_autonomousCommand;
 
-  // private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-
-  private RobotContainer m_robotContainer;
+  private final RobotContainer m_robotContainer;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -45,8 +44,6 @@ public class Robot extends TimedRobot {
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
-    //DriveSubsystem drive = new DriveSubsystem();
-    // SmartDashboard.putNumber( "Gyro", m_robotDrive.getHeading());
     CommandScheduler.getInstance().run();
   }
 
@@ -55,11 +52,11 @@ public class Robot extends TimedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public int disabledPeriodic() {}
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {
+  public double autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     /*
