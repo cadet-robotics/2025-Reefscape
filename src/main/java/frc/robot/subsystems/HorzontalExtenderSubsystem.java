@@ -24,14 +24,14 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
 
     public HorzontalExtenderSubsystem() {
         m_horizontalExtenderMotor.configure( 
-            Configs.HorzontalExtenderSubsystem.kSnowblowerConfig,
+            Configs.HorizontalExtenderSubsystem.kSnowblowerConfig,
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters
         );
     }
 
     // Creates the button bindings for the subsystem
-    public void createButtons( PS4Controller m_driverController) {
+    public void buttonBindings( PS4Controller m_driverController) {
 
         // Extend ( Circle ) 
         new JoystickButton(m_driverController, Button.kCircle.value )

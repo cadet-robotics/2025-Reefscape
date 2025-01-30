@@ -1,21 +1,24 @@
 package frc.robot.subsystems;
 
-import frc.robot.lib.custom.*;
-import frc.robot.Constants;
 import frc.robot.Configs;
+import frc.robot.Constants;
+import frc.robot.lib.custom.*;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import edu.wpi.first.wpilibj.PS4Controller;
-// import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 // import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ElevatorSubsystem extends CSubsystem {
 
@@ -27,10 +30,8 @@ public class ElevatorSubsystem extends CSubsystem {
     );
 
     // Encoder Setup
-    private static final Encoder m_elevatorEncoder = new Encoder( 
-        Constants.ElevatorSubsystem.kElevatorEncoderA, 
-        Constants.ElevatorSubsystem.kElevatorEncoderB 
-    );
+    private static AbsoluteEncoder m_elevatorEncoder;
+        
 
     // Servo Setup
     // This servo is the brake for the elevator
@@ -60,19 +61,30 @@ public class ElevatorSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters 
         );
-        // Ecoder condig
-        resetEncoder();
-        // This value still needs to be found
-        m_elevatorEncoder.setDistancePerPulse( 
-            Constants.ElevatorSubsystem.kElevatorEncoderDistancePerPulse 
-        );
+        m_elevatorEncoder = m_elevatorMotor.getAbsoluteEncoder();
+    }
+
+    public void buttonBindings( PS4Controller m_driverController ) {
+
+        // Should be dpad up with a 10 degree margin for error on either side
+        new JoystickButton( m_driverController, Button.kTouchpad.value )
+            .and( () -> Button.kTouchpad.value < 10 || Button.kTouchpad.value > 350  )
+            .whileTrue( 
+                ElevatorLevelUp()
+            );
+        // Should be dpad down with a 10 degree margin for error on either side
+        new JoystickButton( m_driverController, Button.kTouchpad.value )
+            .and( () -> Math.abs( Button.kTouchpad.value - 180 ) < 10)
+            .whileTrue( 
+                ElevatorLevelDown()
+            );
     }
 
     // The following 5 functions are just in case the RobotContainer needs to access any of these; most likely for testing.
     public SparkMax getElevatorMotor() {
         return m_elevatorMotor;
     }
-    public Encoder getElevatorEncoder() {
+    public AbsoluteEncoder getElevatorEncoder() {
         return m_elevatorEncoder;
     }
     public Servo getElevatorBrake() {
@@ -85,20 +97,18 @@ public class ElevatorSubsystem extends CSubsystem {
        return m_bottomLimitSwitch;
     }
     
-    // Basic global reset button for the encoder. This should only be used in testing and at the time of startup
-    public void resetEncoder() {
-        m_elevatorEncoder.reset();
-    }
-
-    // TODO: Find how to do bindings via the PS4Controller up and down dpad buttons
-    public void buttonBindings( PS4Controller m_driverController ) {}
+    // // Basic global reset button for the encoder. This should only be used in testing and at the time of startup
+    // public void resetEncoder() {
+    //     m_elevatorEncoder.;
+    // }
 
     // This function should bring the elevator to the currently seleted level and is called after a level change
     @Override
     public void periodic() {
-        if ( m_elevatorEncoder.getDistance() > Constants.ElevatorSubsystem.LevelHeights[level] ) {
+        SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
+        if ( m_elevatorEncoder.getPosition() > Constants.ElevatorSubsystem.LevelHeights[level] ) {
             m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevatorSpeed );
-        } else if ( m_elevatorEncoder.getDistance() < Constants.ElevatorSubsystem.LevelHeights[level] ) {
+        } else if ( m_elevatorEncoder.getPosition() < Constants.ElevatorSubsystem.LevelHeights[level] ) {
             m_elevatorMotor.set( Constants.ElevatorSubsystem.kElevatorSpeed );
         } else {
             m_elevatorMotor.stopMotor();
