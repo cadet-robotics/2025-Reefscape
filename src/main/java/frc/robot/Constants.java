@@ -23,6 +23,7 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static final class DriveConstants {
+
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
     public static final double kMaxSpeedMetersPerSecond = 4.8;
@@ -30,8 +31,10 @@ public final class Constants {
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(29.5);
+
     // Distance between centers of right and left wheels on robot
     public static final double kWheelBase = Units.inchesToMeters(29.5);
+
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
 
@@ -102,13 +105,15 @@ public final class Constants {
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
   }
+
   public static final class AlgaeSubsystem {
 
     public static final int kLeftAlgaeMotor = 19;
-    public static final int kRightAlgaeMotor = 18;
+    public static final int kRightAlgaeMotor = 19;
     
     public static final double speed = 0.10;
   }
+
 public static final class BucketSubsytem {
 
     public static final int kSnowblowerMotor = 21;
@@ -118,15 +123,17 @@ public static final class BucketSubsytem {
     public static final double kDumpPosition = 0.0;
     public static final double kLoadPosition = 0.0;
   }
+
   public static final class HorzontalExtenderSubsystem {
     public static final int kSnowblowerMotor = 21;
     public static final double kExtendSpeed = 0.5;
     public static final int kFrontLimitSwitch = 1;
     public static final int kBackLimitSwitch = 0;
   }
+
   public static final class ElevatorSubsystem {
 
-    public static final int kElevatorMotor = 19;
+    public static final int kElevatorMotor = 18;
     public static final double kElevatorSpeed = 0.10;
     public static final int kElevatorBrake = 0;
     public static final int kTopLimitSwitch = 1;
