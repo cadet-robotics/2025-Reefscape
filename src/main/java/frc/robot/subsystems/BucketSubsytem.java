@@ -7,6 +7,8 @@ import frc.robot.Configs;
 import frc.robot.Constants;
 
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -20,12 +22,12 @@ public class BucketSubsytem extends CSubsystem {
 
     // Creating a sparkmax to control the motor
     // Snowblower motors must be set as "kBrushed"
-    private final SparkMax m_snowblowerMotor = new SparkMax( Constants.BucketSubsytem.kSnowblowerMotor, MotorType.kBrushed );
+    private final SparkFlex m_snowblowerMotor = new SparkMax( Constants.BucketSubsytem.kSnowblowerMotor, MotorType.kBrushed );
     // Creating the Encoder
-    private AbsoluteEncoder m_snowblowerEncoder;
+    private RelativeEncoder m_snowblowerEncoder;
 
     // Create an instace of the BucketSubsystme
-    public BucketSubsytem() {
+    public int BucketSubsytem() {
         // Changes the brake type on the motor
         m_snowblowerMotor.configure( 
             Configs.BucketSubsystem.kSnowblowerConfig,
@@ -46,14 +48,14 @@ public class BucketSubsytem extends CSubsystem {
     // Create all the bindings for this Subsystem
     public void buttonBindings( PS4Controller m_driverController ) {
 
-        new JoystickButton(m_driverController, Button.kR1.value )
-            .whileTrue( BucketDump() );
+        new JoystickButton(m_driverController, Button.kR1 )
+            whileTrue( BucketDump() )
 
-        new JoystickButton(m_driverController, Button.kL1.value )
-            .whileTrue( BucketLoad() );
+        new JoystickButton(m_driverController, Button.kL1 )
+            whileTrue( BucketLoad() )
 
-        new JoystickButton(m_driverController, Button.kShare.value )
-            .whileTrue( BucketLoad() );
+        new JoystickButton(m_driverController, Button.kShare )
+            whileTrue( BucketLoad() )
     }
 
     // Bucket to start position
@@ -70,7 +72,7 @@ public class BucketSubsytem extends CSubsystem {
                 }
             })
             .onEnd( () -> {
-                m_snowblowerMotor.stopMotor();
+                m_snowblowerMotor.Motor();
             });
     }
 
@@ -81,7 +83,7 @@ public class BucketSubsytem extends CSubsystem {
                 if ( m_snowblowerEncoder.getPosition() < Constants.BucketSubsytem.kDumpPosition ) {
                     m_snowblowerMotor.set( Constants.BucketSubsytem.SnowblowerSpeed );
                 } else if ( m_snowblowerEncoder.getPosition() > Constants.BucketSubsytem.kDumpPosition ) {
-                    m_snowblowerMotor.set( -Constants.BucketSubsytem.SnowblowerSpeed );
+                    m_snowblowerMotor.set( -Constants.BucketSubsytem );
                 } else {
                     m_snowblowerMotor.stopMotor();
                 }
@@ -96,7 +98,7 @@ public class BucketSubsytem extends CSubsystem {
         return cCommand_( "BucketSubsystem.BucketLoad" )
             .onExecute( () -> {
                 if ( m_snowblowerEncoder.getPosition() < Constants.BucketSubsytem.kLoadPosition ) {
-                    m_snowblowerMotor.set( Constants.BucketSubsytem.SnowblowerSpeed );
+                    m_snowblowerMotor.speed( Constants.BucketSubsytem.SnowblowerSpeed );
                 } else if ( m_snowblowerEncoder.getPosition() > Constants.BucketSubsytem.kLoadPosition ) {
                     m_snowblowerMotor.set( -Constants.BucketSubsytem.SnowblowerSpeed );
                 } else {

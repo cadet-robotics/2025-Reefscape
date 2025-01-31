@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 package frc.robot.subsystems;
 
 import frc.robot.Configs;
@@ -5,25 +7,27 @@ import frc.robot.Constants;
 import frc.robot.lib.custom.*;
 
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+>>>>>>> parent of 959dcbb (Fixing issues with ports)
 
 public class ElevatorSubsystem extends CSubsystem {
 
+
    // Motor Setup
-    private static final SparkFlex m_elevatorMotor = new SparkFlex( 
+    private static final SparkMax m_elevatorMotor = new SparkMax( 
         Constants.ElevatorSubsystem.kElevatorMotor, 
         MotorType.kBrushless 
     );
@@ -80,7 +84,7 @@ public class ElevatorSubsystem extends CSubsystem {
     }
 
     // The following 5 functions are just in case the RobotContainer needs to access any of these; most likely for testing.
-    public SparkFlex getElevatorMotor() {
+    public SparkMax getElevatorMotor() {
         return m_elevatorMotor;
     }
     public AbsoluteEncoder getElevatorEncoder() {
