@@ -1,11 +1,9 @@
 package frc.robot.subsystems;
 
 import frc.robot.Configs;
-import frc.robot.Constants;
 import frc.robot.lib.custom.*;
 
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -24,7 +22,7 @@ public class ElevatorSubsystem extends CSubsystem {
 
    // Motor Setup
     private static final SparkMax m_elevatorMotor = new SparkMax( 
-        Constants.ElevatorSubsystem.kElevatorMotor, 
+        frc.robot.subsystems.Constants.ElevatorSubsystem.kElevatorMotor, 
         MotorType.kBrushless 
     );
 
@@ -35,17 +33,17 @@ public class ElevatorSubsystem extends CSubsystem {
     // Servo Setup
     // This servo is the brake for the elevator
     private static final Servo m_elevatorBrake = new Servo( 
-        Constants.ElevatorSubsystem.kElevatorBrake 
+        frc.robot.subsystems.Constants.ElevatorSubsystem.kElevatorBrake 
     );
 
     // Top Limit Switch Setup
     private static final DigitalInput m_topLimitSwitch = new DigitalInput( 
-          Constants.ElevatorSubsystem.kTopLimitSwitch
+          frc.robot.subsystems.Constants.ElevatorSubsystem.kTopLimitSwitch
     );
 
     // Bottom Limit Switch Setup
     private static final DigitalInput m_bottomLimitSwitch = new DigitalInput( 
-          Constants.ElevatorSubsystem.kBottomLimitSwitch
+          frc.robot.subsystems.Constants.ElevatorSubsystem.kBottomLimitSwitch
     );
 
     // The number corresponding to the level of the elevator
@@ -104,11 +102,11 @@ public class ElevatorSubsystem extends CSubsystem {
     // This function should bring the elevator to the currently seleted level and is called after a level change
     @Override
     public void periodic() {
-        SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
-        if ( m_elevatorEncoder.getPosition() > Constants.ElevatorSubsystem.LevelHeights[level] ) {
-            m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevatorSpeed );
-        } else if ( m_elevatorEncoder.getPosition() < Constants.ElevatorSubsystem.LevelHeights[level] ) {
-            m_elevatorMotor.set( Constants.ElevatorSubsystem.kElevatorSpeed );
+        SmartDashboard.putString( "ElevatorLevel", frc.robot.subsystems.Constants.ElevatorSubsystem.LevelNames[level] );
+        if ( m_elevatorEncoder.getPosition() > frc.robot.subsystems.Constants.ElevatorSubsystem.LevelHeights[level] ) {
+            m_elevatorMotor.set( -frc.robot.subsystems.Constants.ElevatorSubsystem.kElevatorSpeed );
+        } else if ( m_elevatorEncoder.getPosition() < frc.robot.subsystems.Constants.ElevatorSubsystem.LevelHeights[level] ) {
+            m_elevatorMotor.set( frc.robot.subsystems.Constants.ElevatorSubsystem.kElevatorSpeed );
         } else {
             m_elevatorMotor.stopMotor();
         }

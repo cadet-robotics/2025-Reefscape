@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
-
-import frc.robot.Constants;
 import frc.robot.Configs;
 
 import com.revrobotics.spark.SparkMax;
@@ -69,7 +67,7 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
                   m_horizontalExtenderMotor.stopMotor();
                   return;
                }
-                m_horizontalExtenderMotor.set( Constants.HorzontalExtenderSubsystem.kExtendSpeed );
+                m_horizontalExtenderMotor.set( frc.robot.subsystems.Constants.HorzontalExtenderSubsystem.kExtendSpeed );
             })
             .onEnd( () -> {
                 m_horizontalExtenderMotor.stopMotor();
@@ -83,7 +81,7 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
                   m_horizontalExtenderMotor.stopMotor();
                   return;
                }
-                m_horizontalExtenderMotor.set( -Constants.HorzontalExtenderSubsystem.kExtendSpeed );
+                m_horizontalExtenderMotor.set( -frc.robot.subsystems.Constants.HorzontalExtenderSubsystem.kExtendSpeed );
             })
             .onEnd( () -> {
                 m_horizontalExtenderMotor.stopMotor();

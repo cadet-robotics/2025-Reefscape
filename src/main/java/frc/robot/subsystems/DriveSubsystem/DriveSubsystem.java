@@ -30,10 +30,10 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 // 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.Constants.DriveConstants;
 // 
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
+import frc.robot.subsystems.Constants.DriveConstants;
 
 public class DriveSubsystem extends CSubsystem {
 

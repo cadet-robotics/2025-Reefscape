@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -104,10 +104,10 @@ public final class Constants {
   }
 //<<<<<<< HEAD
 //=======
-  private static final class AlgaeSubsystem {
+  public static final class AlgaeSubsystem {
 /* >>>>>>>parent of 959dcbb (Fixing issues with ports)*/
 
-    public static final int kLeftAlgaeMotor = 19;
+    public static final int kLeftAlgaeMotor = 18;
     public static final int kRightAlgaeMotor = 18;
     
     public static final double speed = 0.10;
@@ -116,9 +116,8 @@ public final class Constants {
   
 
 //=======
-  }
 //>>>>>>> parent of 959dcbb (Fixing issues with ports)
-public static final class BucketSubsytem {
+  public static final class BucketSubsytem {
 
     public static final int kSnowblowerMotor = 21;
     public static final double SnowblowerSpeed = 0.10;
@@ -135,7 +134,7 @@ public static final class BucketSubsytem {
   }
   public static final class ElevatorSubsystem {
 
-    public static final int kElevatorMotor = 19;
+    public static final int kElevatorMotor = 18;
     public static final double kElevatorSpeed = 0.10;
     public static final int kElevatorBrake = 0;
     public static final int kTopLimitSwitch = 1;
