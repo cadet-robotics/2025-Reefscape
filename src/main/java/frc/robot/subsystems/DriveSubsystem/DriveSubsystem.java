@@ -82,26 +82,26 @@ public class DriveSubsystem extends CSubsystem {
       e.printStackTrace();
     }
 
-    // AutoBuilder.configure(
-    //       this::getPose,
-    //       this::resetOdometry,
-    //       this::getChassisSpeeds,
-    //       ( speeds, feedforwards ) -> driveRobotRelative( speeds ),
-    //       new PPHolonomicDriveController(
-    //          new PIDConstants( 5.0, 0.0, 0.0 ),
-    //          new PIDConstants( 5.0, 0.0, 0.0 )
-    //       ),
-    //       config,
-    //       () -> {
-    //         // Check to swap 180 degrees based on color
-    //          var allience = DriverStation.getAlliance();
-    //          if ( allience.isPresent() ) {
-    //             return allience.get() == DriverStation.Alliance.Red;
-    //          }
-    //          return false;
-    //       },
-    //       this
-    //   );
+    AutoBuilder.configure(
+          this::getPose,
+          this::resetOdometry,
+          this::getChassisSpeeds,
+          ( speeds, feedforwards ) -> driveRobotRelative( speeds ),
+          new PPHolonomicDriveController(
+             new PIDConstants( 5.0, 0.0, 0.0 ),
+             new PIDConstants( 5.0, 0.0, 0.0 )
+          ),
+          config,
+          () -> {
+            // Check to swap 180 degrees based on color
+             var allience = DriverStation.getAlliance();
+             if ( allience.isPresent() ) {
+                return allience.get() == DriverStation.Alliance.Red;
+             }
+             return false;
+          },
+          this
+      );
              
     // Usage reporting for MAXSwerve template
     m_gyro.reset();
