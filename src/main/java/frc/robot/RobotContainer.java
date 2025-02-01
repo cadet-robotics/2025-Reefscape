@@ -31,9 +31,9 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import java.util.List;
 
 import frc.robot.subsystems.BucketSubsytem;
-import frc.robot.subsystems.AlgaeSubsystem;
+// import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.HorzontalExtenderSubsystem;
+// import frc.robot.subsystems.HorzontalExtenderSubsystem;
 import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 
 /*
@@ -46,10 +46,10 @@ public class RobotContainer {
 
   // The robot's subsystems
   private final BucketSubsytem m_bucket = new BucketSubsytem();
-  private final AlgaeSubsystem m_intake = new AlgaeSubsystem();
+  // private final AlgaeSubsystem m_intake = new AlgaeSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
-  private final HorzontalExtenderSubsystem m_horizontalExtender = new HorzontalExtenderSubsystem();
+  // private final HorzontalExtenderSubsystem m_horizontalExtender = new HorzontalExtenderSubsystem();
 
   // The driver's controller
   private final PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
@@ -149,7 +149,7 @@ public class RobotContainer {
     m_bucket.buttonBindings(m_driverController);
 
     // Intake buttons
-    m_intake.buttonBindings(m_driverController);
+    // m_intake.buttonBindings(m_driverController);
 
     // Swerve Drive buttons
     m_robotDrive.buttonBindings(m_driverController);
@@ -158,7 +158,7 @@ public class RobotContainer {
     m_elevatorSubsystem.buttonBindings(m_driverController);
 
     // Horizontal Extender buttons
-    m_horizontalExtender.buttonBindings(m_driverController);
+    // m_horizontalExtender.buttonBindings(m_driverController);
 
 }
 
