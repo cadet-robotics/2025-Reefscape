@@ -44,11 +44,11 @@ public class AlgaeSubsystem extends CSubsystem {
 
     public void buttonBindings( PS4Controller m_driverController ) {
         // Intake
-        new JoystickButton(m_driverController, Button.kR1.value )
+        new JoystickButton(m_driverController, Button.kR2.value )
             .whileTrue( IntakeIn() );
 
         // Outtake
-        new JoystickButton(m_driverController, Button.kL1.value )
+        new JoystickButton(m_driverController, Button.kL2.value )
             .whileTrue( IntakeOut() );
     }
 
