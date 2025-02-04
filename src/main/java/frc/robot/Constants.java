@@ -109,7 +109,7 @@ public final class Constants {
   public static final class AlgaeSubsystem {
 
     public static final int kLeftAlgaeMotor = 19;
-    public static final int kRightAlgaeMotor = 19;
+    public static final int kRightAlgaeMotor = 18;
     
     public static final double speed = 0.10;
   }
