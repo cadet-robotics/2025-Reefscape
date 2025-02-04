@@ -24,7 +24,7 @@ public class BucketSubsytem extends CSubsystem {
     // Creating the Encoder
     private AbsoluteEncoder m_snowblowerEncoder;
 
-    // Create an instace of the BucketSubsystme
+    // Create an instace of the BucketSubsystem
     public BucketSubsytem() {
         // Changes the brake type on the motor
         m_snowblowerMotor.configure( 
@@ -43,6 +43,8 @@ public class BucketSubsytem extends CSubsystem {
         return m_snowblowerEncoder;
     }
     
+    //TODO: Fix Bucket Subsystem: "ERROR  4  [CAN SPARK] IDs: 21, WPILib or External HAL Error: CAN: Message not found Periodic Status 5"
+
     // Create all the bindings for this Subsystem
     public void buttonBindings( PS4Controller m_driverController ) {
 
@@ -53,14 +55,14 @@ public class BucketSubsytem extends CSubsystem {
             .whileTrue( BucketLoad() );
 
         new JoystickButton(m_driverController, Button.kShare.value )
-            .whileTrue( BucketLoad() );
+            .whileTrue( BucketStart() );
     }
 
     // Bucket to start position
     public CCommand BucketStart() {
-        return cCommand_( "BucketSubsystem.BucketStart" )
+        return cCommand_( "BucketSubsytem.BucketStart" )
             .onExecute( () -> {
-                // Checks wither the motor has to spin forward, backword, or not at all to get to the start position
+                // Checks whether the motor has to spin forward, backward, or not at all to get to the start position
                 if ( m_snowblowerEncoder.getPosition() < Constants.BucketSubsytem.kStartPosition ) {
                     m_snowblowerMotor.set( Constants.BucketSubsytem.SnowblowerSpeed );
                 } else if ( m_snowblowerEncoder.getPosition() > Constants.BucketSubsytem.kStartPosition ) {
@@ -76,7 +78,7 @@ public class BucketSubsytem extends CSubsystem {
 
     // Bucket to dump position
     public CCommand BucketDump() {
-        return cCommand_( "BucketSubsystem.BucketStart" )
+        return cCommand_( "BucketSubsytem.BucketStart" )
             .onExecute( () -> {
                 if ( m_snowblowerEncoder.getPosition() < Constants.BucketSubsytem.kDumpPosition ) {
                     m_snowblowerMotor.set( Constants.BucketSubsytem.SnowblowerSpeed );
@@ -93,7 +95,7 @@ public class BucketSubsytem extends CSubsystem {
 
     // Bucket to load position
     public CCommand BucketLoad () {
-        return cCommand_( "BucketSubsystem.BucketLoad" )
+        return cCommand_( "BucketSubsytem.BucketLoad" )
             .onExecute( () -> {
                 if ( m_snowblowerEncoder.getPosition() < Constants.BucketSubsytem.kLoadPosition ) {
                     m_snowblowerMotor.set( Constants.BucketSubsytem.SnowblowerSpeed );
