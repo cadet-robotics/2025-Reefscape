@@ -117,7 +117,7 @@ public class ElevatorSubsystem extends CSubsystem {
     // Increase the elevator level by one if it's not already at the max level ( 8 )
     public CCommand ElevatorLevelUp() {
         return cCommand_( "ElevatorSubsystem.ElevatorLevelUp" )
-            .onExecute( () -> {
+            .onInitialize( () -> {
                 if ( level < 8 ) {
                     level = level + 1;
                 }
@@ -126,7 +126,7 @@ public class ElevatorSubsystem extends CSubsystem {
     // Decrease the elevator level by one if it's not already at the bottom level
     public CCommand ElevatorLevelDown() {
         return cCommand_( "ElevatorSubsystem.ElevatorLevelDown" )
-            .onExecute( () -> {
+            .onInitialize( () -> {
                 if ( level > 0 ) {
                     level = level - 1;
                 }
