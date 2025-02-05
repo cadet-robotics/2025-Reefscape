@@ -26,13 +26,13 @@ public class AlgaeSubsystem extends CSubsystem {
 
        // Changing the brake type on the left motor
         m_leftAlgaeMotor.configure( 
-            Configs.AccessoryMotorSubsystem.kLeftMotorConfig,
+            Configs.AlgaeSubsystemConfig.kLeftMotorConfig,
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters 
         );
         // Changing the brake type and inverted on the right motor
         m_rightAlgaeMotor.configure( 
-            Configs.AccessoryMotorSubsystem.kRightMotorConfig,
+            Configs.AlgaeSubsystemConfig.kRightMotorConfig,
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters  
         );
