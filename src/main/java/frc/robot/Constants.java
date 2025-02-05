@@ -118,5 +118,4 @@ public final class Constants {
     public static double[] LevelHeights = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
   }
-  }
 }
