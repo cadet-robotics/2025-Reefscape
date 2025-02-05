@@ -66,14 +66,16 @@ public class ElevatorSubsystem extends CSubsystem {
     public void buttonBindings( PS4Controller m_driverController ) {
 
         // Should be dpad up with a 10 degree margin for error on either side
-        new JoystickButton( m_driverController, Button.kTouchpad.value )
-            .and( () -> Button.kTouchpad.value < 10 || Button.kTouchpad.value > 350  )
+        // new JoystickButton( m_driverController, Button.kTouchpad.value )
+        //     .and( () -> Button.kTouchpad.value < 10 || Button.kTouchpad.value > 350  )
+        new JoystickButton(m_driverController, Button.kTriangle.value)
             .whileTrue( 
                 ElevatorLevelUp()
             );
         // Should be dpad down with a 10 degree margin for error on either side
-        new JoystickButton( m_driverController, Button.kTouchpad.value )
-            .and( () -> Math.abs( Button.kTouchpad.value - 180 ) < 10)
+        // new JoystickButton( m_driverController, Button.kTouchpad.value )
+        //     .and( () -> Math.abs( Button.kTouchpad.value - 180 ) < 10)
+        new JoystickButton(m_driverController, Button.kSquare.value)
             .whileTrue( 
                 ElevatorLevelDown()
             );
