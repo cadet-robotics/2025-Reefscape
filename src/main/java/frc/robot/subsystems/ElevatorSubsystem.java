@@ -14,7 +14,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
+
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class ElevatorSubsystem extends CSubsystem {
 
    // Motor Setup
-    private static final SparkMax m_temp = new SparkMax(21 , MotorType.kBrushless);
     private static final SparkFlex m_elevatorMotor = new SparkFlex( 
         Constants.ElevatorSubsystem.kElevatorMotor, 
         MotorType.kBrushless 
@@ -61,21 +60,20 @@ public class ElevatorSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters 
         );
-        // m_elevatorEncoder = m_elevatorMotor.getAbsoluteEncoder();
-        m_elevatorEncoder = m_temp.getAbsoluteEncoder();
+        m_elevatorEncoder = m_elevatorMotor.getAbsoluteEncoder();
     }
 
     public void buttonBindings( PS4Controller m_driverController ) {
 
         // Should be dpad up with a 10 degree margin for error on either side
-        new JoystickButton( m_driverController, m_driverController.getPOV() )
-        .and( () -> Math.abs( m_driverController.getPOV() - 0 ) < 10)
-       .whileTrue( 
-           ElevatorLevelUp()
-       );
+        new JoystickButton( m_driverController, Button.kTouchpad.value )
+            .and( () -> Button.kTouchpad.value < 10 || Button.kTouchpad.value > 350  )
+            .whileTrue( 
+                ElevatorLevelUp()
+            );
         // Should be dpad down with a 10 degree margin for error on either side
-         new JoystickButton( m_driverController, m_driverController.getPOV() )
-             .and( () -> Math.abs( m_driverController.getPOV() - 180 ) < 10)
+        new JoystickButton( m_driverController, Button.kTouchpad.value )
+            .and( () -> Math.abs( Button.kTouchpad.value - 180 ) < 10)
             .whileTrue( 
                 ElevatorLevelDown()
             );
