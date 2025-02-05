@@ -53,4 +53,16 @@ public final class Configs {
                     .positionWrappingInputRange(0, turningFactor);
         }
     }
+    public final class AlgaeSubsystemConfig {
+        public static final SparkMaxConfig kRightMotorConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig kLeftMotorConfig = new SparkMaxConfig();
+
+        static {
+            kLeftMotorConfig
+                .idleMode(IdleMode.kBrake);
+            kRightMotorConfig
+                .idleMode(IdleMode.kBrake)
+                .inverted( true );
+        }
+    }
 }
