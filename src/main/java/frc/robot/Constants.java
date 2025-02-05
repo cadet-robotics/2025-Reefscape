@@ -107,4 +107,16 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
+  public static final class ElevatorSubsystem {
+
+    public static final int kElevatorMotor = 18;
+    public static final double kElevatorSpeed = 0.10;
+    public static final int kElevatorBrake = 0;
+    public static final int kTopLimitSwitch = 1;
+    public static final int kBottomLimitSwitch = 0;
+
+    public static String[] LevelNames = { "AlgaeFloor", "ScoreAlgae", "Trough", "PreClimb", "Intake", "ReefLevel2", "ReefLevel3", "AlgaeTop", "ReefTop" };
+    public static double[] LevelHeights = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+
+  }
 }
