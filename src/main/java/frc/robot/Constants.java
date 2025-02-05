@@ -114,33 +114,4 @@ public final class Constants {
     public static final double speed = 0.10;
   }
 
-public static final class BucketSubsytem {
-
-    public static final int kSnowblowerMotor = 21;
-    public static final double SnowblowerSpeed = 0.10;
-
-    public static final double kStartPosition = 0.0;
-    public static final double kDumpPosition = 0.0;
-    public static final double kLoadPosition = 0.0;
-  }
-
-  public static final class HorzontalExtenderSubsystem {
-    public static final int kSnowblowerMotor = 21;
-    public static final double kExtendSpeed = 0.5;
-    public static final int kFrontLimitSwitch = 1;
-    public static final int kBackLimitSwitch = 0;
-  }
-
-  public static final class ElevatorSubsystem {
-
-    public static final int kElevatorMotor = 18;
-    public static final double kElevatorSpeed = 0.10;
-    public static final int kElevatorBrake = 0;
-    public static final int kTopLimitSwitch = 1;
-    public static final int kBottomLimitSwitch = 0;
-
-    public static String[] LevelNames = { "AlgaeFloor", "ScoreAlgae", "Trough", "PreClimb", "Intake", "ReefLevel2", "ReefLevel3", "AlgaeTop", "ReefTop" };
-    public static double[] LevelHeights = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-
-  }
 }

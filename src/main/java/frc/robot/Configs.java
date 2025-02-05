@@ -53,7 +53,7 @@ public final class Configs {
                     .positionWrappingInputRange(0, turningFactor);
         }
     }
-    public final class AccessoryMotorSubsystem {
+    public final class AlgaeSubsystemConfig {
         public static final SparkMaxConfig kRightMotorConfig = new SparkMaxConfig();
         public static final SparkMaxConfig kLeftMotorConfig = new SparkMaxConfig();
 
@@ -63,27 +63,6 @@ public final class Configs {
             kRightMotorConfig
                 .idleMode(IdleMode.kBrake)
                 .inverted( true );
-        }
-    }
-    public final class BucketSubsystem {
-        public static final SparkMaxConfig kSnowblowerConfig = new SparkMaxConfig();
-        static {
-                kSnowblowerConfig
-                        .idleMode(IdleMode.kBrake);
-        }
-    }
-    public final class HorizontalExtenderSubsystem {
-        public static final SparkMaxConfig kSnowblowerConfig = new SparkMaxConfig();
-        static {
-                kSnowblowerConfig
-                        .idleMode(IdleMode.kBrake);
-        }
-    } 
-    public final class ElevatorSubsystem {
-        public static final SparkMaxConfig kElevatorMotorConfig = new SparkMaxConfig();
-        static {
-                kElevatorMotorConfig
-                        .idleMode(IdleMode.kBrake);
         }
     }
 }
