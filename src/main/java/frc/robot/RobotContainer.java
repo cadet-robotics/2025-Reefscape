@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 // import java.io.BufferedWriter;
 import java.util.List;
 
+import frc.robot.subsystems.BucketSubsytem;
 import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 
 /*
@@ -39,6 +40,7 @@ public class RobotContainer {
 
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final BucketSubsytem m_bucket = new BucketSubsytem();
 
   // The driver's controller
   private final PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
@@ -66,8 +68,11 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     
+    // Bucket System
+    m_bucket.buttonBindings(m_driverController);
+
     // Swerve Drive buttons
-    m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
+    m_robotDrive.buttonBindings(m_driverController);
 
 }
 
