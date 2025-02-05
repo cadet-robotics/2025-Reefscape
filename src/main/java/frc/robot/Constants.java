@@ -107,4 +107,11 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
+  public static final class HorzontalExtenderSubsystem {
+    public static final int kSnowblowerMotor = 21;
+    public static final double kExtendSpeed = 0.5;
+    public static final int kFrontLimitSwitch = 1;
+    public static final int kBackLimitSwitch = 0;
+  }
+
 }
