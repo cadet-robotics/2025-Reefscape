@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 // import java.io.BufferedWriter;
 import java.util.List;
 
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 
 /*
@@ -39,6 +40,7 @@ public class RobotContainer {
 
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
 
   // The driver's controller
   private final PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
@@ -68,6 +70,8 @@ public class RobotContainer {
     
     // Swerve Drive buttons
     m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
+
+    m_elevatorSubsystem.buttonBindings( m_driverController, m_coDriverController );
 
 }
 
