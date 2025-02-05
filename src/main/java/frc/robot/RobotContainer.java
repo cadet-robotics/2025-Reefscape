@@ -31,9 +31,6 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import java.util.List;
 
 import frc.robot.subsystems.BucketSubsytem;
-import frc.robot.subsystems.AlgaeSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.HorzontalExtenderSubsystem;
 import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 
 /*
@@ -148,17 +145,8 @@ public class RobotContainer {
     // Bucket System
     m_bucket.buttonBindings(m_driverController);
 
-    // Intake buttons
-    // m_intake.buttonBindings(m_driverController);
-
     // Swerve Drive buttons
     m_robotDrive.buttonBindings(m_driverController);
-
-    // Elevator Buttons
-    // m_elevatorSubsystem.buttonBindings(m_driverController);
-
-    // Horizontal Extender buttons
-    // m_horizontalExtender.buttonBindings(m_driverController);
 
 }
 
