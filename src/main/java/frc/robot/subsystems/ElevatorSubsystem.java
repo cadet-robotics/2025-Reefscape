@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class ElevatorSubsystem extends CSubsystem {
 
    // Motor Setup
+    private static final SparkMax m_temp = new SparkMax(21 , MotorType.kBrushless);
     private static final SparkFlex m_elevatorMotor = new SparkFlex( 
         Constants.ElevatorSubsystem.kElevatorMotor, 
         MotorType.kBrushless 
@@ -60,7 +61,8 @@ public class ElevatorSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters 
         );
-        m_elevatorEncoder = m_elevatorMotor.getAbsoluteEncoder();
+        // m_elevatorEncoder = m_elevatorMotor.getAbsoluteEncoder();
+        m_elevatorEncoder = m_temp.getAbsoluteEncoder();
     }
 
     public void buttonBindings( PS4Controller m_driverController ) {
