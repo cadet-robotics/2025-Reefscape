@@ -14,7 +14,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -68,16 +68,14 @@ public class ElevatorSubsystem extends CSubsystem {
     public void buttonBindings( PS4Controller m_driverController ) {
 
         // Should be dpad up with a 10 degree margin for error on either side
-        // new JoystickButton( m_driverController, Button.kTouchpad.value )
-        //     .and( () -> Button.kTouchpad.value < 10 || Button.kTouchpad.value > 350  )
-        new JoystickButton(m_driverController, Button.kTriangle.value)
-            .whileTrue( 
-                ElevatorLevelUp()
-            );
+        new JoystickButton( m_driverController, m_driverController.getPOV() )
+        .and( () -> Math.abs( m_driverController.getPOV() - 0 ) < 10)
+       .whileTrue( 
+           ElevatorLevelUp()
+       );
         // Should be dpad down with a 10 degree margin for error on either side
-        // new JoystickButton( m_driverController, Button.kTouchpad.value )
-        //     .and( () -> Math.abs( Button.kTouchpad.value - 180 ) < 10)
-        new JoystickButton(m_driverController, Button.kSquare.value)
+         new JoystickButton( m_driverController, m_driverController.getPOV() )
+             .and( () -> Math.abs( m_driverController.getPOV() - 180 ) < 10)
             .whileTrue( 
                 ElevatorLevelDown()
             );
