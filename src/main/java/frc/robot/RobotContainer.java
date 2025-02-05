@@ -69,7 +69,10 @@ public class RobotContainer {
   private void configureButtonBindings() {
     
     // Swerve Drive buttons
-    m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
+    m_robotDrive.buttonBindings(m_driverController);
+
+    // Elevator Buttons
+    m_elevatorSubsystem.buttonBindings(m_driverController);
 
     m_elevatorSubsystem.buttonBindings( m_driverController, m_coDriverController );
 
