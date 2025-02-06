@@ -42,7 +42,7 @@ public class AlgaeSubsystem extends CSubsystem {
     public SparkMax Left() { return m_leftAlgaeMotor; }
     public SparkMax Right() { return m_rightAlgaeMotor; }
 
-    public void buttonBindings( PS4Controller m_driverController ) {
+    public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
         // Intake
         new JoystickButton(m_driverController, Button.kR2.value )
             .whileTrue( IntakeIn() );
