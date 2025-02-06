@@ -7,9 +7,7 @@ package frc.robot;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.PS4Controller.Button;
 
-import edu.wpi.first.math.MathUtil;
 import frc.robot.Constants.OIConstants;
-import frc.robot.lib.Limelight.LimelightHelpers;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -45,43 +42,8 @@ public class RobotContainer {
 
   // The driver's controller
   private final PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
+  private final PS4Controller m_coDriverController = new PS4Controller(OIConstants.kCoDriverControllerPort);
 
-  // simple proportional turning control with Limelight.
-  // "proportional control" is a control algorithm in which the output is proportional to the error.
-  // in this case, we are going to return an angular velocity that is proportional to the 
-  // "tx" value from the Limelight.
-  double limelight_aim_proportional() {    
-    // kP (constant of proportionality)
-    // this is a hand-tuned number that determines the aggressiveness of our proportional control loop
-    // if it is too high, the robot will oscillate.
-    // if it is too low, the robot will never reach its target
-    // if the robot never turns in the correct direction, kP should be inverted.
-    double kP = .035;
-
-    // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the rightmost edge of 
-    // your limelight 3 feed, tx should return roughly 31 degrees.
-    double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
-
-    // convert to radians per second for our drive method
-    targetingAngularVelocity *= Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;
-
-    //invert since tx is positive when the target is to the right of the crosshair
-    targetingAngularVelocity *= -1.0;
-
-    return targetingAngularVelocity;
-  }
-   
-  // simple proportional ranging control with Limelight's "ty" value
-  // this works best if your Limelight's mount height and target mount height are different.
-  // if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
-  double limelight_range_proportional()
-  {    
-    double kP = .1;
-    double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kP;
-    targetingForwardSpeed *= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
-    targetingForwardSpeed *= -1.0;
-    return targetingForwardSpeed;
-  }
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -91,39 +53,6 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
-    m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        new RunCommand(
-            () -> {
-
-              double x = MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband);
-              double y = MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband);
-              double rot = MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband);
-              boolean fieldRelative = true;
-
-              // Switches to non field-relative driving if the driver presses the R3 button, and switches to using the limelight
-              if ( m_driverController.getR3ButtonPressed() ) {
-
-                // SmartDashboard.putBoolean("LimelightDetecting", LimelightHelpers.get)
-                final var rot_limelight = limelight_aim_proportional();
-                rot = rot_limelight;
-
-                final var forward_limelight = limelight_range_proportional();
-                y = forward_limelight;
-
-                //while using Limelight, turn off field-relative driving.
-                fieldRelative = false;
-              }
-
-              m_robotDrive.drive(
-                x,
-                y,
-                rot,
-                fieldRelative
-              );
-            },
-            m_robotDrive));
   }
 
   /**
@@ -138,7 +67,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     
     // Swerve Drive buttons
-    m_robotDrive.buttonBindings(m_driverController);
+    m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
 
 }
 
