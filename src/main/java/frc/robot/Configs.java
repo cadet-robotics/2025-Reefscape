@@ -53,4 +53,11 @@ public final class Configs {
                     .positionWrappingInputRange(0, turningFactor);
         }
     }
+    public final class HorizontalExtenderSubsystem {
+        public static final SparkMaxConfig kSnowblowerConfig = new SparkMaxConfig();
+        static {
+                kSnowblowerConfig
+                        .idleMode(IdleMode.kBrake);
+        }
+    } 
 }
