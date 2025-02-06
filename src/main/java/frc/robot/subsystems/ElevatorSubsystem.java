@@ -14,9 +14,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -65,7 +63,7 @@ public class ElevatorSubsystem extends CSubsystem {
         m_elevatorEncoder = m_temp.getAbsoluteEncoder();
     }
 
-    public void buttonBindings( PS4Controller m_driverController ) {
+    public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
         // Should be dpad up with a 10 degree margin for error on either side
         new JoystickButton( m_driverController, m_driverController.getPOV() )
