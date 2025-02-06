@@ -1,3 +1,7 @@
+/*
+ * Tests to run on Mikey
+ * - Stops when correspondign limit switch is pressed and ignores other
+ */
 package frc.robot.subsystems;
 
 import frc.robot.lib.custom.CCommand;
@@ -62,6 +66,11 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
         return m_backLimitSwitch.get();
     }
 
+    /*
+     * Horizontal Extender Subsystem
+     * Extends the extender until limit switch hit
+     * Snowblower motor
+     */
     public CCommand Extend() {
         return cCommand_( "HorzontalExtenderSubsystem.Extend" )
             .onExecute( () -> {
@@ -76,6 +85,12 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
             });
     }
 
+
+    /*
+     * Horizontal Extender Subsystem
+     * Retracts the extender until limit switch hit
+     * Snowblower motor
+     */
     public CCommand Retract() {
         return cCommand_( "HorzontalExtenderSubsystem.Retract" )
             .onExecute( () -> {
