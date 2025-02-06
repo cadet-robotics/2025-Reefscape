@@ -36,7 +36,7 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
     }
 
     // Creates the button bindings for the subsystem
-    public void buttonBindings( PS4Controller m_driverController) {
+    public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
         // Extend ( Circle ) 
         new JoystickButton(m_driverController, Button.kCircle.value )
