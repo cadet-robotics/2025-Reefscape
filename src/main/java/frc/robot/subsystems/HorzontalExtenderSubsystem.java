@@ -18,6 +18,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class HorzontalExtenderSubsystem extends CSubsystem {
@@ -76,12 +77,16 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
             .onExecute( () -> {
                if ( frontLimitSwitchPressing() ) {
                   m_horizontalExtenderMotor.stopMotor();
+                  SmartDashboard.putBoolean("allOut", true);
                   return;
                }
                 m_horizontalExtenderMotor.set( Constants.HorzontalExtenderSubsystem.kExtendSpeed );
+                SmartDashboard.putBoolean("allOut", false);
+                SmartDashboard.putBoolean("moveOut", true);
             })
             .onEnd( () -> {
                 m_horizontalExtenderMotor.stopMotor();
+                SmartDashboard.putBoolean("moveOut", false);
             });
     }
 
@@ -96,12 +101,16 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
             .onExecute( () -> {
                if ( backLimitSwitchPressing() ) {
                   m_horizontalExtenderMotor.stopMotor();
+                  SmartDashboard.putBoolean("allIn", true);
                   return;
                }
                 m_horizontalExtenderMotor.set( -Constants.HorzontalExtenderSubsystem.kExtendSpeed );
+                SmartDashboard.putBoolean("allIn", false);
+                SmartDashboard.putBoolean("moveIn", true);
             })
             .onEnd( () -> {
                 m_horizontalExtenderMotor.stopMotor();
+                SmartDashboard.putBoolean("moveIn", false);
             });
     }
 }
