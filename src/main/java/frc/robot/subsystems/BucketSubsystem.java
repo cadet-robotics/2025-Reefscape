@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -22,7 +23,7 @@ public class BucketSubsystem extends CSubsystem {
     // Snowblower motors must be set as "kBrushed"
     private final SparkMax m_snowblowerMotor = new SparkMax( Constants.BucketSubsystem.kSnowblowerMotor, MotorType.kBrushed );
     // Creating the Encoder
-    private AbsoluteEncoder m_snowblowerEncoder;
+    private DutyCycleEncoder m_snowblowerEncoder = new DutyCycleEncoder(Constants.BucketSubsystem.kSnowblowerMotor);
 
     // Create an instace of the BucketSubsystem
     public BucketSubsystem() {
@@ -32,19 +33,16 @@ public class BucketSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters 
         );
-        m_snowblowerEncoder = m_snowblowerMotor.getAbsoluteEncoder();
     }
 
     public SparkMax getSnowblower() {
         return m_snowblowerMotor;
     }
     
-    public AbsoluteEncoder getSnowblowerEncoder() {
+    public DutyCycleEncoder getSnowblowerEncoder() {
         return m_snowblowerEncoder;
     }
     
-    //TODO: Fix Bucket Subsystem: "ERROR  4  [CAN SPARK] IDs: 21, WPILib or External HAL Error: CAN: Message not found Periodic Status 5"
-
     // Create all the bindings for this Subsystem
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
@@ -63,9 +61,9 @@ public class BucketSubsystem extends CSubsystem {
         return cCommand_( "BucketSubsystem.BucketStart" )
             .onExecute( () -> {
                 // Checks whether the motor has to spin forward, backward, or not at all to get to the start position
-                if ( m_snowblowerEncoder.getPosition() < Constants.BucketSubsystem.kStartPosition ) {
+                if ( m_snowblowerEncoder.get() < Constants.BucketSubsystem.kStartPosition ) {
                     m_snowblowerMotor.set( Constants.BucketSubsystem.SnowblowerSpeed );
-                } else if ( m_snowblowerEncoder.getPosition() > Constants.BucketSubsystem.kStartPosition ) {
+                } else if ( m_snowblowerEncoder.get() > Constants.BucketSubsystem.kStartPosition ) {
                     m_snowblowerMotor.set( -Constants.BucketSubsystem.SnowblowerSpeed );
                 } else {
                     m_snowblowerMotor.stopMotor();
@@ -80,9 +78,9 @@ public class BucketSubsystem extends CSubsystem {
     public CCommand BucketDump() {
         return cCommand_( "BucketSubsystem.BucketStart" )
             .onExecute( () -> {
-                if ( m_snowblowerEncoder.getPosition() < Constants.BucketSubsystem.kDumpPosition ) {
+                if ( m_snowblowerEncoder.get() < Constants.BucketSubsystem.kDumpPosition ) {
                     m_snowblowerMotor.set( Constants.BucketSubsystem.SnowblowerSpeed );
-                } else if ( m_snowblowerEncoder.getPosition() > Constants.BucketSubsystem.kDumpPosition ) {
+                } else if ( m_snowblowerEncoder.get() > Constants.BucketSubsystem.kDumpPosition ) {
                     m_snowblowerMotor.set( -Constants.BucketSubsystem.SnowblowerSpeed );
                 } else {
                     m_snowblowerMotor.stopMotor();
@@ -97,9 +95,9 @@ public class BucketSubsystem extends CSubsystem {
     public CCommand BucketLoad () {
         return cCommand_( "BucketSubsystem.BucketLoad" )
             .onExecute( () -> {
-                if ( m_snowblowerEncoder.getPosition() < Constants.BucketSubsystem.kLoadPosition ) {
+                if ( m_snowblowerEncoder.get() < Constants.BucketSubsystem.kLoadPosition ) {
                     m_snowblowerMotor.set( Constants.BucketSubsystem.SnowblowerSpeed );
-                } else if ( m_snowblowerEncoder.getPosition() > Constants.BucketSubsystem.kLoadPosition ) {
+                } else if ( m_snowblowerEncoder.get() > Constants.BucketSubsystem.kLoadPosition ) {
                     m_snowblowerMotor.set( -Constants.BucketSubsystem.SnowblowerSpeed );
                 } else {
                     m_snowblowerMotor.stopMotor();
