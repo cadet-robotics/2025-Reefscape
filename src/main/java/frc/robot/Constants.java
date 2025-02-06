@@ -107,4 +107,12 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
+  public static final class BucketSubsystem {
+    public static final int kSnowblowerMotor = 21;
+    public static final double SnowblowerSpeed = 0.10;
+
+    public static final double kStartPosition = 0.0;
+    public static final double kDumpPosition = 0.0;
+    public static final double kLoadPosition = 0.0;
+  }
 }
