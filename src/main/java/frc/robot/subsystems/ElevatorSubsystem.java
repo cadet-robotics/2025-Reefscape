@@ -12,17 +12,13 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DutyCycle;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-<<<<<<< HEAD
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-=======
->>>>>>> f1477973a862d43e109c3c9cdfc8e70b0f3ac4bd
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class ElevatorSubsystem extends CSubsystem {
 
@@ -34,9 +30,8 @@ public class ElevatorSubsystem extends CSubsystem {
     );
 
     // Encoder Setup
-    private static DutyCycleEncoder m_elevatorEncoder = new DutyCycleEncoder( Constants.ElevatorSubsystem.kElevatorMotor );
+    private static AnalogEncoder m_elevatorEncoder = new AnalogEncoder( 2 );
         
-
     // Servo Setup
     // This servo is the brake for the elevator
     private static final Servo m_elevatorBrake = new Servo( 
@@ -65,11 +60,7 @@ public class ElevatorSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters 
         );
-<<<<<<< HEAD
-        // m_elevatorEncoder = m_elevatorMotor.getAbsoluteEncoder();
-        m_elevatorEncoder = m_temp.getAbsoluteEncoder();
-=======
->>>>>>> f1477973a862d43e109c3c9cdfc8e70b0f3ac4bd
+        m_elevatorEncoder.get();
     }
 
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
@@ -77,9 +68,9 @@ public class ElevatorSubsystem extends CSubsystem {
         // Should be dpad up with a 10 degree margin for error on either side
         new JoystickButton( m_driverController, m_driverController.getPOV() )
         .and( () -> Math.abs( m_driverController.getPOV() - 0 ) < 10)
-       .whileTrue( 
+        .whileTrue( 
            ElevatorLevelUp()
-       );
+        );
         // Should be dpad down with a 10 degree margin for error on either side
          new JoystickButton( m_driverController, m_driverController.getPOV() )
              .and( () -> Math.abs( m_driverController.getPOV() - 180 ) < 10)
@@ -92,7 +83,7 @@ public class ElevatorSubsystem extends CSubsystem {
     public SparkFlex getElevatorMotor() {
         return m_elevatorMotor;
     }
-    public DutyCycleEncoder getElevatorEncoder() {
+    public AnalogEncoder getElevatorEncoder() {
         return m_elevatorEncoder;
     }
     public Servo getElevatorBrake() {
@@ -114,6 +105,7 @@ public class ElevatorSubsystem extends CSubsystem {
     @Override
     public void periodic() {
         SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
+        SmartDashboard.putNumber( "Encoder", m_elevatorEncoder.get() );
         if ( m_elevatorEncoder.get() > Constants.ElevatorSubsystem.LevelHeights[level] ) {
             m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevatorSpeed );
         } else if ( m_elevatorEncoder.get() < Constants.ElevatorSubsystem.LevelHeights[level] ) {
@@ -128,7 +120,7 @@ public class ElevatorSubsystem extends CSubsystem {
         return cCommand_( "ElevatorSubsystem.ElevatorLevelUp" )
             .onInitialize( () -> {
                 if ( level < 8 ) {
-                    level = level + 1;
+                    level++;
                 }
             });
     }
@@ -137,7 +129,7 @@ public class ElevatorSubsystem extends CSubsystem {
         return cCommand_( "ElevatorSubsystem.ElevatorLevelDown" )
             .onInitialize( () -> {
                 if ( level > 0 ) {
-                    level = level - 1;
+                    level--;
                 }
             });
     }

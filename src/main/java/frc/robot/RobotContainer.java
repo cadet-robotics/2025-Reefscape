@@ -72,11 +72,7 @@ public class RobotContainer {
     m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
 
     // Elevator Buttons
-<<<<<<< HEAD
-    m_elevatorSubsystem.buttonBindings(m_driverController);
-=======
     m_elevatorSubsystem.buttonBindings(m_driverController, m_coDriverController);
->>>>>>> f1477973a862d43e109c3c9cdfc8e70b0f3ac4bd
 
 }
 
