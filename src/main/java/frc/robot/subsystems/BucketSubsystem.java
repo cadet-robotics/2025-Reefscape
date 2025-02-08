@@ -15,6 +15,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class BucketSubsystem extends CSubsystem {
@@ -67,6 +68,7 @@ public class BucketSubsystem extends CSubsystem {
                     m_snowblowerMotor.set( -Constants.BucketSubsystem.SnowblowerSpeed );
                 } else {
                     m_snowblowerMotor.stopMotor();
+                    SmartDashboard.putNumber("bucketPosition", 0);
                 }
             })
             .onEnd( () -> {
@@ -84,6 +86,7 @@ public class BucketSubsystem extends CSubsystem {
                     m_snowblowerMotor.set( -Constants.BucketSubsystem.SnowblowerSpeed );
                 } else {
                     m_snowblowerMotor.stopMotor();
+                    SmartDashboard.putNumber("bucketPosition", 1);
                 }
             })
             .onEnd( () -> {
@@ -101,6 +104,7 @@ public class BucketSubsystem extends CSubsystem {
                     m_snowblowerMotor.set( -Constants.BucketSubsystem.SnowblowerSpeed );
                 } else {
                     m_snowblowerMotor.stopMotor();
+                    SmartDashboard.putNumber("bucketPosition", 2);
                 }
             })
             .onEnd( () -> {
