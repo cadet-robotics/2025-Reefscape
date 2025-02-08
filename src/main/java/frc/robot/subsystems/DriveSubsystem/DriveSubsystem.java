@@ -4,10 +4,7 @@
 
 package frc.robot.subsystems.DriveSubsystem;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 // Gyro
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
@@ -16,6 +13,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 // Swerve Drive
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -23,14 +21,17 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.DriverStation;
 // Button Matpping
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 // 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.lib.Limelight.LimelightHelpers;
 // 
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
@@ -60,6 +61,8 @@ public class DriveSubsystem extends CSubsystem {
 
   // The gyro sensor
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
+  
+  public double maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -82,27 +85,6 @@ public class DriveSubsystem extends CSubsystem {
       e.printStackTrace();
     }
 
-    // AutoBuilder.configure(
-    //       this::getPose,
-    //       this::resetOdometry,
-    //       this::getChassisSpeeds,
-    //       ( speeds, feedforwards ) -> driveRobotRelative( speeds ),
-    //       new PPHolonomicDriveController(
-    //          new PIDConstants( 5.0, 0.0, 0.0 ),
-    //          new PIDConstants( 5.0, 0.0, 0.0 )
-    //       ),
-    //       config,
-    //       () -> {
-    //         // Check to swap 180 degrees based on color
-    //          var allience = DriverStation.getAlliance();
-    //          if ( allience.isPresent() ) {
-    //             return allience.get() == DriverStation.Alliance.Red;
-    //          }
-    //          return false;
-    //       },
-    //       this
-    //   );
-             
     // Usage reporting for MAXSwerve template
     m_gyro.reset();
     m_gyro.setAngleAdjustment(180.0);
@@ -126,7 +108,7 @@ public class DriveSubsystem extends CSubsystem {
   public void driveRobotRelative(ChassisSpeeds speeds) {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(
-      swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+      swerveModuleStates, maxSpeed);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
@@ -143,19 +125,88 @@ public class DriveSubsystem extends CSubsystem {
     return DriveConstants.kDriveKinematics.toChassisSpeeds(states);
   }
 
-  public void buttonBindings( PS4Controller m_driverController ) {
-    // setX
-    // new JoystickButton(m_driverController, Button.kR1.value)
-    //     .whileTrue(new RunCommand(
-    //         () -> m_robotDrive.setX(),
-    //         m_robotDrive
-    //     )
-    // );
+  // simple proportional turning control with Limelight.
+  // "proportional control" is a control algorithm in which the output is proportional to the error.
+  // in this case, we are going to return an angular velocity that is proportional to the 
+  // "tx" value from the Limelight.
+  double limelight_aim_proportional() {    
+    // kP (constant of proportionality)
+    // this is a hand-tuned number that determines the aggressiveness of our proportional control loop
+    // if it is too high, the robot will oscillate.
+    // if it is too low, the robot will never reach its target
+    // if the robot never turns in the correct direction, kP should be inverted.
+    double kP = .035;
+
+    // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the rightmost edge of 
+    // your limelight 3 feed, tx should return roughly 31 degrees.
+    double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
+
+    // convert to radians per second for our drive method
+    targetingAngularVelocity *= Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;
+
+    //invert since tx is positive when the target is to the right of the crosshair
+    targetingAngularVelocity *= -1.0;
+
+    return targetingAngularVelocity;
+  }
+   
+  // simple proportional ranging control with Limelight's "ty" value
+  // this works best if your Limelight's mount height and target mount height are different.
+  // if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
+  double limelight_range_proportional()
+  {    
+    double kP = .1;
+    double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kP;
+    targetingForwardSpeed *= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
+    targetingForwardSpeed *= -1.0;
+    return targetingForwardSpeed;
+  }
+
+  public void buttonBindings( PS4Controller m_driverControllerm, PS4Controller m_driverController ) {
+    this.setDefaultCommand(
+        // The left stick controls translation of the robot.
+        // Turning is controlled by the X axis of the right stick.
+        new RunCommand(
+            () -> {
+
+              double x = MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband);
+              double y = MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband);
+              double rot = MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband);
+              boolean fieldRelative = true;
+
+              // Switches to non field-relative driving if the driver presses the R3 button, and switches to using the limelight
+              if ( m_driverController.getR3ButtonPressed() ) {
+
+                // SmartDashboard.putBoolean("LimelightDetecting", LimelightHelpers.get)
+                final var rot_limelight = limelight_aim_proportional();
+                rot = rot_limelight;
+
+                final var forward_limelight = limelight_range_proportional();
+                y = forward_limelight;
+
+                //while using Limelight, turn off field-relative driving.
+                fieldRelative = false;
+              }
+
+              this.drive(
+                x,
+                y,
+                rot,
+                fieldRelative
+              );
+            },
+            this));
 
     // Reset gyro
     new JoystickButton(m_driverController, Button.kOptions.value )
         .whileTrue( 
               GyroReset()
+        );
+
+    // Slow Down Button
+    new JoystickButton(m_driverController, Button.kR2.value )
+        .whileTrue( 
+            SlowDown()
         );
   }
 
@@ -199,8 +250,8 @@ public class DriveSubsystem extends CSubsystem {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // Convert the commanded speeds into the correct units for the drivetrain
-    double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
-    double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
+    double xSpeedDelivered = xSpeed * maxSpeed;
+    double ySpeedDelivered = ySpeed * maxSpeed;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
@@ -209,7 +260,7 @@ public class DriveSubsystem extends CSubsystem {
                 Rotation2d.fromDegrees(-1.0 * m_gyro.getAngle()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+        swerveModuleStates, maxSpeed );
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
@@ -245,7 +296,7 @@ public class DriveSubsystem extends CSubsystem {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
+        desiredStates, maxSpeed );
     m_frontLeft.setDesiredState(desiredStates[0]);
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);
@@ -281,5 +332,16 @@ public class DriveSubsystem extends CSubsystem {
    */
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  // Set speed to 1/4 when command is active
+  public CCommand SlowDown() {
+    return cCommand_( "DriveSubsystem.SlowDown")
+    .onInitialize( () -> {
+      maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond / 4;
+    })
+    .onEnd( () -> {
+      maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond;
+    });
   }
 }

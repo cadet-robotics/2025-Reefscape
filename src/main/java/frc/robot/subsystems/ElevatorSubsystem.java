@@ -13,10 +13,10 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -30,7 +30,7 @@ public class ElevatorSubsystem extends CSubsystem {
     );
 
     // Encoder Setup
-    private static AbsoluteEncoder m_elevatorEncoder;
+    private static DutyCycleEncoder m_elevatorEncoder = new DutyCycleEncoder( Constants.ElevatorSubsystem.kElevatorMotor );
         
 
     // Servo Setup
@@ -61,11 +61,9 @@ public class ElevatorSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters 
         );
-        // m_elevatorEncoder = m_elevatorMotor.getAbsoluteEncoder();
-        m_elevatorEncoder = m_temp.getAbsoluteEncoder();
     }
 
-    public void buttonBindings( PS4Controller m_driverController ) {
+    public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
         // Should be dpad up with a 10 degree margin for error on either side
         new JoystickButton( m_driverController, m_driverController.getPOV() )
@@ -85,7 +83,7 @@ public class ElevatorSubsystem extends CSubsystem {
     public SparkFlex getElevatorMotor() {
         return m_elevatorMotor;
     }
-    public AbsoluteEncoder getElevatorEncoder() {
+    public DutyCycleEncoder getElevatorEncoder() {
         return m_elevatorEncoder;
     }
     public Servo getElevatorBrake() {
@@ -107,9 +105,9 @@ public class ElevatorSubsystem extends CSubsystem {
     @Override
     public void periodic() {
         SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
-        if ( m_elevatorEncoder.getPosition() > Constants.ElevatorSubsystem.LevelHeights[level] ) {
+        if ( m_elevatorEncoder.get() > Constants.ElevatorSubsystem.LevelHeights[level] ) {
             m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevatorSpeed );
-        } else if ( m_elevatorEncoder.getPosition() < Constants.ElevatorSubsystem.LevelHeights[level] ) {
+        } else if ( m_elevatorEncoder.get() < Constants.ElevatorSubsystem.LevelHeights[level] ) {
             m_elevatorMotor.set( Constants.ElevatorSubsystem.kElevatorSpeed );
         } else {
             m_elevatorMotor.stopMotor();
