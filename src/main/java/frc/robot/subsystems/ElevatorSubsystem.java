@@ -1,27 +1,24 @@
 package frc.robot.subsystems;
 
-import frc.robot.Configs;
-import frc.robot.Constants;
-import frc.robot.lib.custom.*;
-
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj.DutyCycle;
 // import edu.wpi.first.wpilibj.DutyCycleEncoder;
 // import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Configs;
+import frc.robot.Constants;
+import frc.robot.lib.custom.CCommand;
+import frc.robot.lib.custom.CSubsystem;
 
 public class ElevatorSubsystem extends CSubsystem {
 
@@ -32,8 +29,9 @@ public class ElevatorSubsystem extends CSubsystem {
         MotorType.kBrushless 
     );
 
+
     // Encoder Setup
-    private static AnalogEncoder m_elevatorEncoder = new AnalogEncoder( 2 );
+    private static DutyCycleEncoder m_elevatorEncoder = new DutyCycleEncoder( 2 );
         
     // Servo Setup
     // This servo is the brake for the elevator
@@ -51,6 +49,11 @@ public class ElevatorSubsystem extends CSubsystem {
           Constants.ElevatorSubsystem.kBottomLimitSwitch
     );
 
+    // Total distance for the encoder
+    public static double total;
+    // Last postion for the encoder
+    public static double last;
+
     // The number corresponding to the level of the elevator
     // This should be a value between 0 and 8 ( There are 9 levels but a 0 based system will be used )
     private static int level = 0;
@@ -63,6 +66,8 @@ public class ElevatorSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters 
         );
+        total = 0;
+        last = m_elevatorEncoder.get();
     }
 
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
@@ -85,7 +90,7 @@ public class ElevatorSubsystem extends CSubsystem {
     public SparkFlex getElevatorMotor() {
         return m_elevatorMotor;
     }
-    public AnalogEncoder getElevatorEncoder() {
+    public DutyCycleEncoder getElevatorEncoder() {
         return m_elevatorEncoder;
     }
     public Servo getElevatorBrake() {
@@ -106,8 +111,27 @@ public class ElevatorSubsystem extends CSubsystem {
     // This function should bring the elevator to the currently seleted level and is called after a level change
     @Override
     public void periodic() {
+
+        double currentPosition = m_elevatorEncoder.get();
+
+        // Filter for noise
+        if (Math.abs(currentPosition - last) < 0.05) {
+            currentPosition = last;
+        }
+
+        // Calculate the change in position
+        double positionChange = currentPosition - last;
+
+        // Update the total accumulated position based on the position change
+        total += positionChange;
+
+        // Update the last position for the next iteration
+        last = currentPosition;
+
         SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
-        SmartDashboard.putNumber( "Encoder", m_elevatorEncoder.get() );
+        SmartDashboard.putNumber( "Encoder", m_elevatorEncoder.get() * 360.0 );
+        SmartDashboard.putNumber( "EncoderTotal", total);
+
         if ( m_elevatorEncoder.get() > Constants.ElevatorSubsystem.LevelHeights[level] ) {
             m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevatorSpeed );
         } else if ( m_elevatorEncoder.get() < Constants.ElevatorSubsystem.LevelHeights[level] ) {
