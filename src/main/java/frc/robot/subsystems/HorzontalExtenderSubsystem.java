@@ -75,18 +75,16 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
     public CCommand Extend() {
         return cCommand_( "HorzontalExtenderSubsystem.Extend" )
             .onExecute( () -> {
+                SmartDashboard.putBoolean("allOut", false);
                if ( frontLimitSwitchPressing() ) {
                   m_horizontalExtenderMotor.stopMotor();
                   SmartDashboard.putBoolean("allOut", true);
                   return;
                }
                 m_horizontalExtenderMotor.set( Constants.HorzontalExtenderSubsystem.kExtendSpeed );
-                SmartDashboard.putBoolean("allOut", false);
-                SmartDashboard.putBoolean("moveOut", true);
             })
             .onEnd( () -> {
                 m_horizontalExtenderMotor.stopMotor();
-                SmartDashboard.putBoolean("moveOut", false);
             });
     }
 
@@ -99,18 +97,16 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
     public CCommand Retract() {
         return cCommand_( "HorzontalExtenderSubsystem.Retract" )
             .onExecute( () -> {
+                SmartDashboard.putBoolean("allIn", false);
                if ( backLimitSwitchPressing() ) {
                   m_horizontalExtenderMotor.stopMotor();
                   SmartDashboard.putBoolean("allIn", true);
                   return;
                }
                 m_horizontalExtenderMotor.set( -Constants.HorzontalExtenderSubsystem.kExtendSpeed );
-                SmartDashboard.putBoolean("allIn", false);
-                SmartDashboard.putBoolean("moveIn", true);
             })
             .onEnd( () -> {
                 m_horizontalExtenderMotor.stopMotor();
-                SmartDashboard.putBoolean("moveIn", false);
             });
     }
 }
