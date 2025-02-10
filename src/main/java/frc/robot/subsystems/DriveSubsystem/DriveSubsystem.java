@@ -32,6 +32,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.lib.Limelight.LimelightHelpers;
+import frc.robot.lib.Limelight.LimelightHelpers.LimelightResults;
+import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Fiducial;
 // 
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
@@ -177,9 +179,18 @@ public class DriveSubsystem extends CSubsystem {
               // Switches to non field-relative driving if the driver presses the L1 button, and switches to using the limelight
               if (LimelightHelpers.getTV("limelight") == true && m_driverController.getL1ButtonPressed() ) {
 
-                LimelightHelpers.LimelightTarget_Fiducial apriltag = new LimelightHelpers.LimelightTarget_Fiducial();
-                
-                
+                LimelightResults llresults = LimelightHelpers.getLatestResults("limelight"); // Get data from Limelight
+
+                for (LimelightTarget_Fiducial target : llresults.targets_Fiducials) {
+
+                  double fiducialID = target.fiducialID; // Access the ID of the detected fiducial
+
+                  // Use the fiducialID to perform further actions based on the target
+                  if(fiducialID == 6 || fiducialID == 7 || fiducialID == 8 || fiducialID == 9 || fiducialID == 10 || fiducialID == 11 || fiducialID == 17 || fiducialID == 18 || fiducialID == 19 || fiducialID == 20 || fiducialID == 21 || fiducialID ==  22) {
+                    x = target.tx;
+                    y = target.ta;
+                  }
+                } 
               }
 
               this.drive(
