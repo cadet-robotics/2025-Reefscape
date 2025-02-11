@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import javax.naming.ldap.ControlFactory;
-
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -10,12 +8,14 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.Configs;
@@ -81,44 +81,32 @@ public class ElevatorSubsystem extends CSubsystem {
             .whileTrue( 
                 ElevatorLevelDown()
             );
+
+        new JoystickButton(m_driverController, Button.kCircle.value )
+           .whileTrue( EngageBrake() );
     }
 
-    // The following 5 functions are just in case the RobotContainer needs to access any of these; most likely for testing.
-    public SparkFlex getElevatorMotor() {
-        return m_elevatorMotor;
+    // Basic global reset button for the encoder. This should only be used in testing and at the time of startup
+    public void resetEncoder() {
+        s_elevatorEncoder.reset();
     }
-    public Encoder getElevatorEncoder() {
-        return s_elevatorEncoder;
+
+    public double getState() {
+        return s_elevatorEncoder.getDistance();
     }
-    public Servo getElevatorBrake() {
-        return m_elevatorBrake;
-    }
-    public DigitalInput getTopLimitSwitch() {
-       return m_topLimitSwitch;
-    }
-    public DigitalInput getBottomLimitSwitch() {
-       return m_bottomLimitSwitch;
-    }
-    
-    // // Basic global reset button for the encoder. This should only be used in testing and at the time of startup
-    // public void resetEncoder() {
-    //     m_elevatorEncoder.;
-    // }
 
     // This function should bring the elevator to the currently seleted level and is called after a level change
     public void setDesiredState( double desiredState ) {
-        double position = s_elevatorEncoder.getDistance();
-        m_elevatorController.setReference(
-            desiredState,
-            ControlType.kPosition
-        );
+        m_elevatorController.setReference( new Rotation2d( desiredState ).getRadians(), ControlType.kPosition);
     }
 
     @Override
     public void periodic() {
 
         SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
-        SmartDashboard.putNumber( "Encoder", s_elevatorEncoder.getDistance() * 360.0 );
+        SmartDashboard.putNumber( "Encoder", s_elevatorEncoder.getDistance() );
+
+        setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
 
     }
      
@@ -141,4 +129,21 @@ public class ElevatorSubsystem extends CSubsystem {
             });
     }
 
+    // Moves the servo to a posisiton that will stop elevator motion
+    public CCommand EngageBrake() {
+        return cCommand_( "ElevatorSubsystem.EngageBrake")
+            // Filler code TODO: must be changed when migrating to mikey
+            .onInitialize( () -> {
+                m_elevatorBrake.set( 0 );
+            });
+    }
+
+    // Moves the servo to a posisiton that will allow elevator motion
+    public CCommand DisengageBrake() {
+        return cCommand_( "ElevatorSubsystem.DisengageBrake")
+            // Filler code TODO: must be changed when migrating to mikey
+            .onInitialize( () -> {
+                m_elevatorBrake.set( 12 );
+            });
+    }
 }
