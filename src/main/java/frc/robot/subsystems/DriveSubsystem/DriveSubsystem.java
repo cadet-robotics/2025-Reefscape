@@ -15,6 +15,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -33,7 +34,11 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.lib.Limelight.LimelightHelpers;
 import frc.robot.lib.Limelight.LimelightHelpers.LimelightResults;
+import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Barcode;
+import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Classifier;
+import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Detector;
 import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Fiducial;
+import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Retro;
 // 
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
@@ -63,7 +68,7 @@ public class DriveSubsystem extends CSubsystem {
 
   // The gyro sensor
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
-  
+
   public double maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond;
 
   // Odometry class for tracking robot pose
@@ -81,7 +86,7 @@ public class DriveSubsystem extends CSubsystem {
   public DriveSubsystem() {
     // Setting up PathPlanner
     RobotConfig config = null;
-    try{
+    try {
       config = RobotConfig.fromGUISettings();
     } catch (Exception e) {
       e.printStackTrace();
@@ -96,7 +101,7 @@ public class DriveSubsystem extends CSubsystem {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    SmartDashboard.putNumber("Gyro", m_gyro.getAngle() );
+    SmartDashboard.putNumber("Gyro", m_gyro.getAngle());
     m_odometry.update(
         Rotation2d.fromDegrees(m_gyro.getAngle()),
         new SwerveModulePosition[] {
@@ -104,13 +109,13 @@ public class DriveSubsystem extends CSubsystem {
             m_frontRight.getPosition(),
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
-        }
-    );
+        });
   }
+
   public void driveRobotRelative(ChassisSpeeds speeds) {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(
-      swerveModuleStates, maxSpeed);
+        swerveModuleStates, maxSpeed);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
@@ -119,103 +124,118 @@ public class DriveSubsystem extends CSubsystem {
 
   public ChassisSpeeds getChassisSpeeds() {
     SwerveModuleState[] states = new SwerveModuleState[] {
-      m_frontLeft.getState(),
-      m_frontRight.getState(),
-      m_rearLeft.getState(),
-      m_rearRight.getState()
+        m_frontLeft.getState(),
+        m_frontRight.getState(),
+        m_rearLeft.getState(),
+        m_rearRight.getState()
     };
     return DriveConstants.kDriveKinematics.toChassisSpeeds(states);
   }
 
   // // simple proportional turning control with Limelight.
-  // // "proportional control" is a control algorithm in which the output is proportional to the error.
-  // // in this case, we are going to return an angular velocity that is proportional to the 
+  // // "proportional control" is a control algorithm in which the output is
+  // proportional to the error.
+  // // in this case, we are going to return an angular velocity that is
+  // proportional to the
   // // "tx" value from the Limelight.
-  // double limelight_aim_proportional() {    
-  //   // kP (constant of proportionality)
-  //   // this is a hand-tuned number that determines the aggressiveness of our proportional control loop
-  //   // if it is too high, the robot will oscillate.
-  //   // if it is too low, the robot will never reach its target
-  //   // if the robot never turns in the correct direction, kP should be inverted.
-  //   double kP = .035;
+  // double limelight_aim_proportional() {
+  // // kP (constant of proportionality)
+  // // this is a hand-tuned number that determines the aggressiveness of our
+  // proportional control loop
+  // // if it is too high, the robot will oscillate.
+  // // if it is too low, the robot will never reach its target
+  // // if the robot never turns in the correct direction, kP should be inverted.
+  // double kP = .035;
 
-  //   // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the rightmost edge of 
-  //   // your limelight 3 feed, tx should return roughly 31 degrees.
-  //   double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
+  // // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the
+  // rightmost edge of
+  // // your limelight 3 feed, tx should return roughly 31 degrees.
+  // double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
 
-  //   // convert to radians per second for our drive method
-  //   targetingAngularVelocity *= Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;
+  // // convert to radians per second for our drive method
+  // targetingAngularVelocity *=
+  // Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;
 
-  //   //invert since tx is positive when the target is to the right of the crosshair
-  //   targetingAngularVelocity *= -1.0;
+  // //invert since tx is positive when the target is to the right of the
+  // crosshair
+  // targetingAngularVelocity *= -1.0;
 
-  //   return targetingAngularVelocity;
+  // return targetingAngularVelocity;
   // }
-   
+
   // // simple proportional ranging control with Limelight's "ty" value
-  // // this works best if your Limelight's mount height and target mount height are different.
-  // // if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
+  // // this works best if your Limelight's mount height and target mount height
+  // are different.
+  // // if your limelight and target are mounted at the same or similar heights,
+  // use "ta" (area) for target ranging rather than "ty"
   // double limelight_range_proportional()
-  // {    
-  //   double kP = .1;
-  //   double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kP;
-  //   targetingForwardSpeed *= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
-  //   targetingForwardSpeed *= -1.0;
-  //   return targetingForwardSpeed;
+  // {
+  // double kP = .1;
+  // double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kP;
+  // targetingForwardSpeed *= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
+  // targetingForwardSpeed *= -1.0;
+  // return targetingForwardSpeed;
   // }
 
-  public void buttonBindings( PS4Controller m_driverController, PS4Controller m_codriverController ) {
+  public void buttonBindings(PS4Controller m_driverController, PS4Controller m_codriverController) {
     this.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> {
 
-              double x = MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband);
-              double y = MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband);
+              double tx = MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband);
+              double ty = MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband);
               double rot = MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband);
               boolean fieldRelative = true;
 
-              // Switches to non field-relative driving if the driver presses the L1 button, and switches to using the limelight
-              if (LimelightHelpers.getTV("limelight") == true && m_driverController.getL1ButtonPressed() ) {
+              // Switches to non field-relative driving if the driver presses the L1 button,
+              // and switches to using the limelight
+              if (LimelightHelpers.getTV("") == true && m_driverController.getL1ButtonPressed()) {
 
-                LimelightResults llresults = LimelightHelpers.getLatestResults("limelight"); // Get data from Limelight
+                LimelightResults results = LimelightHelpers.getLatestResults("");
+                if (results.valid) {
+                  // AprilTags/Fiducials
+                  if (results.targets_Fiducials.length > 0) {
+                    LimelightTarget_Fiducial tag = results.targets_Fiducials[0];
+                    double id = tag.fiducialID; // Tag ID
+                    String family = tag.fiducialFamily; // Tag family (e.g., "16h5")
 
-                for (LimelightTarget_Fiducial target : llresults.targets_Fiducials) {
+                    // 3D Pose Data
+                    Pose3d robotPoseField = tag.getRobotPose_FieldSpace(); // Robot's pose in field space
+                    Pose3d cameraPoseTag = tag.getCameraPose_TargetSpace(); // Camera's pose relative to tag
+                    Pose3d robotPoseTag = tag.getRobotPose_TargetSpace(); // Robot's pose relative to tag
+                    Pose3d tagPoseCamera = tag.getTargetPose_CameraSpace(); // Tag's pose relative to camera
+                    Pose3d tagPoseRobot = tag.getTargetPose_RobotSpace(); // Tag's pose relative to robot
 
-                  double fiducialID = target.fiducialID; // Access the ID of the detected fiducial
-
-                  // Use the fiducialID to perform further actions based on the target
-                  if(fiducialID == 6 || fiducialID == 7 || fiducialID == 8 || fiducialID == 9 || fiducialID == 10 || fiducialID == 11 || fiducialID == 17 || fiducialID == 18 || fiducialID == 19 || fiducialID == 20 || fiducialID == 21 || fiducialID ==  22) {
-                    x = target.tx;
-                    y = target.ta;
+                    // 2D targeting data
+                    tx = tag.tx; // Horizontal offset from crosshair
+                    ty = tag.ty; // Vertical offset from crosshair
+                    double ta = tag.ta; // Target area (0-100% of image)
+                    // x = tx;
+                    // y = ty;
                   }
-                } 
+                }
               }
 
               this.drive(
-                x,
-                y,
-                rot,
-                fieldRelative
-              );
+                  tx,
+                  ty,
+                  rot,
+                  fieldRelative);
             },
             this));
 
     // Reset gyro
-    new JoystickButton(m_driverController, Button.kOptions.value )
-        .whileTrue( 
-              GyroReset()
-        );
+    new JoystickButton(m_driverController, Button.kOptions.value)
+        .whileTrue(
+            GyroReset());
 
     // Slow Down Button
-    new JoystickButton(m_driverController, Button.kR2.value )
-        .whileTrue( 
-            SlowDown()
-        );
+    new JoystickButton(m_driverController, Button.kR2.value)
+        .whileTrue(
+            SlowDown());
   }
-
-
 
   /**
    * Returns the currently-estimated pose of the robot.
@@ -240,8 +260,7 @@ public class DriveSubsystem extends CSubsystem {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         },
-        pose
-    );
+        pose);
   }
 
   /**
@@ -265,7 +284,7 @@ public class DriveSubsystem extends CSubsystem {
                 Rotation2d.fromDegrees(-1.0 * m_gyro.getAngle()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, maxSpeed );
+        swerveModuleStates, maxSpeed);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
@@ -276,17 +295,17 @@ public class DriveSubsystem extends CSubsystem {
    * Sets the wheels into an X formation to prevent movement.
    */
   public CCommand GyroReset() {
-     return cCommand_( "DriveSubsystem.GyroReset" )
-        .onExecute( () -> {
-             resetOdometry(getPose());
-             zeroHeading();
-             resetEncoders();
+    return cCommand_("DriveSubsystem.GyroReset")
+        .onExecute(() -> {
+          resetOdometry(getPose());
+          zeroHeading();
+          resetEncoders();
         });
   }
 
   public CCommand WheelX() {
-     return cCommand_( "DriveSubsystem.WheelX" )
-        .onExecute( () -> {
+    return cCommand_("DriveSubsystem.WheelX")
+        .onExecute(() -> {
           m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
           m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
           m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
@@ -301,7 +320,7 @@ public class DriveSubsystem extends CSubsystem {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, maxSpeed );
+        desiredStates, maxSpeed);
     m_frontLeft.setDesiredState(desiredStates[0]);
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);
@@ -341,12 +360,12 @@ public class DriveSubsystem extends CSubsystem {
 
   // Set speed to 1/4 when command is active
   public CCommand SlowDown() {
-    return cCommand_( "DriveSubsystem.SlowDown")
-    .onInitialize( () -> {
-      maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond / 4;
-    })
-    .onEnd( () -> {
-      maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond;
-    });
+    return cCommand_("DriveSubsystem.SlowDown")
+        .onInitialize(() -> {
+          maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond / 4;
+        })
+        .onEnd(() -> {
+          maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond;
+        });
   }
 }
