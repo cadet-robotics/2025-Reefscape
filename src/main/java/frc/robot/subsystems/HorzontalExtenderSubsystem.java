@@ -75,16 +75,21 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
     public CCommand Extend() {
         return cCommand_( "HorzontalExtenderSubsystem.Extend" )
             .onExecute( () -> {
+                SmartDashboard.putBoolean("allIn", false);
                 SmartDashboard.putBoolean("allOut", false);
                if ( frontLimitSwitchPressing() ) {
                   m_horizontalExtenderMotor.stopMotor();
-                  SmartDashboard.putBoolean("allOut", true);
                   return;
                }
                 m_horizontalExtenderMotor.set( Constants.HorzontalExtenderSubsystem.kExtendSpeed );
+                SmartDashboard.putBoolean("moveOut", true);
             })
             .onEnd( () -> {
                 m_horizontalExtenderMotor.stopMotor();
+                if ( frontLimitSwitchPressing() ) {
+                    SmartDashboard.putBoolean("allOut", true);
+                }
+                SmartDashboard.putBoolean("moveOut", false);
             });
     }
 
@@ -97,16 +102,21 @@ public class HorzontalExtenderSubsystem extends CSubsystem {
     public CCommand Retract() {
         return cCommand_( "HorzontalExtenderSubsystem.Retract" )
             .onExecute( () -> {
+                SmartDashboard.putBoolean("allOut", false);
                 SmartDashboard.putBoolean("allIn", false);
                if ( backLimitSwitchPressing() ) {
                   m_horizontalExtenderMotor.stopMotor();
-                  SmartDashboard.putBoolean("allIn", true);
                   return;
                }
                 m_horizontalExtenderMotor.set( -Constants.HorzontalExtenderSubsystem.kExtendSpeed );
+                SmartDashboard.putBoolean("moveIn", true);
             })
             .onEnd( () -> {
                 m_horizontalExtenderMotor.stopMotor();
+                if ( backLimitSwitchPressing() ) {
+                    SmartDashboard.putBoolean("allIn", true);
+                }
+                SmartDashboard.putBoolean("moveIn", false);
             });
     }
 }
