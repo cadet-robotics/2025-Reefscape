@@ -39,6 +39,7 @@ import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Classifier;
 import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Detector;
 import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Retro;
+import frc.robot.lib.Limelight.LimelightHelpers.RawFiducial;
 // 
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
@@ -66,6 +67,7 @@ public class DriveSubsystem extends CSubsystem {
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
 
+  public static PS4Controller m_driverController; 
   // The gyro sensor
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
 
@@ -110,6 +112,7 @@ public class DriveSubsystem extends CSubsystem {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+    SmartDashboard.putBoolean("L1Pressed", m_driverController.getL1ButtonPressed());    
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds) {
@@ -177,7 +180,8 @@ public class DriveSubsystem extends CSubsystem {
   // return targetingForwardSpeed;
   // }
 
-  public void buttonBindings(PS4Controller m_driverController, PS4Controller m_codriverController) {
+  public void buttonBindings(PS4Controller m_driverController_, PS4Controller m_codriverController) {
+    m_driverController = m_driverController_;
     this.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
@@ -193,29 +197,19 @@ public class DriveSubsystem extends CSubsystem {
               // and switches to using the limelight
               if (LimelightHelpers.getTV("") == true && m_driverController.getL1ButtonPressed()) {
 
-                LimelightResults results = LimelightHelpers.getLatestResults("");
-                if (results.valid) {
-                  // AprilTags/Fiducials
-                  if (results.targets_Fiducials.length > 0) {
-                    LimelightTarget_Fiducial tag = results.targets_Fiducials[0];
-                    double id = tag.fiducialID; // Tag ID
-                    String family = tag.fiducialFamily; // Tag family (e.g., "16h5")
-
-                    // 3D Pose Data
-                    Pose3d robotPoseField = tag.getRobotPose_FieldSpace(); // Robot's pose in field space
-                    Pose3d cameraPoseTag = tag.getCameraPose_TargetSpace(); // Camera's pose relative to tag
-                    Pose3d robotPoseTag = tag.getRobotPose_TargetSpace(); // Robot's pose relative to tag
-                    Pose3d tagPoseCamera = tag.getTargetPose_CameraSpace(); // Tag's pose relative to camera
-                    Pose3d tagPoseRobot = tag.getTargetPose_RobotSpace(); // Tag's pose relative to robot
-
-                    // 2D targeting data
-                    tx = tag.tx; // Horizontal offset from crosshair
-                    ty = tag.ty; // Vertical offset from crosshair
-                    double ta = tag.ta; // Target area (0-100% of image)
-                    // x = tx;
-                    // y = ty;
+                
+                RawFiducial[] fiducials = LimelightHelpers.getRawFiducials("");
+                  for (RawFiducial fiducial : fiducials) {
+                    int id = fiducial.id;                    // Tag ID
+                    double txnc = fiducial.txnc;             // X offset (no crosshair)
+                    double tync = fiducial.tync;             // Y offset (no crosshair)
+                    double ta = fiducial.ta;                 // Target area
+                    double distToCamera = fiducial.distToCamera;  // Distance to camera
+                    double distToRobot = fiducial.distToRobot;    // Distance to robot
+                    double ambiguity = fiducial.ambiguity;   // Tag pose ambiguity
+                    tx = distToCamera;
+                    ty = ta;
                   }
-                }
               }
 
               this.drive(
