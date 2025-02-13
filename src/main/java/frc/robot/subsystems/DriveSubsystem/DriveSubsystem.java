@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems.DriveSubsystem;
 
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
+
 import com.pathplanner.lib.config.RobotConfig;
 // Gyro
 import com.studica.frc.AHRS;
@@ -47,159 +51,165 @@ import frc.robot.lib.custom.CSubsystem;
 public class DriveSubsystem extends CSubsystem {
 
   // Create MAXSwerveModules
-  private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
+  private final MAXSwerveModule frontLeftMaxSwerveModule = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
       DriveConstants.kFrontLeftChassisAngularOffset);
 
-  private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
+  private final MAXSwerveModule frontRightMaxSwerveModule = new MAXSwerveModule(
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
       DriveConstants.kFrontRightChassisAngularOffset);
 
-  private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
+  private final MAXSwerveModule rearLeftMaxSwerveModule = new MAXSwerveModule(
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
       DriveConstants.kBackLeftChassisAngularOffset);
 
-  private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
+  private final MAXSwerveModule rearRightMaxSwerveModule = new MAXSwerveModule(
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
 
-  public static PS4Controller m_driverController;
+  public static PS4Controller driverPS4Controller;
   // The gyro sensor
-  private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
+  private final AHRS gyroAHRS = new AHRS(NavXComType.kMXP_SPI);
 
   public double maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond;
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
+  SwerveDriveOdometry swerveDriveOdemtry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(m_gyro.getAngle()),
+      Rotation2d.fromDegrees(gyroAHRS.getAngle()),
       new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
+          frontLeftMaxSwerveModule.getPosition(),
+          frontRightMaxSwerveModule.getPosition(),
+          rearLeftMaxSwerveModule.getPosition(),
+          rearRightMaxSwerveModule.getPosition()
       });
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     // Setting up PathPlanner
-    RobotConfig config = null;
+
     try {
-      config = RobotConfig.fromGUISettings();
-    } catch (Exception e) {
+      RobotConfig.fromGUISettings();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ParseException e) {
       e.printStackTrace();
     }
 
     // Usage reporting for MAXSwerve template
-    m_gyro.reset();
-    m_gyro.setAngleAdjustment(180.0);
+    gyroAHRS.reset();
+    gyroAHRS.setAngleAdjustment(180.0);
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
   }
-  
+
   // simple proportional turning control with Limelight.
-  // "proportional control" is a control algorithm in which the output is proportional to the error.
-  // in this case, we are going to return an angular velocity that is proportional to the
+  // "proportional control" is a control algorithm in which the output is
+  // proportional to the error.
+  // in this case, we are going to return an angular velocity that is proportional
+  // to the
   // "tx" value from the Limelight.
   double limelight_aim_proportional() {
     // kP (constant of proportionality)
-    // this is a hand-tuned number that determines the aggressiveness of our proportional control loop
+    // this is a hand-tuned number that determines the aggressiveness of our
+    // proportional control loop
     // if it is too high, the robot will oscillate.
     // if it is too low, the robot will never reach its target
     // if the robot never turns in the correct direction, kP should be inverted.
     double kP = .035;
-  
-    // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the rightmost edge of
+
+    // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the
+    // rightmost edge of
     // your limelight 3 feed, tx should return roughly 31 degrees.
     double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
-  
+
     // convert to radians per second for our drive method
     targetingAngularVelocity *= Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;
-  
-    //invert since tx is positive when the target is to the right of the crosshair
+
+    // invert since tx is positive when the target is to the right of the crosshair
     targetingAngularVelocity *= -1.0;
-  
+
     return targetingAngularVelocity;
-    }
-  
-    // simple proportional ranging control with Limelight's "ty" value
-    // this works best if your Limelight's mount height and target mount height are different.
-    // if your limelight and target are mounted at the same or similar heights,use "ta" (area) for target ranging rather than "ty"
-    double limelight_range_proportional()
-    {
+  }
+
+  // simple proportional ranging control with Limelight's "ty" value
+  // this works best if your Limelight's mount height and target mount height are
+  // different.
+  // if your limelight and target are mounted at the same or similar heights,use
+  // "ta" (area) for target ranging rather than "ty"
+  double limelight_range_proportional() {
     double kP = .1;
     double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kP;
     targetingForwardSpeed *= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
     targetingForwardSpeed *= -1.0;
     return targetingForwardSpeed;
-    }
+  }
 
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    SmartDashboard.putNumber("Gyro", m_gyro.getAngle());
-    m_odometry.update(
-        Rotation2d.fromDegrees(m_gyro.getAngle()),
+    SmartDashboard.putNumber("Gyro", gyroAHRS.getAngle());
+
+    swerveDriveOdemtry.update(
+        Rotation2d.fromDegrees(gyroAHRS.getAngle()),
         new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
+            frontLeftMaxSwerveModule.getPosition(),
+            frontRightMaxSwerveModule.getPosition(),
+            rearLeftMaxSwerveModule.getPosition(),
+            rearRightMaxSwerveModule.getPosition()
         });
-    SmartDashboard.putBoolean("CirclePressed", m_driverController.getCircleButtonPressed());
-    double x = MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband);
-    double y = MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband);
-    double rot = MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband);
+
+    SmartDashboard.putBoolean("CirclePressed", driverPS4Controller.getCircleButtonPressed());
+
+
+    //get input from driver PS4 Controller
+    double xSpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftY(), OIConstants.kDriveDeadband);
+    double ySpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftX(), OIConstants.kDriveDeadband);
+    double rotationalSpeed = MathUtil.applyDeadband(driverPS4Controller.getRightX(), OIConstants.kDriveDeadband);
     boolean fieldRelative = true;
 
-    // Switches to non field-relative driving if the driver presses the Circle button,
+    // Switches to non field-relative driving if the driver presses the Circle
+    // button,
     // and switches to using the limelight
-      if(LimelightHelpers.getTV("") && m_driverController.getCircleButton())
-      {
-        final var rot_limelight = limelight_aim_proportional();
-        rot = rot_limelight;
+    if (LimelightHelpers.getTV("") && driverPS4Controller.getCircleButton()) {
+      final var rot_limelight = limelight_aim_proportional();
+      rotationalSpeed = rot_limelight;
 
-        final var forward_limelight = limelight_range_proportional();
-        x = forward_limelight;
+      final var forward_limelight = limelight_range_proportional();
+      xSpeed = forward_limelight;
 
-        //while using Limelight, turn off field-relative driving.
-        fieldRelative = false;
-      }
+      // while using Limelight, turn off field-relative driving.
+      fieldRelative = false;
+    }
 
-    this.drive(
-        x,
-        y,
-        rot,
-        fieldRelative);
+    this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative);
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds) {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, maxSpeed);
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+    frontLeftMaxSwerveModule.setDesiredState(swerveModuleStates[0]);
+    frontRightMaxSwerveModule.setDesiredState(swerveModuleStates[1]);
+    rearLeftMaxSwerveModule.setDesiredState(swerveModuleStates[2]);
+    rearRightMaxSwerveModule.setDesiredState(swerveModuleStates[3]);
   }
 
   public ChassisSpeeds getChassisSpeeds() {
-    SwerveModuleState[] states = new SwerveModuleState[] {
-        m_frontLeft.getState(),
-        m_frontRight.getState(),
-        m_rearLeft.getState(),
-        m_rearRight.getState()
+    SwerveModuleState[] swerveModuleStates = new SwerveModuleState[] {
+        frontLeftMaxSwerveModule.getState(),
+        frontRightMaxSwerveModule.getState(),
+        rearLeftMaxSwerveModule.getState(),
+        rearRightMaxSwerveModule.getState()
     };
-    return DriveConstants.kDriveKinematics.toChassisSpeeds(states);
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(swerveModuleStates);
   }
 
-  
-
-  public void buttonBindings(PS4Controller m_driverController_, PS4Controller m_codriverController) {
-    m_driverController = m_driverController_;
+  public void buttonBindings(PS4Controller ps4DriverController, PS4Controller ps4CodriverController) {
+    driverPS4Controller = ps4DriverController;
     // this.setDefaultCommand(
     // // The left stick controls translation of the robot.
     // // Turning is controlled by the X axis of the right stick.
@@ -243,14 +253,14 @@ public class DriveSubsystem extends CSubsystem {
     // this));
 
     // Reset gyro
-    new JoystickButton(m_driverController, Button.kOptions.value)
+    new JoystickButton(driverPS4Controller, Button.kOptions.value)
         .whileTrue(
             GyroReset());
 
     // Slow Down Button
-    new JoystickButton(m_driverController, Button.kR2.value)
+    new JoystickButton(driverPS4Controller, Button.kR2.value)
         .whileTrue(
-            SlowDown());
+            slowDown());
   }
 
   /**
@@ -259,24 +269,24 @@ public class DriveSubsystem extends CSubsystem {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return swerveDriveOdemtry.getPoseMeters();
   }
 
   /**
    * Resets the odometry to the specified pose.
    *
-   * @param pose The pose to which to set the odometry.
+   * @param pose2d The pose to which to set the odometry.
    */
-  public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(
-        Rotation2d.fromDegrees(m_gyro.getAngle()),
+  public void resetOdometry(Pose2d pose2d) {
+    swerveDriveOdemtry.resetPosition(
+        Rotation2d.fromDegrees(gyroAHRS.getAngle()),
         new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
+            frontLeftMaxSwerveModule.getPosition(),
+            frontRightMaxSwerveModule.getPosition(),
+            rearLeftMaxSwerveModule.getPosition(),
+            rearRightMaxSwerveModule.getPosition()
         },
-        pose);
+        pose2d);
   }
 
   /**
@@ -284,27 +294,28 @@ public class DriveSubsystem extends CSubsystem {
    *
    * @param xSpeed        Speed of the robot in the x direction (forward).
    * @param ySpeed        Speed of the robot in the y direction (sideways).
-   * @param rot           Angular rate of the robot.
+   * @param rotation           Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to the
    *                      field.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+  public void drive(double xSpeed, double ySpeed, double rotation, boolean fieldRelative) {
     // Convert the commanded speeds into the correct units for the drivetrain
     double xSpeedDelivered = xSpeed * maxSpeed;
     double ySpeedDelivered = ySpeed * maxSpeed;
-    double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
+    double rotationDelivered = rotation * DriveConstants.kMaxAngularSpeed;
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
-                Rotation2d.fromDegrees(-1.0 * m_gyro.getAngle()))
-            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, maxSpeed);
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotationDelivered, Rotation2d.fromDegrees(-1.0 * gyroAHRS.getAngle()))
+            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotationDelivered));
+    
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeed);
+
+    frontLeftMaxSwerveModule.setDesiredState(swerveModuleStates[0]);
+    frontRightMaxSwerveModule.setDesiredState(swerveModuleStates[1]);
+    rearLeftMaxSwerveModule.setDesiredState(swerveModuleStates[2]);
+    rearRightMaxSwerveModule.setDesiredState(swerveModuleStates[3]);
+
   }
 
   /**
@@ -322,10 +333,10 @@ public class DriveSubsystem extends CSubsystem {
   public CCommand WheelX() {
     return cCommand_("DriveSubsystem.WheelX")
         .onExecute(() -> {
-          m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-          m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-          m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-          m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+          frontLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+          frontRightMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+          rearRightMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+          rearLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
         });
   }
 
@@ -337,23 +348,23 @@ public class DriveSubsystem extends CSubsystem {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, maxSpeed);
-    m_frontLeft.setDesiredState(desiredStates[0]);
-    m_frontRight.setDesiredState(desiredStates[1]);
-    m_rearLeft.setDesiredState(desiredStates[2]);
-    m_rearRight.setDesiredState(desiredStates[3]);
+    frontLeftMaxSwerveModule.setDesiredState(desiredStates[0]);
+    frontRightMaxSwerveModule.setDesiredState(desiredStates[1]);
+    rearLeftMaxSwerveModule.setDesiredState(desiredStates[2]);
+    rearRightMaxSwerveModule.setDesiredState(desiredStates[3]);
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
-    m_frontLeft.resetEncoders();
-    m_rearLeft.resetEncoders();
-    m_frontRight.resetEncoders();
-    m_rearRight.resetEncoders();
+    frontLeftMaxSwerveModule.resetEncoders();
+    rearLeftMaxSwerveModule.resetEncoders();
+    frontRightMaxSwerveModule.resetEncoders();
+    rearRightMaxSwerveModule.resetEncoders();
   }
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.reset();
+    gyroAHRS.reset();
   }
 
   /**
@@ -362,7 +373,7 @@ public class DriveSubsystem extends CSubsystem {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Rotation2d.fromDegrees(m_gyro.getAngle()).getDegrees();
+    return Rotation2d.fromDegrees(gyroAHRS.getAngle()).getDegrees();
   }
 
   /**
@@ -371,11 +382,11 @@ public class DriveSubsystem extends CSubsystem {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return gyroAHRS.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
   // Set speed to 1/4 when command is active
-  public CCommand SlowDown() {
+  public CCommand slowDown() {
     return cCommand_("DriveSubsystem.SlowDown")
         .onInitialize(() -> {
           maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond / 4;
