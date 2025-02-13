@@ -91,6 +91,6 @@ public class BucketSubsystem extends CSubsystem {
     }
     public void periodic ()
     {
-        m_PidController.calculate(m_snowblowerEncoder.get(),Constants.BucketSubsystem.bucketPositionArray[positionIndex]);
+        m_snowblowerMotor.set( m_PidController.calculate(m_snowblowerEncoder.get(),Constants.BucketSubsystem.bucketPositionArray[positionIndex]));
     }
 }
