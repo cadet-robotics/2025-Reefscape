@@ -53,14 +53,12 @@ public final class Configs {
                     .positionWrappingInputRange(0, turningFactor);
         }
     }
+
     public final class ElevatorSubsystem {
         public static SparkMaxConfig kElevatorMotorConfig = new SparkMaxConfig();
         static {
                 kElevatorMotorConfig
                         .idleMode(IdleMode.kBrake);
-                kElevatorMotorConfig.closedLoop
-                        .feedbackSensor( FeedbackSensor.kAlternateOrExternalEncoder )
-                        .pid( 1.0, 0.0, 0.0 );
         }
     }
 }
