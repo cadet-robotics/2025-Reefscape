@@ -67,7 +67,7 @@ public class DriveSubsystem extends CSubsystem {
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
 
-  public static PS4Controller m_driverController; 
+  public static PS4Controller m_driverController;
   // The gyro sensor
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
 
@@ -112,7 +112,38 @@ public class DriveSubsystem extends CSubsystem {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
-    SmartDashboard.putBoolean("L1Pressed", m_driverController.getL1ButtonPressed());    
+    SmartDashboard.putBoolean("CirclePressed", m_driverController.getCircleButtonPressed());
+    double tx = MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband);
+    double ty = MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband);
+    double rot = MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband);
+    boolean fieldRelative = true;
+
+    // Switches to non field-relative driving if the driver presses the L1 button,
+    // and switches to using the limelight
+    if (LimelightHelpers.getTV("") == true && m_driverController.getCircleButtonPressed()) {
+      // if (m_driverController.getCircleButtonPressed()) {
+
+      // RawFiducial[] fiducials = LimelightHelpers.getRawFiducials("");
+      // for (RawFiducial fiducial : fiducials) {
+      //   int id = fiducial.id; // Tag ID
+      //   double txnc = fiducial.txnc; // X offset (no crosshair)
+      //   double tync = fiducial.tync; // Y offset (no crosshair)
+      //   double ta = fiducial.ta; // Target area
+      //   double distToCamera = fiducial.distToCamera; // Distance to camera
+      //   double distToRobot = fiducial.distToRobot; // Distance to robot
+      //   double ambiguity = fiducial.ambiguity; // Tag pose ambiguity
+        
+      // }
+      tx = LimelightHelpers.getTX("");
+      ty = LimelightHelpers.getTY("");
+      fieldRelative = false;
+    }
+
+    this.drive(
+        tx,
+        ty,
+        rot,
+        fieldRelative);
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds) {
@@ -182,43 +213,47 @@ public class DriveSubsystem extends CSubsystem {
 
   public void buttonBindings(PS4Controller m_driverController_, PS4Controller m_codriverController) {
     m_driverController = m_driverController_;
-    this.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        new RunCommand(
-            () -> {
+    // this.setDefaultCommand(
+    // // The left stick controls translation of the robot.
+    // // Turning is controlled by the X axis of the right stick.
+    // new RunCommand(
+    // () -> {
 
-              double tx = MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband);
-              double ty = MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband);
-              double rot = MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband);
-              boolean fieldRelative = true;
+    // double tx = MathUtil.applyDeadband(m_driverController.getLeftY(),
+    // OIConstants.kDriveDeadband);
+    // double ty = MathUtil.applyDeadband(m_driverController.getLeftX(),
+    // OIConstants.kDriveDeadband);
+    // double rot = MathUtil.applyDeadband(m_driverController.getRightX(),
+    // OIConstants.kDriveDeadband);
+    // boolean fieldRelative = true;
 
-              // Switches to non field-relative driving if the driver presses the L1 button,
-              // and switches to using the limelight
-              if (LimelightHelpers.getTV("") == true && m_driverController.getL1ButtonPressed()) {
+    // // Switches to non field-relative driving if the driver presses the L1
+    // button,
+    // // and switches to using the limelight
+    // if (LimelightHelpers.getTV("") == true &&
+    // m_driverController.getL1ButtonPressed()) {
 
-                
-                RawFiducial[] fiducials = LimelightHelpers.getRawFiducials("");
-                  for (RawFiducial fiducial : fiducials) {
-                    int id = fiducial.id;                    // Tag ID
-                    double txnc = fiducial.txnc;             // X offset (no crosshair)
-                    double tync = fiducial.tync;             // Y offset (no crosshair)
-                    double ta = fiducial.ta;                 // Target area
-                    double distToCamera = fiducial.distToCamera;  // Distance to camera
-                    double distToRobot = fiducial.distToRobot;    // Distance to robot
-                    double ambiguity = fiducial.ambiguity;   // Tag pose ambiguity
-                    tx = distToCamera;
-                    ty = ta;
-                  }
-              }
+    // RawFiducial[] fiducials = LimelightHelpers.getRawFiducials("");
+    // for (RawFiducial fiducial : fiducials) {
+    // int id = fiducial.id; // Tag ID
+    // double txnc = fiducial.txnc; // X offset (no crosshair)
+    // double tync = fiducial.tync; // Y offset (no crosshair)
+    // double ta = fiducial.ta; // Target area
+    // double distToCamera = fiducial.distToCamera; // Distance to camera
+    // double distToRobot = fiducial.distToRobot; // Distance to robot
+    // double ambiguity = fiducial.ambiguity; // Tag pose ambiguity
+    // tx = distToCamera;
+    // ty = ta;
+    // }
+    // }
 
-              this.drive(
-                  tx,
-                  ty,
-                  rot,
-                  fieldRelative);
-            },
-            this));
+    // this.drive(
+    // tx,
+    // ty,
+    // rot,
+    // fieldRelative);
+    // },
+    // this));
 
     // Reset gyro
     new JoystickButton(m_driverController, Button.kOptions.value)
