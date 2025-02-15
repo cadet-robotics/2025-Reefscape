@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class AlgaeSubsystem extends CSubsystem {
     
-    // Make a new motor with a specified port and type
+    // Creation of the two sparkmaxes that control the neo 550 motors
     private final SparkMax m_leftAlgaeMotor = new SparkMax( Constants.AlgaeSubsystem.kLeftAlgaeMotor, MotorType.kBrushless );
     private final SparkMax m_rightAlgaeMotor = new SparkMax( Constants.AlgaeSubsystem.kRightAlgaeMotor, MotorType.kBrushless );
 
@@ -30,17 +30,13 @@ public class AlgaeSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters 
         );
-        // Changing the brake type and inverted on the right motor
+        // Changing the brake type of and inverting the right motor
         m_rightAlgaeMotor.configure( 
             Configs.AlgaeSubsystemConfig.kRightMotorConfig,
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters  
         );
     }
-
-    // Allows access of the motor objects
-    public SparkMax Left() { return m_leftAlgaeMotor; }
-    public SparkMax Right() { return m_rightAlgaeMotor; }
 
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
         // Intake
@@ -64,6 +60,7 @@ public class AlgaeSubsystem extends CSubsystem {
                 m_rightAlgaeMotor.stopMotor();
             });
     }
+
     // Spins the motors outwards until the command stops running
     public CCommand IntakeOut() {
         return cCommand_("AccessoryMotorSubsystem.IntakeOut")
