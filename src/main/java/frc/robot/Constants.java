@@ -109,10 +109,10 @@ public final class Constants {
 
   public static final class AlgaeSubsystem {
 
-    public static final int kLeftAlgaeMotor = 19;
-    public static final int kRightAlgaeMotor = 18;
+    public static final int kLeftAlgaeMotor = 19; // CAN ID
+    public static final int kRightAlgaeMotor = 18; // CAN ID
+    public static final double kSpeed = 0.10; // Speed
     
-    public static final double speed = 0.10;
   }
 
 }
