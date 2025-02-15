@@ -112,6 +112,10 @@ public final class Constants {
     public static final double kExtendSpeed = 0.5;
     public static final int kFrontLimitSwitch = 1;
     public static final int kBackLimitSwitch = 0;
+    // Can be Hold or Press
+    // Hold : button must be heald for movement
+    // Press: will fully extend or retract with one press
+    public static final String extederMode = "Press";
   }
 
 }
