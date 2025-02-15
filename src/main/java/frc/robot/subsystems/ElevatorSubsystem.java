@@ -108,10 +108,10 @@ public class ElevatorSubsystem extends CSubsystem {
     public void setDesiredState( double desiredState ) {
         double move = m_elevatorController.calculate( s_elevatorEncoder.getDistance(), desiredState );
         if ( move > 0 && !m_topLimitSwitch.get() ) {
-            m_elevatorMotor.set( move );
+            m_elevatorMotor.set( move/100.0 );
         } else {
             if ( move < 0 && !m_bottomLimitSwitch.get() ) {
-                m_elevatorMotor.set( move );
+                m_elevatorMotor.set( move/100.0 );
             } else {
                 m_elevatorMotor.set( 0);
             }

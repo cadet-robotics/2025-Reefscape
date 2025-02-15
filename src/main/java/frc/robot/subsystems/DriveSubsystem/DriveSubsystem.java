@@ -179,6 +179,7 @@ public class DriveSubsystem extends CSubsystem {
 
                 // SmartDashboard.putBoolean("LimelightDetecting", LimelightHelpers.get)
                 final var rot_limelight = limelight_aim_proportional();
+                
                 rot = rot_limelight;
 
                 final var forward_limelight = limelight_range_proportional();
