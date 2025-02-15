@@ -108,10 +108,10 @@ public final class Constants {
   }
 
   public static final class HorzontalExtenderSubsystem {
-    public static final int kSnowblowerMotor = 21;
-    public static final double kExtendSpeed = 0.5;
-    public static final int kFrontLimitSwitch = 1;
-    public static final int kBackLimitSwitch = 0;
+    public static final int kSnowblowerMotor = 21; // CAN ID
+    public static final double kExtendSpeed = 0.5; // Speed
+    public static final int kFrontLimitSwitch = 1; // DIO Port 
+    public static final int kBackLimitSwitch = 0;  // DIO Port
     // Can be Hold or Press
     // Hold : button must be heald for movement
     // Press: will fully extend or retract with one press
