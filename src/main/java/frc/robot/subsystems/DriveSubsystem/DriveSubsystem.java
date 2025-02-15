@@ -142,9 +142,9 @@ public class DriveSubsystem extends CSubsystem {
   // "ta" (area) for target ranging rather than "ty"
   double limelight_range_proportional() {
     double kP = .1;
-    double targetingForwardSpeed = LimelightHelpers.getTY("limelight") * kP;
+    double targetingForwardSpeed = LimelightHelpers.getTA("limelight") * kP;
     targetingForwardSpeed *= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
-    targetingForwardSpeed *= -1.0;
+    // targetingForwardSpeed *= -1.0;
     return targetingForwardSpeed;
   }
 
@@ -152,6 +152,7 @@ public class DriveSubsystem extends CSubsystem {
   public void periodic() {
     // Update the odometry in the periodic block
     SmartDashboard.putNumber("Gyro", gyroAHRS.getAngle());
+    boolean useLimeLight = false;
 
     swerveDriveOdemtry.update(
         Rotation2d.fromDegrees(gyroAHRS.getAngle()),
@@ -175,17 +176,18 @@ public class DriveSubsystem extends CSubsystem {
     // button,
     // and switches to using the limelight
     if (LimelightHelpers.getTV("") && driverPS4Controller.getCircleButton()) {
+      useLimeLight = true;
       final var rot_limelight = limelight_aim_proportional();
       rotationalSpeed = rot_limelight;
 
       final var forward_limelight = limelight_range_proportional();
-      xSpeed = forward_limelight;
+      xSpeed = forward_limelight/10.0;
 
       // while using Limelight, turn off field-relative driving.
       fieldRelative = false;
     }
 
-    this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative);
+    this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative, useLimeLight );
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds) {
@@ -297,12 +299,20 @@ public class DriveSubsystem extends CSubsystem {
    * @param rotation           Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to the
    *                      field.
+   * @param limelightdrive Wither the drive function is using the limelight
    */
-  public void drive(double xSpeed, double ySpeed, double rotation, boolean fieldRelative) {
+  public void drive(double xSpeed, double ySpeed, double rotation, boolean fieldRelative, boolean limeLightDrive) {
     // Convert the commanded speeds into the correct units for the drivetrain
-    double xSpeedDelivered = xSpeed * maxSpeed;
-    double ySpeedDelivered = ySpeed * maxSpeed;
-    double rotationDelivered = rotation * DriveConstants.kMaxAngularSpeed;
+    double speedMultiplier;
+    if ( limeLightDrive ) {
+      speedMultiplier = 5.0;
+    } else {
+      speedMultiplier = 1.0;
+    }
+
+    double xSpeedDelivered = xSpeed * maxSpeed/speedMultiplier;
+    double ySpeedDelivered = ySpeed * maxSpeed/speedMultiplier;
+    double rotationDelivered = rotation * DriveConstants.kMaxAngularSpeed/speedMultiplier;
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
@@ -317,6 +327,7 @@ public class DriveSubsystem extends CSubsystem {
     rearRightMaxSwerveModule.setDesiredState(swerveModuleStates[3]);
 
   }
+
 
   /**
    * Sets the wheels into an X formation to prevent movement.
