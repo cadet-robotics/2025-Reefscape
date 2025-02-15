@@ -169,7 +169,7 @@ public class DriveSubsystem extends CSubsystem {
     //get input from driver PS4 Controller
     double xSpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftY(), OIConstants.kDriveDeadband);
     double ySpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftX(), OIConstants.kDriveDeadband);
-    double rotationalSpeed = MathUtil.applyDeadband(driverPS4Controller.getRightX(), OIConstants.kDriveDeadband);
+    double rotationalSpeed = -MathUtil.applyDeadband(driverPS4Controller.getRightX(), OIConstants.kDriveDeadband);
     boolean fieldRelative = true;
 
     // Switches to non field-relative driving if the driver presses the Circle
