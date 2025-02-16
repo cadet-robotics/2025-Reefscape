@@ -72,7 +72,6 @@ public final class Configs {
                 .inverted( true );
         }
     }
-}
 
     public final class ElevatorSubsystem {
         public static SparkMaxConfig kElevatorMotorConfig = new SparkMaxConfig();
@@ -81,10 +80,13 @@ public final class Configs {
                         .idleMode(IdleMode.kBrake);
         }
     }
-    public static final class BucketSubsystem {
-        public static final int kSnowblowerMotor = 21; // CAN ID
-        public static final double SnowblowerSpeed = 0.10; // Speed
-        public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
-  
+
+    public final class BucketSubsystem {
+        public static final SparkMaxConfig kSnowblowerConfig = new SparkMaxConfig();
+        static {
+                kSnowblowerConfig
+                        .idleMode(IdleMode.kBrake);
+        }
     }
+    
 }

@@ -150,6 +150,8 @@ public final class Constants {
     public static final double kServoEnagedPos = 1.0; // Postion
     public static final double kServoDisenagedPos = 1.0; // Position
   
+  }
+
   public static final class BucketSubsystem {
 
     public static final int kSnowblowerMotor = 21; // CAN ID
@@ -157,4 +159,4 @@ public final class Constants {
     public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
 
   }
-}
+} 
