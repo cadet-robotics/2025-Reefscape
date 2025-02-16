@@ -50,18 +50,21 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 11;
-    public static final int kRearLeftDrivingCanId = 13;
-    public static final int kFrontRightDrivingCanId = 15;
-    public static final int kRearRightDrivingCanId = 17;
-
-    public static final int kFrontLeftTurningCanId = 10;
-    public static final int kRearLeftTurningCanId = 12;
-    public static final int kFrontRightTurningCanId = 14;
-    public static final int kRearRightTurningCanId = 16;
+    public static final int kFrontLeftDrivingCanId = 11;  // CAN ID
+    public static final int kRearLeftDrivingCanId = 13;   // CAN ID
+    public static final int kFrontRightDrivingCanId = 15; // CAN ID 
+    public static final int kRearRightDrivingCanId = 17;  // CAN ID 
+    public static final int kFrontLeftTurningCanId = 10;  // CAN ID 
+    public static final int kRearLeftTurningCanId = 12;   // CAN ID 
+    public static final int kFrontRightTurningCanId = 14; // CAN ID 
+    public static final int kRearRightTurningCanId = 16;  // CAN ID 
 
     public static final boolean kGyroReversed = true;
     
+    // Both of these values are changable and impact the speed of the robot in given circumstances
+    public static final double kSlowMultiplier = 5.0;
+    public static final double kLimelightSpeedMultiplier = 5.0;
+
   }
 
   public static final class ModuleConstants {
@@ -80,6 +83,7 @@ public final class Constants {
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
     public static final double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
         / kDrivingMotorReduction;
+
   }
 
   public static final class OIConstants {

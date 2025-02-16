@@ -9,42 +9,33 @@ import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
 import com.pathplanner.lib.config.RobotConfig;
-// Gyro
+
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-// Swerve Drive
+
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-// Button Matpping
+
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
-// 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
 import frc.robot.Constants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.lib.Limelight.LimelightHelpers;
-import frc.robot.lib.Limelight.LimelightHelpers.LimelightResults;
-import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Barcode;
-import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Classifier;
-import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Detector;
-import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Fiducial;
-import frc.robot.lib.Limelight.LimelightHelpers.LimelightTarget_Retro;
-import frc.robot.lib.Limelight.LimelightHelpers.RawFiducial;
-// 
+
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
 
@@ -71,11 +62,14 @@ public class DriveSubsystem extends CSubsystem {
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
 
+  // A local copy of the m_driverController from `RobotContainer.java`
   public static PS4Controller driverPS4Controller;
+
   // The gyro sensor
   private final AHRS gyroAHRS = new AHRS(NavXComType.kMXP_SPI);
 
-  public double maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond;
+  // The multiplier used for slow mode 
+  private static double slowMultiplier = 1.0;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry swerveDriveOdemtry = new SwerveDriveOdometry(
@@ -193,7 +187,7 @@ public class DriveSubsystem extends CSubsystem {
   public void driveRobotRelative(ChassisSpeeds speeds) {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, maxSpeed);
+        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
     frontLeftMaxSwerveModule.setDesiredState(swerveModuleStates[0]);
     frontRightMaxSwerveModule.setDesiredState(swerveModuleStates[1]);
     rearLeftMaxSwerveModule.setDesiredState(swerveModuleStates[2]);
@@ -212,47 +206,6 @@ public class DriveSubsystem extends CSubsystem {
 
   public void buttonBindings(PS4Controller ps4DriverController, PS4Controller ps4CodriverController) {
     driverPS4Controller = ps4DriverController;
-    // this.setDefaultCommand(
-    // // The left stick controls translation of the robot.
-    // // Turning is controlled by the X axis of the right stick.
-    // new RunCommand(
-    // () -> {
-
-    // double tx = MathUtil.applyDeadband(m_driverController.getLeftY(),
-    // OIConstants.kDriveDeadband);
-    // double ty = MathUtil.applyDeadband(m_driverController.getLeftX(),
-    // OIConstants.kDriveDeadband);
-    // double rot = MathUtil.applyDeadband(m_driverController.getRightX(),
-    // OIConstants.kDriveDeadband);
-    // boolean fieldRelative = true;
-
-    // // Switches to non field-relative driving if the driver presses the L1
-    // button,
-    // // and switches to using the limelight
-    // if (LimelightHelpers.getTV("") == true &&
-    // m_driverController.getL1ButtonPressed()) {
-
-    // RawFiducial[] fiducials = LimelightHelpers.getRawFiducials("");
-    // for (RawFiducial fiducial : fiducials) {
-    // int id = fiducial.id; // Tag ID
-    // double txnc = fiducial.txnc; // X offset (no crosshair)
-    // double tync = fiducial.tync; // Y offset (no crosshair)
-    // double ta = fiducial.ta; // Target area
-    // double distToCamera = fiducial.distToCamera; // Distance to camera
-    // double distToRobot = fiducial.distToRobot; // Distance to robot
-    // double ambiguity = fiducial.ambiguity; // Tag pose ambiguity
-    // tx = distToCamera;
-    // ty = ta;
-    // }
-    // }
-
-    // this.drive(
-    // tx,
-    // ty,
-    // rot,
-    // fieldRelative);
-    // },
-    // this));
 
     // Reset gyro
     new JoystickButton(driverPS4Controller, Button.kOptions.value)
@@ -292,34 +245,35 @@ public class DriveSubsystem extends CSubsystem {
   }
 
   /**
-   * Method to drive the robot using joystick info.
+   * Method to drive the robot using joystick info or values passed from the limelight.
    *
    * @param xSpeed        Speed of the robot in the x direction (forward).
    * @param ySpeed        Speed of the robot in the y direction (sideways).
-   * @param rotation           Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the
-   *                      field.
+   * @param rotation      Angular rate of the robot.
+   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    * @param limelightdrive Wither the drive function is using the limelight
    */
   public void drive(double xSpeed, double ySpeed, double rotation, boolean fieldRelative, boolean limeLightDrive) {
-    // Convert the commanded speeds into the correct units for the drivetrain
+
+    // The speed multiplier is used to slow down the robot when it is controlled by the limelight
     double speedMultiplier;
     if ( limeLightDrive ) {
-      speedMultiplier = 5.0;
+      speedMultiplier = DriveConstants.kLimelightSpeedMultiplier;
     } else {
       speedMultiplier = 1.0;
     }
 
-    double xSpeedDelivered = xSpeed * maxSpeed/speedMultiplier;
-    double ySpeedDelivered = ySpeed * maxSpeed/speedMultiplier;
-    double rotationDelivered = rotation * DriveConstants.kMaxAngularSpeed/speedMultiplier;
+    // Convert the commanded speeds into the correct units for the drivetrain
+    double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond/speedMultiplier/slowMultiplier;
+    double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond/speedMultiplier/slowMultiplier;
+    double rotationDelivered = rotation * DriveConstants.kMaxAngularSpeed/speedMultiplier/slowMultiplier;
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotationDelivered, Rotation2d.fromDegrees(-1.0 * gyroAHRS.getAngle()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotationDelivered));
     
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
 
     frontLeftMaxSwerveModule.setDesiredState(swerveModuleStates[0]);
     frontRightMaxSwerveModule.setDesiredState(swerveModuleStates[1]);
@@ -341,24 +295,13 @@ public class DriveSubsystem extends CSubsystem {
         });
   }
 
-  public CCommand WheelX() {
-    return cCommand_("DriveSubsystem.WheelX")
-        .onExecute(() -> {
-          frontLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-          frontRightMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-          rearRightMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-          rearLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-        });
-  }
-
   /**
    * Sets the swerve ModuleStates.
    *
    * @param desiredStates The desired SwerveModule states.
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds( desiredStates, DriveConstants.kMaxSpeedMetersPerSecond );
     frontLeftMaxSwerveModule.setDesiredState(desiredStates[0]);
     frontRightMaxSwerveModule.setDesiredState(desiredStates[1]);
     rearLeftMaxSwerveModule.setDesiredState(desiredStates[2]);
@@ -396,14 +339,33 @@ public class DriveSubsystem extends CSubsystem {
     return gyroAHRS.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
-  // Set speed to 1/4 when command is active
+  /**
+   * slowDown 
+   * Sets the slowMultiplier to the value configured in constants
+   * DriveSubsystem
+   */
   public CCommand slowDown() {
     return cCommand_("DriveSubsystem.SlowDown")
         .onInitialize(() -> {
-          maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond / 4;
+          slowMultiplier = DriveConstants.kSlowMultiplier;
         })
         .onEnd(() -> {
-          maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond;
+          slowMultiplier = 1.0;
+        });
+  }
+
+  /**
+   * WheelX 
+   * Sets the wheels into a X shape
+   * DriveSubsystem
+   */
+  public CCommand WheelX() {
+    return cCommand_("DriveSubsystem.WheelX")
+        .onExecute(() -> {
+          frontLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+          frontRightMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+          rearRightMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+          rearLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
         });
   }
 }
