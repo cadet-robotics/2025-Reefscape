@@ -107,4 +107,15 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
+  public static final class HorzontalExtenderSubsystem {
+    public static final int kSnowblowerMotor = 21; // CAN ID
+    public static final double kExtendSpeed = 0.5; // Speed
+    public static final int kFrontLimitSwitch = 1; // DIO Port 
+    public static final int kBackLimitSwitch = 0;  // DIO Port
+    // Can be Hold or Press
+    // Hold : button must be heald for movement
+    // Press: will fully extend or retract with one press
+    public static final String extederMode = "Press";
+  }
+
 }

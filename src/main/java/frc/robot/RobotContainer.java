@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 // import java.io.BufferedWriter;
 import java.util.List;
 
+import frc.robot.subsystems.HorizontalExtenderSubsystem;
 import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 
 /*
@@ -39,6 +40,7 @@ public class RobotContainer {
 
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final HorizontalExtenderSubsystem m_horizontalExtender = new HorizontalExtenderSubsystem();
 
   // The driver's controller
   private final PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
@@ -68,6 +70,9 @@ public class RobotContainer {
     
     // Swerve Drive buttons
     m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
+
+    // Horizontal Extender buttons
+    m_horizontalExtender.buttonBindings(m_driverController, m_coDriverController);
 
 }
 
