@@ -106,15 +106,6 @@ public class ElevatorSubsystem extends CSubsystem {
             .whileTrue( DisengageBrake() );
     }
 
-    // Basic global reset button for the encoder. This should only be used in testing and at the time of startup
-    public void resetEncoder() {
-        s_elevatorEncoder.reset();
-    }
-
-    public double getState() {
-        return s_elevatorEncoder.getDistance();
-    }
-
     /** 
      * Sets the desired state for the elevator motor
      * 
