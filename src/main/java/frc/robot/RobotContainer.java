@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 // import java.io.BufferedWriter;
 import java.util.List;
 
+import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.HorizontalExtenderSubsystem;
 import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 
@@ -39,6 +40,7 @@ import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 public class RobotContainer {
 
   // The robot's subsystems
+  private final AlgaeSubsystem m_intake = new AlgaeSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final HorizontalExtenderSubsystem m_horizontalExtender = new HorizontalExtenderSubsystem();
 
@@ -68,6 +70,8 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     
+    m_intake.buttonBindings(m_driverController, m_coDriverController);
+
     // Swerve Drive buttons
     m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
 
@@ -75,7 +79,6 @@ public class RobotContainer {
     m_horizontalExtender.buttonBindings(m_driverController, m_coDriverController);
 
 }
-
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

@@ -60,4 +60,16 @@ public final class Configs {
                         .idleMode(IdleMode.kBrake);
         }
     } 
+    public final class AlgaeSubsystemConfig {
+        public static final SparkMaxConfig kRightMotorConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig kLeftMotorConfig = new SparkMaxConfig();
+
+        static {
+            kLeftMotorConfig
+                .idleMode(IdleMode.kBrake);
+            kRightMotorConfig
+                .idleMode(IdleMode.kBrake)
+                .inverted( true );
+        }
+    }
 }

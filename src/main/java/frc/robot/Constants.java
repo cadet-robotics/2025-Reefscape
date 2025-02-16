@@ -116,6 +116,12 @@ public final class Constants {
     // Hold : button must be heald for movement
     // Press: will fully extend or retract with one press
     public static final String extederMode = "Press";
+  public static final class AlgaeSubsystem {
+
+    public static final int kLeftAlgaeMotor = 19; // CAN ID
+    public static final int kRightAlgaeMotor = 18; // CAN ID
+    public static final double kSpeed = 0.10; // Speed
+    
   }
 
 }
