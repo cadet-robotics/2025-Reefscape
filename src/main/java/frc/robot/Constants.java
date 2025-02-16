@@ -108,10 +108,10 @@ public final class Constants {
   }
 
   public static final class BucketSubsystem {
-    public static final int kSnowblowerMotor = 21;
-    public static final double SnowblowerSpeed = 0.10;
-    public static final double[] bucketPositionArray = {0.0,0.25,0.75};
-    public static final double kDumpPosition = 0.0;
-    public static final double kLoadPosition = 0.0;
+
+    public static final int kSnowblowerMotor = 21; // CAN ID
+    public static final double SnowblowerSpeed = 0.10; // Speed
+    public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
+
   }
 }
