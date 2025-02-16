@@ -30,6 +30,7 @@ import java.util.List;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.HorizontalExtenderSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.BucketSubsystem;
 import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 
 /*
@@ -45,6 +46,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final HorizontalExtenderSubsystem m_horizontalExtender = new HorizontalExtenderSubsystem();
   private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+  private final BucketSubsystem m_bucket = new BucketSubsystem();
 
   // The driver's controller
   private final PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
@@ -72,7 +74,11 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     
+    // Intake buttons
     m_intake.buttonBindings(m_driverController, m_coDriverController);
+
+    // Bucket System
+    m_bucket.buttonBindings(m_driverController, m_coDriverController );
 
     // Swerve Drive buttons
     m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
