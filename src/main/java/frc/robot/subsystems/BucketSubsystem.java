@@ -23,7 +23,7 @@ public class BucketSubsystem extends CSubsystem {
     private final SparkMax m_snowblowerMotor = new SparkMax( Constants.BucketSubsystem.kSnowblowerMotor, MotorType.kBrushed );
 
     // Creating the Encoder
-    private DutyCycleEncoder s_snowblowerEncoder = new DutyCycleEncoder(Constants.BucketSubsystem.kSnowblowerMotor);
+    private DutyCycleEncoder s_snowblowerEncoder = new DutyCycleEncoder( 4 );
 
     // TODO: Values need to be tuned on Mikey
     private PIDController m_PidController = new PIDController(1, 0, 0);

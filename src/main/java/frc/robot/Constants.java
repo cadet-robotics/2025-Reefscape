@@ -112,10 +112,10 @@ public final class Constants {
   }
 
   public static final class HorzontalExtenderSubsystem {
-    public static final int kSnowblowerMotor = 21; // CAN ID
+    public static final int kSnowblowerMotor = 5; // CAN ID
     public static final double kExtendSpeed = 0.5; // Speed
-    public static final int kFrontLimitSwitch = 1; // DIO Port 
-    public static final int kBackLimitSwitch = 0;  // DIO Port
+    public static final int kFrontLimitSwitch = 6; // DIO Port 
+    public static final int kBackLimitSwitch = 5;  // DIO Port
     // Can be Hold or Press
     // Hold : button must be heald for movement
     // Press: will fully extend or retract with one press
@@ -124,16 +124,15 @@ public final class Constants {
 
   public static final class AlgaeSubsystem {
 
-    public static final int kLeftAlgaeMotor = 19; // CAN ID
-    public static final int kRightAlgaeMotor = 18; // CAN ID
+    public static final int kLeftAlgaeMotor = 3; // CAN ID
+    public static final int kRightAlgaeMotor = 4; // CAN ID
     public static final double kSpeed = 0.10; // Speed
     
   }
 
   public static final class ElevatorSubsystem {
 
-    public static final int kElevatorMotor = 18; // CAN ID
-    public static final double kElevatorSpeed = 0.10; // Speed
+    public static final int kElevatorMotor = 1; // CAN ID
 
     public static final int kElevatorBrake = 0; // RLS ID
 
@@ -154,7 +153,7 @@ public final class Constants {
 
   public static final class BucketSubsystem {
 
-    public static final int kSnowblowerMotor = 21; // CAN ID
+    public static final int kSnowblowerMotor = 2; // CAN ID
     public static final double SnowblowerSpeed = 0.10; // Speed
     public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
 
