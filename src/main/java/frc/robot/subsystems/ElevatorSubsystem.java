@@ -78,7 +78,6 @@ public class ElevatorSubsystem extends CSubsystem {
         //         ElevatorLevelDown()
         //     );
 
-        // TODO: @zach the POV buttons stopped working
         new JoystickButton( m_driverController, Button.kCross.value )
             .whileTrue( 
                 ElevatorLevelUp()
@@ -152,7 +151,7 @@ public class ElevatorSubsystem extends CSubsystem {
         return cCommand_( "ElevatorSubsystem.EngageBrake")
             // Filler code TODO: must be changed when migrating to mikey
             .onInitialize( () -> {
-                m_elevatorBrake.set( 0 );
+                m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
             });
     }
 
@@ -161,7 +160,7 @@ public class ElevatorSubsystem extends CSubsystem {
         return cCommand_( "ElevatorSubsystem.DisengageBrake")
             // Filler code TODO: must be changed when migrating to mikey
             .onInitialize( () -> {
-                m_elevatorBrake.set( 1 );
+                m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoDisenagedPos );
             });
     }
 }

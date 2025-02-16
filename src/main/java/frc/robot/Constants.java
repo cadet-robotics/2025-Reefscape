@@ -118,6 +118,9 @@ public final class Constants {
     public static final int kELevatorEncoder = 2;
     public static String[] LevelNames = { "AlgaeFloor", "ScoreAlgae", "Trough", "PreClimb", "Intake", "ReefLevel2", "ReefLevel3", "AlgaeTop", "ReefTop" };
     public static double[] LevelHeights = { 0.0, 10000.0, 20000.0, 30000.0, 40000.0, 50000.0, 60000.0, 70000.0, 80000.0, 90.0000 };
+
+    public static final double kServoEnagedPos = 1.0;
+    public static final double kServoDisenagedPos = 1.0;
   
 
   }
