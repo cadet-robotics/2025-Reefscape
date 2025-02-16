@@ -116,6 +116,8 @@ public final class Constants {
     // Hold : button must be heald for movement
     // Press: will fully extend or retract with one press
     public static final String extederMode = "Press";
+  }
+
   public static final class AlgaeSubsystem {
 
     public static final int kLeftAlgaeMotor = 19; // CAN ID
@@ -124,4 +126,26 @@ public final class Constants {
     
   }
 
+  public static final class ElevatorSubsystem {
+
+    public static final int kElevatorMotor = 18; // CAN ID
+    public static final double kElevatorSpeed = 0.10; // Speed
+
+    public static final int kElevatorBrake = 0; // RLS ID
+
+    public static final int kTopLimitSwitch = 1;    // DIO ID
+    public static final int kBottomLimitSwitch = 0; // DIO ID
+
+    public static final int kElevatorEncoderA = 2; // DIO ID
+    public static final int kElevatorEncoderB = 3; // DIO ID 
+
+    public static String[] LevelNames = { "AlgaeFloor", "ScoreAlgae", "Trough", "PreClimb", "Intake", "ReefLevel2", "ReefLevel3", "AlgaeTop", "ReefTop" };
+    public static double[] LevelHeights = { 0.0, 10000.0, 20000.0, 30000.0, 40000.0, 50000.0, 60000.0, 70000.0, 80000.0, 90.0000 };
+
+    // TODO: The following values need to be tuned on Mikey
+    public static final double kServoEnagedPos = 1.0; // Postion
+    public static final double kServoDisenagedPos = 1.0; // Position
+  
+
+  }
 }

@@ -73,3 +73,12 @@ public final class Configs {
         }
     }
 }
+
+    public final class ElevatorSubsystem {
+        public static SparkMaxConfig kElevatorMotorConfig = new SparkMaxConfig();
+        static {
+                kElevatorMotorConfig
+                        .idleMode(IdleMode.kBrake);
+        }
+    }
+}
