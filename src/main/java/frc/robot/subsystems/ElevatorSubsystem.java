@@ -21,7 +21,7 @@ import frc.robot.lib.custom.CSubsystem;
 
 public class ElevatorSubsystem extends CSubsystem {
 
-   // Motor Setup
+   // Elevator motor Setup
     private static final SparkFlex m_elevatorMotor = new SparkFlex( 
         Constants.ElevatorSubsystem.kElevatorMotor, 
         MotorType.kBrushless 
@@ -31,7 +31,7 @@ public class ElevatorSubsystem extends CSubsystem {
     private static PIDController m_elevatorController = new PIDController(1.0, 0, 0);
 
     // Encoder Setup
-    private static Encoder s_elevatorEncoder = new Encoder( 2, 3 );
+    private static Encoder s_elevatorEncoder = new Encoder( Constants.ElevatorSubsystem.kElevatorEncoderA, Constants.ElevatorSubsystem.kElevatorEncoderB );
         
     // Servo Setup
     // This servo is the brake for the elevator
@@ -53,7 +53,9 @@ public class ElevatorSubsystem extends CSubsystem {
     // This should be a value between 0 and 8 ( There are 9 levels but a 0 based system will be used )
     private static int level = 0;
 
-    // Creates the Elevator Subsystem
+    /**
+     * Creates the elevator subsystem
+     */
     public ElevatorSubsystem() {
         // Configuring the brake mode on the elevator motor
         m_elevatorMotor.configure( 
@@ -63,6 +65,12 @@ public class ElevatorSubsystem extends CSubsystem {
         );
     }
 
+    /**
+     * Does all of the button bindings for the subsystem
+     *
+     * @param m_driverController The main driver controller
+     * @param m_coDriverController The co-driver controller
+     */
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
         // // Should be dpad up with a 10 degree margin for error on either side
@@ -78,17 +86,22 @@ public class ElevatorSubsystem extends CSubsystem {
         //         ElevatorLevelDown()
         //     );
 
+        // EvelatorLeverUp ( Cross )
         new JoystickButton( m_driverController, Button.kCross.value )
             .whileTrue( 
                 ElevatorLevelUp()
             );
+        // LevelDown ( Triangle )
          new JoystickButton( m_driverController, Button.kTriangle.value )
             .whileTrue( 
                 ElevatorLevelDown()
             );
 
+        // EngageBrake ( Circle )
         new JoystickButton(m_driverController, Button.kCircle.value )
            .whileTrue( EngageBrake() );
+
+        // DisengageBrake ( Square )
         new JoystickButton(m_driverController, Button.kSquare.value )
             .whileTrue( DisengageBrake() );
     }
@@ -102,8 +115,11 @@ public class ElevatorSubsystem extends CSubsystem {
         return s_elevatorEncoder.getDistance();
     }
 
-    // This function should bring the elevator to the currently seleted level and is called after a level change
-    // Should also stop the motor if it tries to go past the limit switch:w
+    /** 
+     * Sets the desired state for the elevator motor
+     * 
+     * @param desiredState The desired state for the motor
+     */
     public void setDesiredState( double desiredState ) {
         double move = m_elevatorController.calculate( s_elevatorEncoder.getDistance(), desiredState );
         if ( move > 0 && !m_topLimitSwitch.get() ) {
@@ -117,6 +133,11 @@ public class ElevatorSubsystem extends CSubsystem {
         }
     }
 
+    /**
+     * Periodic
+     * Frequently checks the elevator level and encoder position, both get sent to the dashboard.
+     * Sets the elevator motor's desired state to the position that coresponds to the selecected level
+     */
     @Override
     public void periodic() {
 
@@ -127,7 +148,11 @@ public class ElevatorSubsystem extends CSubsystem {
 
     }
      
-    // Increase the elevator level by one if it's not already at the max level ( 8 )
+    /**
+     * ElevatorLevelUp
+     * Increases the selected elevator level by one
+     * Elevator Subsystem
+     */
     public CCommand ElevatorLevelUp() {
         return cCommand_( "ElevatorSubsystem.ElevatorLevelUp" )
             .onInitialize( () -> {
@@ -136,7 +161,11 @@ public class ElevatorSubsystem extends CSubsystem {
                 }
             });
     }
-    // Decrease the elevator level by one if it's not already at the bottom level
+    /**
+     * ElevatorLevelDown
+     * Reduces the selected elevator level by one
+     * Elevator Subsystem
+     */
     public CCommand ElevatorLevelDown() {
         return cCommand_( "ElevatorSubsystem.ElevatorLevelDown" )
             .onInitialize( () -> {
@@ -146,7 +175,11 @@ public class ElevatorSubsystem extends CSubsystem {
             });
     }
 
-    // Moves the servo to a posisiton that will stop elevator motion
+    /**
+     * EngageBreak
+     * Moves the brake to the brake position
+     * Elevator Subsystem
+     */
     public CCommand EngageBrake() {
         return cCommand_( "ElevatorSubsystem.EngageBrake")
             // Filler code TODO: must be changed when migrating to mikey
@@ -155,7 +188,11 @@ public class ElevatorSubsystem extends CSubsystem {
             });
     }
 
-    // Moves the servo to a posisiton that will allow elevator motion
+    /**
+     * DisengageBrake
+     * Moves the brake to the starting position
+     * Elevator Subsystem
+     */
     public CCommand DisengageBrake() {
         return cCommand_( "ElevatorSubsystem.DisengageBrake")
             // Filler code TODO: must be changed when migrating to mikey
