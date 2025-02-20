@@ -149,6 +149,7 @@ public final class Constants {
     public static final double kServoEnagedPos = 1.0; // Postion
     public static final double kServoDisenagedPos = 1.0; // Position
   
+    public static final double kBreakEngageTime = 119.5;
   }
 
   public static final class BucketSubsystem {

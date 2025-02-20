@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PS4Controller;
@@ -49,6 +50,8 @@ public class ElevatorSubsystem extends CSubsystem {
           Constants.ElevatorSubsystem.kBottomLimitSwitch
     );
 
+    private static Timer m_breakTimer = new Timer();
+
     // The number corresponding to the level of the elevator
     // This should be a value between 0 and 8 ( There are 9 levels but a 0 based system will be used )
     private static int level = 0;
@@ -63,6 +66,10 @@ public class ElevatorSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters 
         );
+    }
+
+    public void startTimer() {
+        m_breakTimer.start();
     }
 
     /**
@@ -124,6 +131,9 @@ public class ElevatorSubsystem extends CSubsystem {
 
         setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
 
+        if ( m_breakTimer.get() <= Constants.ElevatorSubsystem.kBreakEngageTime ) {
+            m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
+        }
     }
      
     /**

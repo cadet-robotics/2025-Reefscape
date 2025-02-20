@@ -45,7 +45,7 @@ public class RobotContainer {
   private final AlgaeSubsystem m_intake = new AlgaeSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final HorizontalExtenderSubsystem m_horizontalExtender = new HorizontalExtenderSubsystem();
-  private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+  public final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
   private final BucketSubsystem m_bucket = new BucketSubsystem();
 
   // The driver's controller
