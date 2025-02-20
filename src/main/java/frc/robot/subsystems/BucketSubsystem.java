@@ -52,14 +52,32 @@ public class BucketSubsystem extends CSubsystem {
      */
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
-        new JoystickButton(m_driverController, Button.kR1.value )
+        // BucketDump ( Right Bumper ) ( Co Driver )
+        new JoystickButton(m_coDriverController, Button.kR1.value )
             .whileTrue( BucketDump() );
 
-        new JoystickButton(m_driverController, Button.kL1.value )
+        // Bucket Load ( Left Bumper ) ( Co Driver )
+        new JoystickButton(m_coDriverController, Button.kL1.value )
             .whileTrue( BucketLoad() );
 
-        new JoystickButton(m_driverController, Button.kShare.value )
+        // Bucket Start ( Share ) ( Co Driver )
+        new JoystickButton(m_coDriverController, Button.kShare.value )
             .whileTrue( BucketStart() );
+    }
+
+    /**
+     * Sets the desired state for the motor to the selected position based on the positionIndex
+     */
+    public void goToDesiredState() {
+        m_snowblowerMotor.set( m_PidController.calculate( s_snowblowerEncoder.get(), Constants.BucketSubsystem.bucketPositionArray[positionIndex]));
+    }
+    
+    /**
+     * peridically calls `goToDesiredState`
+     */
+    public void periodic ()
+    {
+        goToDesiredState();
     }
 
     /**
@@ -102,20 +120,5 @@ public class BucketSubsystem extends CSubsystem {
             .onEnd( () -> {
                 m_snowblowerMotor.stopMotor();
             });
-    }
-
-    /**
-     * Sets the desired state for the motor to the selected position based on the positionIndex
-     */
-    public void goToDesiredState() {
-        m_snowblowerMotor.set( m_PidController.calculate( s_snowblowerEncoder.get(), Constants.BucketSubsystem.bucketPositionArray[positionIndex]));
-    }
-    
-    /**
-     * peridically calls `goToDesiredState`
-     */
-    public void periodic ()
-    {
-        goToDesiredState();
     }
 }

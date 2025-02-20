@@ -73,36 +73,23 @@ public class ElevatorSubsystem extends CSubsystem {
      */
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
-        // // Should be dpad up with a 10 degree margin for error on either side
-        // new JoystickButton( m_driverController, m_driverController.getPOV() )
-        //     .and( () -> Math.abs( m_driverController.getPOV() - 0 ) < 10)
-        //     .whileTrue( 
-        //         ElevatorLevelUp()
-        //     );
-        // // Should be dpad down with a 10 degree margin for error on either side
-        //  new JoystickButton( m_driverController, m_driverController.getPOV() )
-        //      .and( () -> Math.abs( m_driverController.getPOV() - 180 ) < 10)
-        //     .whileTrue( 
-        //         ElevatorLevelDown()
-        //     );
+        // Should be dpad up with a 10 degree margin for error on either side
+        // ElevatorLevelUp ( Dpad Up ) ( Co Driver )
+        new JoystickButton( m_driverController, m_driverController.getPOV() )
+            .and( () -> Math.abs( m_coDriverController.getPOV() - 0 ) < 10)
+                .whileTrue( ElevatorLevelUp() );
+        // ElevatorLevelDown ( Dpad Down ) ( Co Driver )
+        // Should be dpad down with a 10 degree margin for error on either side
+         new JoystickButton( m_coDriverController, m_driverController.getPOV() )
+            .and( () -> Math.abs( m_driverController.getPOV() - 180 ) < 10)
+                .whileTrue( ElevatorLevelDown() );
 
-        // EvelatorLeverUp ( Cross )
-        new JoystickButton( m_driverController, Button.kCross.value )
-            .whileTrue( 
-                ElevatorLevelUp()
-            );
-        // LevelDown ( Triangle )
-         new JoystickButton( m_driverController, Button.kTriangle.value )
-            .whileTrue( 
-                ElevatorLevelDown()
-            );
-
-        // EngageBrake ( Circle )
-        new JoystickButton(m_driverController, Button.kCircle.value )
+        // EngageBrake ( Right Bumper )
+        new JoystickButton(m_driverController, Button.kR1.value )
            .whileTrue( EngageBrake() );
 
-        // DisengageBrake ( Square )
-        new JoystickButton(m_driverController, Button.kSquare.value )
+        // DisengageBrake ( Left Bumper )
+        new JoystickButton(m_driverController, Button.kL1.value )
             .whileTrue( DisengageBrake() );
     }
 

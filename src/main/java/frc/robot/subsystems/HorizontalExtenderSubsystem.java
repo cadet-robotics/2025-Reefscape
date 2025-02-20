@@ -49,18 +49,14 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
         // Extend ( Circle ) 
-        new JoystickButton(m_driverController, Button.kCircle.value )
+        new JoystickButton(m_coDriverController, Button.kCircle.value )
             .and( () -> !frontLimitSwitchPressing()  )
-            .whileTrue(
-                Extend()
-            );
+                .whileTrue( Extend() );
 
         // Retract ( Cross )
-        new JoystickButton(m_driverController, Button.kCross.value )
+        new JoystickButton(m_coDriverController, Button.kCross.value )
             .and( () -> !backLimitSwitchPressing() )
-            .whileTrue(
-                Retract()
-            );
+                .whileTrue( Retract() );
     }
 
     /**
