@@ -4,12 +4,15 @@
 
 package frc.robot;
 
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import edu.wpi.first.wpilibj.PS4Controller.Button;
+import java.util.List;
 
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
@@ -24,11 +27,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
-// import java.io.BufferedWriter;
-import java.util.List;
-
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -40,12 +38,11 @@ public class RobotContainer {
 
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+  public final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
 
   // The driver's controller
   private final PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
   private final PS4Controller m_coDriverController = new PS4Controller(OIConstants.kCoDriverControllerPort);
-
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -67,15 +64,14 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    
     // Swerve Drive buttons
     m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
 
     // Elevator Buttons
     m_elevatorSubsystem.buttonBindings(m_driverController, m_coDriverController);
 
-}
-
+  }
+  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

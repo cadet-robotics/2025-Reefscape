@@ -125,8 +125,8 @@ public final class Constants {
 
     // TODO: The following values need to be tuned on Mikey
     public static final double kServoEnagedPos = 1.0; // Postion
-    public static final double kServoDisenagedPos = 1.0; // Position
-  
+    public static final double kServoDisenagedPos = 0.0; // Position
 
+    public static final double breakEnableTime = 119.5;
   }
 }
