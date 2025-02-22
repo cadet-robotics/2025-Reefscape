@@ -122,7 +122,7 @@ public class DriveSubsystem extends CSubsystem {
   /**
    * Sets the functions that the drive subsystem will use to check if slow mode should be enabled
    */
-  public void setSlowFunctions( BooleanSupplier elevatorFunction, BooleanSupplier extenderFunction) {
+  public static void setSlowFunctions( BooleanSupplier elevatorFunction, BooleanSupplier extenderFunction) {
     elevatorSlowCheck = elevatorFunction;
     extenderSlowCheck = extenderFunction;
   }

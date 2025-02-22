@@ -66,7 +66,8 @@ public class ElevatorSubsystem extends CSubsystem {
             return true;
         }
         return false;
-    }
+    };
+
     /**
      * Creates the elevator subsystem
      */
