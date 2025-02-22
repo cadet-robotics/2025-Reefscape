@@ -27,10 +27,11 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 // import java.io.BufferedWriter;
 import java.util.List;
 
-import frc.robot.subsystems.AlgaeSubsystem;
-import frc.robot.subsystems.BucketSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.HorizontalExtenderSubsystem;
+// TODO: commented out and should be gradually uncommneted to test more features on mikey
+// import frc.robot.subsystems.AlgaeSubsystem;
+// import frc.robot.subsystems.BucketSubsystem;
+// import frc.robot.subsystems.ElevatorSubsystem;
+// import frc.robot.subsystems.HorizontalExtenderSubsystem;
 import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 
 /*
@@ -42,11 +43,12 @@ import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 public class RobotContainer {
 
   // The robot's subsystems
-  private final AlgaeSubsystem m_intake = new AlgaeSubsystem();
+  // TODO: commented out and should be gradually uncommneted to test more features on mikey
+  // private final AlgaeSubsystem m_intake = new AlgaeSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final HorizontalExtenderSubsystem m_horizontalExtender = new HorizontalExtenderSubsystem();
-  public final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
-  private final BucketSubsystem m_bucket = new BucketSubsystem();
+  // private final HorizontalExtenderSubsystem m_horizontalExtender = new HorizontalExtenderSubsystem();
+  // public final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+  // private final BucketSubsystem m_bucket = new BucketSubsystem();
 
   // The driver's controller
   private final PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
@@ -59,16 +61,19 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    // TODO: commented out and should be gradually uncommneted to test more features on mikey
+    // passSlowModeBooleanSuppliers();
 
     // Configure default commands
   }
 
-  private void passSlowModeBooleanSuppliers() {
-    DriveSubsystem.setSlowFunctions( 
-      m_elevatorSubsystem.elevatorSlowCheck, 
-      m_horizontalExtender.extenderSlowCheck 
-    );
-  }
+  // TODO: commented out and should be gradually uncommneted to test more features on mikey
+  // private void passSlowModeBooleanSuppliers() {
+  //   DriveSubsystem.setSlowFunctions( 
+  //     m_elevatorSubsystem.elevatorSlowCheck, 
+  //     m_horizontalExtender.extenderSlowCheck 
+  //   );
+  // }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -81,22 +86,23 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     
-    // Intake buttons
-    m_intake.buttonBindings(m_driverController, m_coDriverController);
+    // TODO: commented out and should be gradually uncommneted to test more features on mikey
+    // // Intake buttons
+    // m_intake.buttonBindings(m_driverController, m_coDriverController);
 
-    // Bucket System
-    m_bucket.buttonBindings(m_driverController, m_coDriverController );
+    // // Bucket System
+    // m_bucket.buttonBindings(m_driverController, m_coDriverController );
 
     // Swerve Drive buttons
     m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
 
-    // Horizontal Extender buttons
-    m_horizontalExtender.buttonBindings(m_driverController, m_coDriverController);
-    // Swerve Drive buttons
-    m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
+    // // Horizontal Extender buttons
+    // m_horizontalExtender.buttonBindings(m_driverController, m_coDriverController);
+    // // Swerve Drive buttons
+    // m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
 
-    // Elevator Buttons
-    m_elevatorSubsystem.buttonBindings(m_driverController, m_coDriverController);
+    // // Elevator Buttons
+    // m_elevatorSubsystem.buttonBindings(m_driverController, m_coDriverController);
 
 }
   /**

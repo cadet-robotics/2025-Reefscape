@@ -61,7 +61,7 @@ public class ElevatorSubsystem extends CSubsystem {
     /**
      * Checks if the robot should be in slow mode based on the position of the elevator
      */
-    public static final BooleanSupplier elevatorSlowCheck = ()->{
+    public final BooleanSupplier elevatorSlowCheck = ()->{
         if ( s_elevatorEncoder.getDistance() > Constants.ElevatorSubsystem.kElevatorSlowThreashold ) {
             return true;
         }
