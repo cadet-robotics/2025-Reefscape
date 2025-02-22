@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -57,6 +59,15 @@ public class ElevatorSubsystem extends CSubsystem {
     private static int level = 0;
 
     /**
+     * Checks if the robot should be in slow mode based on the position of the elevator
+     */
+    public static final BooleanSupplier elevatorSlowCheck = ()->{
+        if ( s_elevatorEncoder.getDistance() > Constants.ElevatorSubsystem.kElevatorSlowThreashold ) {
+            return true;
+        }
+        return false;
+    }
+    /**
      * Creates the elevator subsystem
      */
     public ElevatorSubsystem() {
@@ -92,11 +103,11 @@ public class ElevatorSubsystem extends CSubsystem {
                 .whileTrue( ElevatorLevelDown() );
 
         // EngageBrake ( Right Bumper )
-        new JoystickButton(m_driverController, Button.kR1.value )
+        new JoystickButton(m_driverController, Button.kSquare.value )
            .whileTrue( EngageBrake() );
 
         // DisengageBrake ( Left Bumper )
-        new JoystickButton(m_driverController, Button.kL1.value )
+        new JoystickButton(m_driverController, Button.kTriangle.value )
             .whileTrue( DisengageBrake() );
     }
 

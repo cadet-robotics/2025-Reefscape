@@ -132,6 +132,7 @@ public final class Constants {
 
   public static final class ElevatorSubsystem {
 
+    public static final double kElevatorSlowThreashold = 1000.0;
     public static final int kElevatorMotor = 1; // CAN ID
 
     public static final int kElevatorBrake = 0; // RLS ID

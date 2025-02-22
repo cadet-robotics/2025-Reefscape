@@ -5,6 +5,7 @@
 package frc.robot.subsystems.DriveSubsystem;
 
 import java.io.IOException;
+import java.util.function.BooleanSupplier;
 
 import org.json.simple.parser.ParseException;
 
@@ -71,6 +72,10 @@ public class DriveSubsystem extends CSubsystem {
   // The multiplier used for slow mode 
   private static double slowMultiplier = 1.0;
 
+  // The functions for if the drive subsystem should be in slow mode
+  private static BooleanSupplier elevatorSlowCheck = ()->{return true;}; // Setting the default values in case it never gets inintalized
+  private static BooleanSupplier extenderSlowCheck = ()->{return true;};
+
   // Odometry class for tracking robot pose
   SwerveDriveOdometry swerveDriveOdemtry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -109,13 +114,27 @@ public class DriveSubsystem extends CSubsystem {
             GyroReset());
 
     // Slow Down Button
-    new JoystickButton(driverPS4Controller, Button.kR2.value)
-        .whileTrue(
-            slowDown());
+    // new JoystickButton(driverPS4Controller, Button.kR2.value)
+    //     .whileTrue(
+    //         slowDown());
   }
 
+  /**
+   * Sets the functions that the drive subsystem will use to check if slow mode should be enabled
+   */
+  public void setSlowFunctions( BooleanSupplier elevatorFunction, BooleanSupplier extenderFunction) {
+    elevatorSlowCheck = elevatorFunction;
+    extenderSlowCheck = extenderFunction;
+  }
+  
   @Override
   public void periodic() {
+    
+    if ( driverPS4Controller.getR1ButtonPressed() || extenderSlowCheck.getAsBoolean() || elevatorSlowCheck.getAsBoolean() ) {
+      slowMultiplier = DriveConstants.kSlowMultiplier;
+    } else { 
+      slowMultiplier = 1.0;
+    }
     // Update the odometry in the periodic block
     SmartDashboard.putNumber("Gyro", gyroAHRS.getAngle());
     boolean useLimeLight = false;
@@ -244,8 +263,7 @@ public class DriveSubsystem extends CSubsystem {
     rearLeftMaxSwerveModule.setDesiredState(swerveModuleStates[2]);
     rearRightMaxSwerveModule.setDesiredState(swerveModuleStates[3]);
   }
-
-  public ChassisSpeeds getChassisSpeeds() {
+public ChassisSpeeds getChassisSpeeds() {
     SwerveModuleState[] swerveModuleStates = new SwerveModuleState[] {
         frontLeftMaxSwerveModule.getState(),
         frontRightMaxSwerveModule.getState(),
@@ -326,20 +344,20 @@ public class DriveSubsystem extends CSubsystem {
     return gyroAHRS.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
-  /**
-   * slowDown 
-   * Sets the slowMultiplier to the value configured in constants
-   * DriveSubsystem
-   */
-  public CCommand slowDown() {
-    return cCommand_("DriveSubsystem.SlowDown")
-        .onInitialize(() -> {
-          slowMultiplier = DriveConstants.kSlowMultiplier;
-        })
-        .onEnd(() -> {
-          slowMultiplier = 1.0;
-        });
-  }
+  // /**
+  //  * slowDown 
+  //  * Sets the slowMultiplier to the value configured in constants
+  //  * DriveSubsystem
+  //  */
+  // public CCommand slowDown() {
+  //   return cCommand_("DriveSubsystem.SlowDown")
+  //       .onInitialize(() -> {
+  //         slowMultiplier = DriveConstants.kSlowMultiplier;
+  //       })
+  //       .onEnd(() -> {
+  //         slowMultiplier = 1.0;
+  //       });
+  // }
 
   /**
    * WheelX 

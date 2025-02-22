@@ -10,6 +10,8 @@ import frc.robot.lib.custom.CSubsystem;
 import frc.robot.Configs;
 import frc.robot.Constants;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -27,6 +29,14 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
     private final SparkMax m_horizontalExtenderMotor = new SparkMax( Constants.HorzontalExtenderSubsystem.kSnowblowerMotor, MotorType.kBrushed );    
     private final DigitalInput s_frontLimitSwitch = new DigitalInput( Constants.HorzontalExtenderSubsystem.kFrontLimitSwitch );
     private final DigitalInput s_backLimitSwitch = new DigitalInput( Constants.HorzontalExtenderSubsystem.kBackLimitSwitch );
+
+    /**
+     * Checks if the robot should be in slow mode based on the horizontal extender
+     */
+    public final BooleanSupplier extenderSlowCheck = () -> {
+        return s_frontLimitSwitch.get(); // Will only enter slow mode if the front limit switch is pressed
+        // return !s_backLimitSwitch.get(); // Will only enter slow mode if the back limit switch is not pressed
+    };
 
     /**
      * HorizontalSubsytemSetup

@@ -63,6 +63,13 @@ public class RobotContainer {
     // Configure default commands
   }
 
+  private void passSlowModeBooleanSuppliers() {
+    DriveSubsystem.setSlowFunctions( 
+      m_elevatorSubsystem.elevatorSlowCheck, 
+      m_horizontalExtender.extenderSlowCheck 
+    );
+  }
+
   /**
    * Use this method to define your button->command mappings. Buttons can be
    * created by
