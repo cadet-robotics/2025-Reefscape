@@ -149,7 +149,6 @@ public class DriveSubsystem extends CSubsystem {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
-    SmartDashboard.putBoolean("CirclePressed", m_driverController.getCircleButtonPressed());
     double x = MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband);
     double y = MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband);
     double rot = MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband);
@@ -160,13 +159,14 @@ public class DriveSubsystem extends CSubsystem {
       if(LimelightHelpers.getTV("") && m_driverController.getCircleButton())
       {
         final var rot_limelight = limelight_aim_proportional();
-        rot = rot_limelight;
+        rot = -1.0 * rot_limelight;
 
         final var forward_limelight = limelight_range_proportional();
-        x = forward_limelight;
+        x = -0.25 * forward_limelight;
 
         //while using Limelight, turn off field-relative driving.
         fieldRelative = false;
+
       }
 
     this.drive(
@@ -248,9 +248,13 @@ public class DriveSubsystem extends CSubsystem {
             GyroReset());
 
     // Slow Down Button
-    new JoystickButton(m_driverController, Button.kR2.value)
+    new JoystickButton(m_driverController, Button.kL1.value)
         .whileTrue(
             SlowDown());
+
+    new JoystickButton(m_driverController, Button.kR2.value)
+        .whileTrue(
+            Slower());
   }
 
   /**
@@ -292,7 +296,7 @@ public class DriveSubsystem extends CSubsystem {
     // Convert the commanded speeds into the correct units for the drivetrain
     double xSpeedDelivered = xSpeed * maxSpeed;
     double ySpeedDelivered = ySpeed * maxSpeed;
-    double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
+    double rotDelivered = -1 * rot * DriveConstants.kMaxAngularSpeed;
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
@@ -378,10 +382,20 @@ public class DriveSubsystem extends CSubsystem {
   public CCommand SlowDown() {
     return cCommand_("DriveSubsystem.SlowDown")
         .onInitialize(() -> {
-          maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond / 4;
+          maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond / 2;
         })
         .onEnd(() -> {
           maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond;
         });
+  }
+
+  public CCommand Slower() {
+    return cCommand_("DriveSubsystem.Slower")
+      .onInitialize(() -> {
+        maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond / 4;
+      })
+      .onEnd(() -> {
+        maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond;
+      });
   }
 }
