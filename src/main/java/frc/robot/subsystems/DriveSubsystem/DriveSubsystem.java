@@ -132,8 +132,10 @@ public class DriveSubsystem extends CSubsystem {
     
     if ( driverPS4Controller.getR1ButtonPressed() || extenderSlowCheck.getAsBoolean() || elevatorSlowCheck.getAsBoolean() ) {
       slowMultiplier = DriveConstants.kSlowMultiplier;
+      SmartDashboard.putBoolean("slowmode", true);
     } else { 
       slowMultiplier = 1.0;
+      SmartDashboard.putBoolean( "slowmode", false);
     }
     // Update the odometry in the periodic block
     SmartDashboard.putNumber("Gyro", gyroAHRS.getAngle());
