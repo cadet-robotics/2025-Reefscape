@@ -62,7 +62,8 @@ public final class Constants {
     public static final boolean kGyroReversed = true;
     
     // Both of these values are changable and impact the speed of the robot in given circumstances
-    public static final double kSlowMultiplier = 1.0;
+    public static final double kSlowMultiplier = 2.0;
+    public static final double kSlowerMultiplier = 5.0;
     public static final double kLimelightSpeedMultiplier = 5.0;
 
   }

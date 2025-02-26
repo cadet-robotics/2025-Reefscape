@@ -130,12 +130,21 @@ public class DriveSubsystem extends CSubsystem {
   @Override
   public void periodic() {
     
-    if ( driverPS4Controller.getR1ButtonPressed() || extenderSlowCheck.getAsBoolean() || elevatorSlowCheck.getAsBoolean() ) {
+    if ( driverPS4Controller.getL1ButtonPressed() || extenderSlowCheck.getAsBoolean() || elevatorSlowCheck.getAsBoolean()) {
+
+      slowMultiplier = DriveConstants.kSlowerMultiplier;
+
+    } else if ( driverPS4Controller.getR1ButtonPressed() ) {
+
       slowMultiplier = DriveConstants.kSlowMultiplier;
       SmartDashboard.putBoolean("slowmode", true);
-    } else { 
+
+    } 
+    else { 
+
       slowMultiplier = 1.0;
       SmartDashboard.putBoolean( "slowmode", false);
+
     }
     // Update the odometry in the periodic block
     SmartDashboard.putNumber("Gyro", gyroAHRS.getAngle());
