@@ -68,7 +68,7 @@ public class DriveSubsystem extends CSubsystem {
   // The gyro sensor
   private final AHRS gyroAHRS = new AHRS(NavXComType.kMXP_SPI);
 
-  // The multiplier used for slow mode 
+  // The multipliers used for slow modes
   private static double slowMultiplier = 1.0;
 
   // Odometry class for tracking robot pose
@@ -212,10 +212,15 @@ public class DriveSubsystem extends CSubsystem {
         .whileTrue(
             GyroReset());
 
-    // Slow Down Button
-    new JoystickButton(driverPS4Controller, Button.kR2.value)
+    // Slow Down Button (1/2 Speed)
+    new JoystickButton(driverPS4Controller, Button.kL1.value)
         .whileTrue(
             slowDown());
+
+    // Slower / Fine Adjustments Button (1/5 Speed)
+    new JoystickButton(driverPS4Controller, Button.kR2.value)
+        .whileTrue(
+            slower());
   }
 
   /**
@@ -353,6 +358,22 @@ public class DriveSubsystem extends CSubsystem {
           slowMultiplier = 1.0;
         });
   }
+
+  /**
+   * slower 
+   * Sets the slowerMultiplier to the value configured in constants
+   * Used for finer adjustments
+   * DriveSubsystem
+   */
+  public CCommand slower() {
+    return cCommand_("DriveSubsystem.Slower")
+        .onInitialize(() -> {
+          slowMultiplier = DriveConstants.kSlowerMultiplier;
+        })
+        .onEnd(() -> {
+          slowMultiplier = 1.0;
+        });
+}
 
   /**
    * WheelX 
