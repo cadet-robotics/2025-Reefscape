@@ -88,6 +88,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    // TODO: commented out and should be gradually uncommneted to test more features on mikey
+    // m_robotContainer.m_elevatorSubsystem.startTimer();
   }
 
   /** This function is called periodically during operator control. */

@@ -453,7 +453,7 @@ public class LimelightHelpers {
             botpose_wpiblue = new double[6];
             camerapose_robotspace = new double[6];
             targets_Retro = new LimelightTarget_Retro[0];
-            targets_Fiducials = new LimelightTarget_Fiducial[0];
+            targets_Fiducials = new LimelightTarget_Fiducial[22];
             targets_Classifier = new LimelightTarget_Classifier[0];
             targets_Detector = new LimelightTarget_Detector[0];
             targets_Barcode = new LimelightTarget_Barcode[0];

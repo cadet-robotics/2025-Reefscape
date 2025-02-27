@@ -1,37 +1,41 @@
 package frc.robot.subsystems;
 
-import frc.robot.Configs;
-import frc.robot.Constants;
-import frc.robot.lib.custom.*;
+import java.util.function.BooleanSupplier;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import frc.robot.Configs;
+import frc.robot.Constants;
+import frc.robot.lib.custom.CCommand;
+import frc.robot.lib.custom.CSubsystem;
 
 public class ElevatorSubsystem extends CSubsystem {
 
-   // Motor Setup
+   // Elevator motor Setup
     private static final SparkFlex m_elevatorMotor = new SparkFlex( 
         Constants.ElevatorSubsystem.kElevatorMotor, 
         MotorType.kBrushless 
     );
 
-    // Encoder Setup
-    private static AbsoluteEncoder m_elevatorEncoder;
-        
+    // TODO: Pid tuning should be conducted on Mikey
+    private static PIDController m_elevatorController = new PIDController(1.0, 0, 0);
 
+    // Encoder Setup
+    private static Encoder s_elevatorEncoder = new Encoder( Constants.ElevatorSubsystem.kElevatorEncoderA, Constants.ElevatorSubsystem.kElevatorEncoderB );
+        
     // Servo Setup
     // This servo is the brake for the elevator
     private static final Servo m_elevatorBrake = new Servo( 
@@ -39,20 +43,36 @@ public class ElevatorSubsystem extends CSubsystem {
     );
 
     // Top Limit Switch Setup
+    // Limit SwitchES ARE REVERSED
     private static final DigitalInput m_topLimitSwitch = new DigitalInput( 
           Constants.ElevatorSubsystem.kTopLimitSwitch
     );
 
     // Bottom Limit Switch Setup
+    //limit switch values are reversed
     private static final DigitalInput m_bottomLimitSwitch = new DigitalInput( 
           Constants.ElevatorSubsystem.kBottomLimitSwitch
     );
+
+    private static Timer m_breakTimer = new Timer();
 
     // The number corresponding to the level of the elevator
     // This should be a value between 0 and 8 ( There are 9 levels but a 0 based system will be used )
     private static int level = 0;
 
-    // Creates the Elevator Subsystem
+    /**
+     * Checks if the robot should be in slow mode based on the position of the elevator
+     */
+    public final BooleanSupplier elevatorSlowCheck = ()->{
+        if ( s_elevatorEncoder.getDistance() > Constants.ElevatorSubsystem.kElevatorSlowThreashold ) {
+            return true;
+        }
+        return false;
+    };
+
+    /**
+     * Creates the elevator subsystem
+     */
     public ElevatorSubsystem() {
         // Configuring the brake mode on the elevator motor
         m_elevatorMotor.configure( 
@@ -60,77 +80,169 @@ public class ElevatorSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters 
         );
-        m_elevatorEncoder = m_elevatorMotor.getAbsoluteEncoder();
     }
 
-    public void buttonBindings( PS4Controller m_driverController ) {
+    public void startTimer() {
+        m_breakTimer.start();
+    }
+
+    /**
+     * Does all of the button bindings for the subsystem
+     *
+     * @param m_driverController The main driver controller
+     * @param m_coDriverController The co-driver controller
+     */
+    public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
         // Should be dpad up with a 10 degree margin for error on either side
-        new JoystickButton( m_driverController, Button.kTouchpad.value )
-            .and( () -> Button.kTouchpad.value < 10 || Button.kTouchpad.value > 350  )
-            .whileTrue( 
-                ElevatorLevelUp()
-            );
-        // Should be dpad down with a 10 degree margin for error on either side
-        new JoystickButton( m_driverController, Button.kTouchpad.value )
-            .and( () -> Math.abs( Button.kTouchpad.value - 180 ) < 10)
-            .whileTrue( 
-                ElevatorLevelDown()
-            );
+        // ElevatorLevelUp ( Dpad Up ) ( Co Driver )
+        // new JoystickButton( m_coDriverController, m_driverController.getPOV() )
+        //     .and( () -> Math.abs( m_coDriverController.getPOV() - 0 ) < 10)
+        //         .whileTrue( ElevatorLevelUp() );
+        // // ElevatorLevelDown ( Dpad Down ) ( Co Driver )
+        // // Should be dpad down with a 10 degree margin for error on either side
+        //  new JoystickButton( m_coDriverController, m_driverController.getPOV() )
+        //     .and( () -> Math.abs( m_coDriverController.getPOV() - 180 ) < 10)
+        //         .whileTrue( ElevatorLevelDown() );
+
+        // EngageBrake ( Right Bumper )
+        // new JoystickButton(m_driverController, Button.kTriangle.value )
+        //    .whileTrue( EngageBrake() );
+
+        // DisengageBrake ( Left Bumper )
+        // new JoystickButton(m_driverController, Button.kCross.value )
+        //     .whileTrue( DisengageBrake() );
+
+        new JoystickButton(m_driverController, Button.kCircle.value )
+            .whileTrue( ElevatorDoUp() );
+
+        new JoystickButton(m_driverController, Button.kSquare.value )
+            .whileTrue( ElevatorDoDown() );
     }
 
-    // The following 5 functions are just in case the RobotContainer needs to access any of these; most likely for testing.
-    public SparkFlex getElevatorMotor() {
-        return m_elevatorMotor;
-    }
-    public AbsoluteEncoder getElevatorEncoder() {
-        return m_elevatorEncoder;
-    }
-    public Servo getElevatorBrake() {
-        return m_elevatorBrake;
-    }
-    public DigitalInput getTopLimitSwitch() {
-       return m_topLimitSwitch;
-    }
-    public DigitalInput getBottomLimitSwitch() {
-       return m_bottomLimitSwitch;
-    }
-    
-    // // Basic global reset button for the encoder. This should only be used in testing and at the time of startup
-    // public void resetEncoder() {
-    //     m_elevatorEncoder.;
-    // }
-
-    // This function should bring the elevator to the currently seleted level and is called after a level change
-    @Override
-    public void periodic() {
-        SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
-        if ( m_elevatorEncoder.getPosition() > Constants.ElevatorSubsystem.LevelHeights[level] ) {
-            m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevatorSpeed );
-        } else if ( m_elevatorEncoder.getPosition() < Constants.ElevatorSubsystem.LevelHeights[level] ) {
-            m_elevatorMotor.set( Constants.ElevatorSubsystem.kElevatorSpeed );
+    /** 
+     * Sets the desired state for the elevator motor
+     * 
+     * @param desiredState The desired state for the motor
+     */
+    public void setDesiredState( double desiredState ) {
+        double move = m_elevatorController.calculate( s_elevatorEncoder.getDistance(), desiredState );
+        //limit switch values are reversed
+        if ( move > 0 && !m_topLimitSwitch.get() ) {
+            m_elevatorMotor.set( move/100.0 );
         } else {
-            m_elevatorMotor.stopMotor();
+            //limit switch values are reversed
+            if ( move < 0 && !m_bottomLimitSwitch.get() ) {
+                m_elevatorMotor.set( move/100.0 );
+            } else {
+                m_elevatorMotor.set( 0);
+            }
         }
     }
+
+    /**
+     * Periodic
+     * Frequently checks the elevator level and encoder position, both get sent to the dashboard.
+     * Sets the elevator motor's desired state to the position that coresponds to the selecected level
+     */
+    @Override
+    public void periodic() {
+
+        //limit switch values are reversed 
+        SmartDashboard.putBoolean( "ElevatorBottom", m_bottomLimitSwitch.get() );
+        SmartDashboard.putBoolean( "ElevatorTop", m_topLimitSwitch.get() );
+        SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
+        SmartDashboard.putNumber( "Encoder", s_elevatorEncoder.getDistance() );
+
+        // setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
+
+        // if ( m_breakTimer.get() <= Constants.ElevatorSubsystem.kBreakEngageTime ) {
+        //     m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
+        // }
+    }
      
-    // Increase the elevator level by one if it's not already at the max level ( 8 )
+    /**
+     * ElevatorLevelUp
+     * Increases the selected elevator level by one
+     * Elevator Subsystem
+     */
     public CCommand ElevatorLevelUp() {
         return cCommand_( "ElevatorSubsystem.ElevatorLevelUp" )
-            .onExecute( () -> {
+            .onInitialize( () -> {
                 if ( level < 8 ) {
                     level = level + 1;
                 }
             });
     }
-    // Decrease the elevator level by one if it's not already at the bottom level
+    /**
+     * ElevatorLevelDown
+     * Reduces the selected elevator level by one
+     * Elevator Subsystem
+     */
     public CCommand ElevatorLevelDown() {
         return cCommand_( "ElevatorSubsystem.ElevatorLevelDown" )
-            .onExecute( () -> {
+            .onInitialize( () -> {
                 if ( level > 0 ) {
                     level = level - 1;
                 }
             });
     }
 
+    /**
+     * EngageBreak
+     * Moves the brake to the brake position
+     * Elevator Subsystem
+     */
+    public CCommand EngageBrake() {
+        return cCommand_( "ElevatorSubsystem.EngageBrake")
+            // Filler code TODO: must be changed when migrating to mikey
+            .onInitialize( () -> {
+                m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
+            });
+    }
+
+    /**
+     * DisengageBrake
+     * Moves the brake to the starting position
+     * Elevator Subsystem
+     */
+    public CCommand DisengageBrake() {
+        return cCommand_( "ElevatorSubsystem.DisengageBrake")
+            // Filler code TODO: must be changed when migrating to mikey
+            .onInitialize( () -> {
+                m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoDisenagedPos );
+            });
+    }
+
+    public CCommand ElevatorDoUp() {
+        return cCommand_( "ElevatorSubsystem.ElevatorDoUp")
+            // Filler code TODO: must be changed when migrating to mikey
+            .onExecute( () -> {
+                // Limit Switches are reversed
+                if ( m_topLimitSwitch.get() ) {
+                    m_elevatorMotor.set( Constants.ElevatorSubsystem.kElevaotrManualSpeed);
+                } else {
+                    m_elevatorMotor.stopMotor();
+                }
+            })
+            .onEnd( ()->{
+                m_elevatorMotor.stopMotor();
+            });
+    }
+    
+    public CCommand ElevatorDoDown() {
+        return cCommand_( "ElevatorSubsystem.ElevaotrDoDown")
+            // Filler code TODO: must be changed when migrating to mikey
+            .onInitialize( () -> {
+                // LIMIT SWITCHES ARE REVERSED
+                if ( m_bottomLimitSwitch.get() ) {
+                    m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevaotrManualSpeed);
+                } else { 
+                    m_elevatorMotor.stopMotor();
+                }
+            })
+            .onEnd( ()->{
+                m_elevatorMotor.stopMotor();
+            });
+    }
 }

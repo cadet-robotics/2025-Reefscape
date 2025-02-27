@@ -4,10 +4,10 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -50,18 +50,22 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 11;
-    public static final int kRearLeftDrivingCanId = 13;
-    public static final int kFrontRightDrivingCanId = 15;
-    public static final int kRearRightDrivingCanId = 17;
-
-    public static final int kFrontLeftTurningCanId = 10;
-    public static final int kRearLeftTurningCanId = 12;
-    public static final int kFrontRightTurningCanId = 14;
-    public static final int kRearRightTurningCanId = 16;
+    public static final int kFrontLeftDrivingCanId = 11;  // CAN ID
+    public static final int kRearLeftDrivingCanId = 13;   // CAN ID
+    public static final int kFrontRightDrivingCanId = 15; // CAN ID 
+    public static final int kRearRightDrivingCanId = 17;  // CAN ID 
+    public static final int kFrontLeftTurningCanId = 10;  // CAN ID 
+    public static final int kRearLeftTurningCanId = 12;   // CAN ID 
+    public static final int kFrontRightTurningCanId = 14; // CAN ID 
+    public static final int kRearRightTurningCanId = 16;  // CAN ID 
 
     public static final boolean kGyroReversed = true;
     
+    // Both of these values are changable and impact the speed of the robot in given circumstances
+    public static final double kSlowMultiplier = 2.0;
+    public static final double kSlowerMultiplier = 5.0;
+    public static final double kLimelightSpeedMultiplier = 5.0;
+
   }
 
   public static final class ModuleConstants {
@@ -80,10 +84,12 @@ public final class Constants {
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
     public static final double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
         / kDrivingMotorReduction;
+
   }
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kCoDriverControllerPort = 1;
     public static final double kDriveDeadband = 0.05;
   }
 
@@ -106,41 +112,54 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
+  public static final class HorzontalExtenderSubsystem {
+    public static final int kSnowblowerMotor = 5; // CAN ID
+    public static final double kExtendSpeed = 0.3; // Speed
+    public static final int kFrontLimitSwitch = 6; // DIO Port 
+    public static final int kBackLimitSwitch = 5;  // DIO Port
+    // Can be Hold or Press
+    // Hold : button must be heald for movement
+    // Press: will fully extend or retract with one press
+    public static final String extederMode = "Hold";
+  }
+
   public static final class AlgaeSubsystem {
 
-    public static final int kLeftAlgaeMotor = 19;
-    public static final int kRightAlgaeMotor = 19;
+    public static final int kLeftAlgaeMotor = 3; // CAN ID
+    public static final int kRightAlgaeMotor = 4; // CAN ID
+    public static final double kAlgaeIntakeSpeed = 0.6; // Speed
     
-    public static final double speed = 0.10;
-  }
-
-public static final class BucketSubsytem {
-
-    public static final int kSnowblowerMotor = 21;
-    public static final double SnowblowerSpeed = 0.10;
-
-    public static final double kStartPosition = 0.0;
-    public static final double kDumpPosition = 0.0;
-    public static final double kLoadPosition = 0.0;
-  }
-
-  public static final class HorzontalExtenderSubsystem {
-    public static final int kSnowblowerMotor = 21;
-    public static final double kExtendSpeed = 0.5;
-    public static final int kFrontLimitSwitch = 1;
-    public static final int kBackLimitSwitch = 0;
   }
 
   public static final class ElevatorSubsystem {
 
-    public static final int kElevatorMotor = 18;
-    public static final double kElevatorSpeed = 0.10;
-    public static final int kElevatorBrake = 0;
-    public static final int kTopLimitSwitch = 1;
-    public static final int kBottomLimitSwitch = 0;
+    public static final double kElevaotrManualSpeed = 0.1;
+    public static final double kElevatorSlowThreashold = 1000.0;
+    public static final int kElevatorMotor = 1; // CAN ID
+
+    public static final int kElevatorBrake = 0; // RLS ID
+
+    public static final int kTopLimitSwitch = 0;    // DIO ID
+    public static final int kBottomLimitSwitch = 1; // DIO ID
+
+    public static final int kElevatorEncoderA = 2; // DIO ID
+    public static final int kElevatorEncoderB = 3; // DIO ID 
 
     public static String[] LevelNames = { "AlgaeFloor", "ScoreAlgae", "Trough", "PreClimb", "Intake", "ReefLevel2", "ReefLevel3", "AlgaeTop", "ReefTop" };
-    public static double[] LevelHeights = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    public static double[] LevelHeights = { 0.0, 10000.0, 20000.0, 30000.0, 40000.0, 50000.0, 60000.0, 70000.0, 80000.0, 90.0000 };
+
+    // TODO: The following values need to be tuned on Mikey
+    public static final double kServoEnagedPos = 1.0; // Postion
+    public static final double kServoDisenagedPos = 1.0; // Position
+  
+    public static final double kBreakEngageTime = 119.5;
+  }
+
+  public static final class BucketSubsystem {
+
+    public static final int kSnowblowerMotor = 2; // CAN ID
+    public static final double SnowblowerSpeed = 0.2; // Speed
+    public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
 
   }
-}
+} 

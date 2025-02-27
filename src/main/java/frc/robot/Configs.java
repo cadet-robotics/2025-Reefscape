@@ -1,8 +1,8 @@
 package frc.robot;
 
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
 import frc.robot.Constants.ModuleConstants;
 
@@ -53,7 +53,14 @@ public final class Configs {
                     .positionWrappingInputRange(0, turningFactor);
         }
     }
-    public final class AccessoryMotorSubsystem {
+    public final class HorizontalExtenderSubsystem {
+        public static final SparkMaxConfig kSnowblowerConfig = new SparkMaxConfig();
+        static {
+                kSnowblowerConfig
+                        .idleMode(IdleMode.kBrake);
+        }
+    } 
+    public final class AlgaeSubsystemConfig {
         public static final SparkMaxConfig kRightMotorConfig = new SparkMaxConfig();
         public static final SparkMaxConfig kLeftMotorConfig = new SparkMaxConfig();
 
@@ -65,6 +72,15 @@ public final class Configs {
                 .inverted( true );
         }
     }
+
+    public final class ElevatorSubsystem {
+        public static SparkMaxConfig kElevatorMotorConfig = new SparkMaxConfig();
+        static {
+                kElevatorMotorConfig
+                        .idleMode(IdleMode.kBrake);
+        }
+    }
+
     public final class BucketSubsystem {
         public static final SparkMaxConfig kSnowblowerConfig = new SparkMaxConfig();
         static {
@@ -72,18 +88,5 @@ public final class Configs {
                         .idleMode(IdleMode.kBrake);
         }
     }
-    public final class HorizontalExtenderSubsystem {
-        public static final SparkMaxConfig kSnowblowerConfig = new SparkMaxConfig();
-        static {
-                kSnowblowerConfig
-                        .idleMode(IdleMode.kBrake);
-        }
-    } 
-    public final class ElevatorSubsystem {
-        public static final SparkMaxConfig kElevatorMotorConfig = new SparkMaxConfig();
-        static {
-                kElevatorMotorConfig
-                        .idleMode(IdleMode.kBrake);
-        }
-    }
+    
 }
