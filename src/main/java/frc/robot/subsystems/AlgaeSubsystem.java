@@ -65,8 +65,8 @@ public class AlgaeSubsystem extends CSubsystem {
     public CCommand IntakeIn() {
         return cCommand_("AccessoryMotorSubsystem.IntakeIn")
             .onInitialize( () -> {
-                m_leftAlgaeMotor.set( -Constants.AlgaeSubsystem.kSpeed );
-                m_rightAlgaeMotor.set( -Constants.AlgaeSubsystem.kSpeed );
+                m_leftAlgaeMotor.set( -Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
+                m_rightAlgaeMotor.set( -Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
             })
             .onEnd( () -> {
                 m_leftAlgaeMotor.stopMotor();
@@ -82,8 +82,8 @@ public class AlgaeSubsystem extends CSubsystem {
     public CCommand IntakeOut() {
         return cCommand_("AccessoryMotorSubsystem.IntakeOut")
             .onInitialize( () -> {
-                m_leftAlgaeMotor.set( Constants.AlgaeSubsystem.kSpeed );
-                m_rightAlgaeMotor.set( Constants.AlgaeSubsystem.kSpeed );
+                m_leftAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
+                m_rightAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
             })
             .onEnd( () -> {
                 m_leftAlgaeMotor.stopMotor();

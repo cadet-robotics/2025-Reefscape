@@ -26,7 +26,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class HorizontalExtenderSubsystem extends CSubsystem {
 
     // The spark max for the snowblower motor
-    private final SparkMax m_horizontalExtenderMotor = new SparkMax( Constants.HorzontalExtenderSubsystem.kSnowblowerMotor, MotorType.kBrushed );    
+    private final SparkMax m_horizontalExtenderMotor = new SparkMax( Constants.HorzontalExtenderSubsystem.kSnowblowerMotor, MotorType.kBrushed );
+    //limit switch values are reversed    
     private final DigitalInput s_frontLimitSwitch = new DigitalInput( Constants.HorzontalExtenderSubsystem.kFrontLimitSwitch );
     private final DigitalInput s_backLimitSwitch = new DigitalInput( Constants.HorzontalExtenderSubsystem.kBackLimitSwitch );
 
@@ -34,6 +35,7 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
      * Checks if the robot should be in slow mode based on the horizontal extender
      */
     public final BooleanSupplier extenderSlowCheck = () -> {
+        //limit switch values are reversed
         return s_frontLimitSwitch.get(); // Will only enter slow mode if the front limit switch is pressed
         // return !s_backLimitSwitch.get(); // Will only enter slow mode if the back limit switch is not pressed
     };
@@ -60,12 +62,14 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
 
         // Extend ( Circle ) 
         new JoystickButton(m_coDriverController, Button.kCircle.value )
-            .and( () -> !frontLimitSwitchPressing()  )
+            //limit switch values are reversed
+            .and( () -> frontLimitSwitchPressing()  )
                 .whileTrue( Extend() );
 
         // Retract ( Cross )
         new JoystickButton(m_coDriverController, Button.kCross.value )
-            .and( () -> !backLimitSwitchPressing() )
+            //limit switch values are reversed
+            .and( () -> backLimitSwitchPressing() )
                 .whileTrue( Retract() );
     }
 
@@ -75,6 +79,7 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
      * @return boolean limit switch state
      */
     public Boolean frontLimitSwitchPressing() {
+        //limit switch values are reversed
         return s_frontLimitSwitch.get();
     }
 
@@ -84,13 +89,15 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
      * @return boolean limit switch state
      */
     public Boolean backLimitSwitchPressing() {
+        //limit switch values are reversed
         return s_backLimitSwitch.get();
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("allIn", frontLimitSwitchPressing());
-        SmartDashboard.putBoolean("allOut", backLimitSwitchPressing());
+        //limit switch values are reversed
+        SmartDashboard.putBoolean("allIn", !frontLimitSwitchPressing());
+        SmartDashboard.putBoolean("allOut", !backLimitSwitchPressing());
     }
 
     /**
@@ -104,7 +111,8 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
             .onInitialize( () -> {
                 SmartDashboard.putBoolean( "moveOut", true );
                 if ( Constants.HorzontalExtenderSubsystem.extederMode.equals( "Press" )) {
-                    while( !( frontLimitSwitchPressing())) {
+                    //limit switch values are reversed
+                    while( ( frontLimitSwitchPressing())) {
                         m_horizontalExtenderMotor.set( Constants.HorzontalExtenderSubsystem.kExtendSpeed);
                     }
                 }
@@ -112,7 +120,8 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
             // Code for press extension
             .onExecute( () -> {
                 if ( Constants.HorzontalExtenderSubsystem.extederMode.equals( "Hold" )) {
-                    if ( frontLimitSwitchPressing() ) {
+                    //limit switch values are reversed
+                    if ( !frontLimitSwitchPressing() ) {
                         m_horizontalExtenderMotor.stopMotor();
                         return;
                     }
@@ -138,7 +147,8 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
             .onInitialize( () -> {
                 SmartDashboard.putBoolean( "moveIn", true );
                 if ( Constants.HorzontalExtenderSubsystem.extederMode.equals( "Press" )) {
-                    while( !( backLimitSwitchPressing())) {
+                    //limit switch values are reversed
+                    while( ( backLimitSwitchPressing())) {
                         m_horizontalExtenderMotor.set( -Constants.HorzontalExtenderSubsystem.kExtendSpeed);
                     }
                 }
@@ -146,7 +156,8 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
             // Code for press retraction
             .onExecute( () -> {
                 if ( Constants.HorzontalExtenderSubsystem.extederMode.equals( "Hold" )) {
-                    if ( backLimitSwitchPressing() ) {
+                    //limit switch values are reversed
+                    if ( !backLimitSwitchPressing() ) {
                         m_horizontalExtenderMotor.stopMotor();
                         return;
                     }

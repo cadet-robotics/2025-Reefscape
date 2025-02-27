@@ -89,7 +89,7 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
-    public static final int kCoDriverControllerPort = 0;
+    public static final int kCoDriverControllerPort = 1;
     public static final double kDriveDeadband = 0.05;
   }
 
@@ -114,32 +114,33 @@ public final class Constants {
 
   public static final class HorzontalExtenderSubsystem {
     public static final int kSnowblowerMotor = 5; // CAN ID
-    public static final double kExtendSpeed = 0.5; // Speed
+    public static final double kExtendSpeed = 0.3; // Speed
     public static final int kFrontLimitSwitch = 6; // DIO Port 
     public static final int kBackLimitSwitch = 5;  // DIO Port
     // Can be Hold or Press
     // Hold : button must be heald for movement
     // Press: will fully extend or retract with one press
-    public static final String extederMode = "Press";
+    public static final String extederMode = "Hold";
   }
 
   public static final class AlgaeSubsystem {
 
     public static final int kLeftAlgaeMotor = 3; // CAN ID
     public static final int kRightAlgaeMotor = 4; // CAN ID
-    public static final double kSpeed = 0.10; // Speed
+    public static final double kAlgaeIntakeSpeed = 0.6; // Speed
     
   }
 
   public static final class ElevatorSubsystem {
 
+    public static final double kElevaotrManualSpeed = 0.1;
     public static final double kElevatorSlowThreashold = 1000.0;
     public static final int kElevatorMotor = 1; // CAN ID
 
     public static final int kElevatorBrake = 0; // RLS ID
 
-    public static final int kTopLimitSwitch = 1;    // DIO ID
-    public static final int kBottomLimitSwitch = 0; // DIO ID
+    public static final int kTopLimitSwitch = 0;    // DIO ID
+    public static final int kBottomLimitSwitch = 1; // DIO ID
 
     public static final int kElevatorEncoderA = 2; // DIO ID
     public static final int kElevatorEncoderB = 3; // DIO ID 
@@ -157,7 +158,7 @@ public final class Constants {
   public static final class BucketSubsystem {
 
     public static final int kSnowblowerMotor = 2; // CAN ID
-    public static final double SnowblowerSpeed = 0.10; // Speed
+    public static final double SnowblowerSpeed = 0.2; // Speed
     public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
 
   }

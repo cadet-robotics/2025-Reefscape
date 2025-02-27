@@ -43,11 +43,13 @@ public class ElevatorSubsystem extends CSubsystem {
     );
 
     // Top Limit Switch Setup
+    // Limit SwitchES ARE REVERSED
     private static final DigitalInput m_topLimitSwitch = new DigitalInput( 
           Constants.ElevatorSubsystem.kTopLimitSwitch
     );
 
     // Bottom Limit Switch Setup
+    //limit switch values are reversed
     private static final DigitalInput m_bottomLimitSwitch = new DigitalInput( 
           Constants.ElevatorSubsystem.kBottomLimitSwitch
     );
@@ -94,22 +96,28 @@ public class ElevatorSubsystem extends CSubsystem {
 
         // Should be dpad up with a 10 degree margin for error on either side
         // ElevatorLevelUp ( Dpad Up ) ( Co Driver )
-        new JoystickButton( m_driverController, m_driverController.getPOV() )
-            .and( () -> Math.abs( m_coDriverController.getPOV() - 0 ) < 10)
-                .whileTrue( ElevatorLevelUp() );
-        // ElevatorLevelDown ( Dpad Down ) ( Co Driver )
-        // Should be dpad down with a 10 degree margin for error on either side
-         new JoystickButton( m_coDriverController, m_driverController.getPOV() )
-            .and( () -> Math.abs( m_driverController.getPOV() - 180 ) < 10)
-                .whileTrue( ElevatorLevelDown() );
+        // new JoystickButton( m_coDriverController, m_driverController.getPOV() )
+        //     .and( () -> Math.abs( m_coDriverController.getPOV() - 0 ) < 10)
+        //         .whileTrue( ElevatorLevelUp() );
+        // // ElevatorLevelDown ( Dpad Down ) ( Co Driver )
+        // // Should be dpad down with a 10 degree margin for error on either side
+        //  new JoystickButton( m_coDriverController, m_driverController.getPOV() )
+        //     .and( () -> Math.abs( m_coDriverController.getPOV() - 180 ) < 10)
+        //         .whileTrue( ElevatorLevelDown() );
 
         // EngageBrake ( Right Bumper )
-        new JoystickButton(m_driverController, Button.kSquare.value )
-           .whileTrue( EngageBrake() );
+        // new JoystickButton(m_driverController, Button.kTriangle.value )
+        //    .whileTrue( EngageBrake() );
 
         // DisengageBrake ( Left Bumper )
-        new JoystickButton(m_driverController, Button.kTriangle.value )
-            .whileTrue( DisengageBrake() );
+        // new JoystickButton(m_driverController, Button.kCross.value )
+        //     .whileTrue( DisengageBrake() );
+
+        new JoystickButton(m_driverController, Button.kCircle.value )
+            .whileTrue( ElevatorDoUp() );
+
+        new JoystickButton(m_driverController, Button.kSquare.value )
+            .whileTrue( ElevatorDoDown() );
     }
 
     /** 
@@ -119,9 +127,11 @@ public class ElevatorSubsystem extends CSubsystem {
      */
     public void setDesiredState( double desiredState ) {
         double move = m_elevatorController.calculate( s_elevatorEncoder.getDistance(), desiredState );
+        //limit switch values are reversed
         if ( move > 0 && !m_topLimitSwitch.get() ) {
             m_elevatorMotor.set( move/100.0 );
         } else {
+            //limit switch values are reversed
             if ( move < 0 && !m_bottomLimitSwitch.get() ) {
                 m_elevatorMotor.set( move/100.0 );
             } else {
@@ -138,14 +148,17 @@ public class ElevatorSubsystem extends CSubsystem {
     @Override
     public void periodic() {
 
+        //limit switch values are reversed 
+        SmartDashboard.putBoolean( "ElevatorBottom", m_bottomLimitSwitch.get() );
+        SmartDashboard.putBoolean( "ElevatorTop", m_topLimitSwitch.get() );
         SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
         SmartDashboard.putNumber( "Encoder", s_elevatorEncoder.getDistance() );
 
-        setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
+        // setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
 
-        if ( m_breakTimer.get() <= Constants.ElevatorSubsystem.kBreakEngageTime ) {
-            m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
-        }
+        // if ( m_breakTimer.get() <= Constants.ElevatorSubsystem.kBreakEngageTime ) {
+        //     m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
+        // }
     }
      
     /**
@@ -198,6 +211,38 @@ public class ElevatorSubsystem extends CSubsystem {
             // Filler code TODO: must be changed when migrating to mikey
             .onInitialize( () -> {
                 m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoDisenagedPos );
+            });
+    }
+
+    public CCommand ElevatorDoUp() {
+        return cCommand_( "ElevatorSubsystem.ElevatorDoUp")
+            // Filler code TODO: must be changed when migrating to mikey
+            .onExecute( () -> {
+                // Limit Switches are reversed
+                if ( m_topLimitSwitch.get() ) {
+                    m_elevatorMotor.set( Constants.ElevatorSubsystem.kElevaotrManualSpeed);
+                } else {
+                    m_elevatorMotor.stopMotor();
+                }
+            })
+            .onEnd( ()->{
+                m_elevatorMotor.stopMotor();
+            });
+    }
+    
+    public CCommand ElevatorDoDown() {
+        return cCommand_( "ElevatorSubsystem.ElevaotrDoDown")
+            // Filler code TODO: must be changed when migrating to mikey
+            .onInitialize( () -> {
+                // LIMIT SWITCHES ARE REVERSED
+                if ( m_bottomLimitSwitch.get() ) {
+                    m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevaotrManualSpeed);
+                } else { 
+                    m_elevatorMotor.stopMotor();
+                }
+            })
+            .onEnd( ()->{
+                m_elevatorMotor.stopMotor();
             });
     }
 }

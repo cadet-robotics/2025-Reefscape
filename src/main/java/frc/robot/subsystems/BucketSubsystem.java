@@ -13,6 +13,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -30,11 +31,16 @@ public class BucketSubsystem extends CSubsystem {
 
     private static int positionIndex = 0;
 
+    // Wiether the bucket is being moved manually
+    private static boolean moving = false;
+
     /**
     * Create an instace of the BucketSubsystem
     */
     public BucketSubsystem() {
         
+        SmartDashboard.putBoolean( "Moving forward", false);
+        SmartDashboard.putBoolean( "Moving backward", false );
         // Changes the brake type on the motor
         m_snowblowerMotor.configure( 
             Configs.BucketSubsystem.kSnowblowerConfig,
@@ -63,6 +69,12 @@ public class BucketSubsystem extends CSubsystem {
         // Bucket Start ( Share ) ( Co Driver )
         new JoystickButton(m_coDriverController, Button.kShare.value )
             .whileTrue( BucketStart() );
+
+        new JoystickButton(m_coDriverController, Button.kTriangle.value )
+            .whileTrue( BucketForward() );
+        
+        new JoystickButton(m_coDriverController, Button.kSquare.value )
+            .whileTrue( BucketBackward() );
     }
 
     /**
@@ -77,7 +89,9 @@ public class BucketSubsystem extends CSubsystem {
      */
     public void periodic ()
     {
-        goToDesiredState();
+        if ( !moving ) {
+            // goToDesiredState();
+        }
     }
 
     /**
@@ -99,7 +113,7 @@ public class BucketSubsystem extends CSubsystem {
      * BucketSubsystem
     */
     public CCommand BucketDump() {
-        return cCommand_( "BucketSubsystem.BucketStart" )
+        return cCommand_( "BucketSubsystem.BucketDump" )
             .onInitialize( () -> {
                 positionIndex = 1;
             })
@@ -118,6 +132,38 @@ public class BucketSubsystem extends CSubsystem {
                 positionIndex = 2;
             })
             .onEnd( () -> {
+                m_snowblowerMotor.stopMotor();
+            });
+    }
+
+    public CCommand BucketForward() {
+        return cCommand_( "BucketSubsystem.BucketForward")
+            .onInitialize( () -> {
+                moving = true;
+                SmartDashboard.putBoolean( "Moving forward", true );
+            })
+            .onExecute( () -> {
+                m_snowblowerMotor.set( Constants.BucketSubsystem.SnowblowerSpeed );
+            })
+            .onEnd( () -> {
+                moving = false;
+                SmartDashboard.putBoolean( "Moving forward", true );
+                m_snowblowerMotor.stopMotor();
+            });
+    }
+
+    public CCommand BucketBackward() {
+        return cCommand_( "BucketSubsystem.BucketBackward")
+            .onInitialize( () -> {
+                SmartDashboard.putBoolean( "Moving backward", true );
+                moving = true;
+            })
+            .onExecute( () -> {
+                m_snowblowerMotor.set( -Constants.BucketSubsystem.SnowblowerSpeed );
+            })
+            .onEnd( () -> {
+                SmartDashboard.putBoolean( "Moving backward", false);
+                moving = false;
                 m_snowblowerMotor.stopMotor();
             });
     }
