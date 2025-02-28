@@ -153,6 +153,27 @@ public final class Constants {
     public static final double kServoDisenagedPos = 1.0; // Position
   
     public static final double kBreakEngageTime = 119.5;
+
+    public static final class CrappyPid {
+      // TODO: tune all values
+
+
+      // The slower speed to be used by the elevator when within the slow distance threshold
+      public static double kElevatorSlowSpeed = 0.05;
+
+      // Defualt speed for the elevator
+      public static double kElevatorNormSpeed = 0.1;
+      
+      // The speed the elevator will hover at ( must be enabled in elevatorSubsystem )
+      public static double kElevatorHoverSpeed = 0.01;
+
+      // The distance when the elevator should stop, or use the however speed instead of moving slowly
+      public static double kElevatorStopThreshold = 200.0;
+
+      // The distance where crappy pid should use a slow speed instead of the normal one
+      public static double kElevatorSlowDistanceThreashold = 500.0;
+
+    }
   }
 
   public static final class BucketSubsystem {
@@ -160,6 +181,7 @@ public final class Constants {
     public static final int kSnowblowerMotor = 2; // CAN ID
     public static final double SnowblowerSpeed = 0.2; // Speed
     public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
+
 
   }
 } 
