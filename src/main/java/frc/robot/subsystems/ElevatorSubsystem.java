@@ -128,14 +128,14 @@ public class ElevatorSubsystem extends CSubsystem {
     public void setDesiredState( double desiredState ) {
         double move = m_elevatorController.calculate( s_elevatorEncoder.getDistance(), desiredState );
         //limit switch values are reversed
-        if ( move > 0 && !m_topLimitSwitch.get() ) {
-            m_elevatorMotor.set( move/100.0 );
+        if ( move > 0 && !m_topLimitSwitch.get() && move < Constants.ElevatorSubsystem.PidMax ) {
+            m_elevatorMotor.set( move );
         } else {
             //limit switch values are reversed
-            if ( move < 0 && !m_bottomLimitSwitch.get() ) {
-                m_elevatorMotor.set( move/100.0 );
+            if ( move < 0 && !m_bottomLimitSwitch.get() && move > -Constants.ElevatorSubsystem.PidMax ) {
+                m_elevatorMotor.set( move );
             } else {
-                m_elevatorMotor.set( 0);
+                m_elevatorMotor.stopMotor();
             }
         }
     }

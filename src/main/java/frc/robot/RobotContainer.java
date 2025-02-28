@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 // import java.io.BufferedWriter;
 import java.util.List;
 
-// TODO: commented out and should be gradually uncommneted to test more features on mikey
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.BucketSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -43,7 +42,6 @@ import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 public class RobotContainer {
 
   // The robot's subsystems
-  // TODO: commented out and should be gradually uncommneted to test more features on mikey
   private final AlgaeSubsystem m_intake = new AlgaeSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final HorizontalExtenderSubsystem m_horizontalExtender = new HorizontalExtenderSubsystem();
@@ -61,19 +59,18 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    // TODO: commented out and should be gradually uncommneted to test more features on mikey
-    // passSlowModeBooleanSuppliers();
+    passSlowModeBooleanSuppliers();
 
     // Configure default commands
   }
 
-  // TODO: commented out and should be gradually uncommneted to test more features on mikey
-  // private void passSlowModeBooleanSuppliers() {
-  //   DriveSubsystem.setSlowFunctions( 
-  //     m_elevatorSubsystem.elevatorSlowCheck, 
-  //     m_horizontalExtender.extenderSlowCheck 
-  //   );
-  // }
+  private void passSlowModeBooleanSuppliers() {
+
+    DriveSubsystem.setSlowFunctions( 
+      m_elevatorSubsystem.elevatorSlowCheck, 
+      m_horizontalExtender.extenderSlowCheck 
+    );
+  }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -86,7 +83,6 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     
-    // TODO: commented out and should be gradually uncommneted to test more features on mikey
     // Intake buttons
     m_intake.buttonBindings(m_driverController, m_coDriverController);
 

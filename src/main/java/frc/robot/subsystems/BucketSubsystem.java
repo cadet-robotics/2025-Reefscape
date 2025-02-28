@@ -81,7 +81,13 @@ public class BucketSubsystem extends CSubsystem {
      * Sets the desired state for the motor to the selected position based on the positionIndex
      */
     public void goToDesiredState() {
-        m_snowblowerMotor.set( m_PidController.calculate( s_snowblowerEncoder.get(), Constants.BucketSubsystem.bucketPositionArray[positionIndex]));
+       double attempt = m_PidController.calculate( s_snowblowerEncoder.get(), Constants.BucketSubsystem.bucketPositionArray[positionIndex])
+       // Simple limit for PID control
+       if ( attempt < Constants.BucketSubsystem.PidMax && attempt > -Constants.BucketSubsystem.PidMax ) {
+           m_snowblowerMotor.set( attempt );
+       } else { 
+          m_snowblowerMotor.stopMotor();
+       }
     }
     
     /**

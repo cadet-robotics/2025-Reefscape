@@ -136,6 +136,8 @@ public final class Constants {
 
   public static final class ElevatorSubsystem {
 
+    public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
+
     public static final double kElevaotrManualSpeed = 0.1;
     public static final double kElevatorSlowThreashold = 1000.0;
     public static final int kElevatorMotor = 1; // CAN ID
@@ -181,10 +183,11 @@ public final class Constants {
 
   public static final class BucketSubsystem {
 
+    public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
+
     public static final int kSnowblowerMotor = 2; // CAN ID
     public static final double SnowblowerSpeed = 0.2; // Speed
     public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
-
 
   }
 
@@ -221,6 +224,7 @@ public final class Constants {
   public static class CoDriverControls
   {
     //TODO make constants for all of the buttons like DriverControls
+    // ^ Is this not already done? - Jacob
 
     public static final int bucketDumpPositionButton = Button.kR1.value;
 
@@ -236,4 +240,5 @@ public final class Constants {
 
     public static final int horizontalRetractButton = Button.kCross.value;
   }
+
 } 
