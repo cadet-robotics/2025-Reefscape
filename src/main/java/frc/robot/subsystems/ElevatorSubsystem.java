@@ -282,4 +282,21 @@ public class ElevatorSubsystem extends CSubsystem {
                 m_elevatorMotor.stopMotor();
             });
     }
+
+    // TODO: at some point we can try to have this run on startup
+    /** A command that can be used to zero the elevator encoder by moving it down to the bottom limit switch */
+    public CCommand ZeroElevator() {
+        return cCommand_( "ElevatorSubsystem.ZeroElevator")
+            .onExecute( () -> {
+                // LIMIT SWITCHES ARE REVERSED
+                if ( m_bottomLimitSwitch.get() ) {
+                    m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevaotrManualSpeed );
+                } else {
+                    m_elevatorMotor.stopMotor();
+                    s_elevatorEncoder.reset();
+                }
+            })
+            // Stop the motor in the off chance that execution of onExecute stopped before it stopped the motor
+            .onEnd( () -> { m_elevatorMotor.stopMotor();});
+    }
 }
