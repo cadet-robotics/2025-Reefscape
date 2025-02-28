@@ -130,11 +130,11 @@ public class DriveSubsystem extends CSubsystem {
   @Override
   public void periodic() {
     
-    if ( driverPS4Controller.getL1ButtonPressed() || extenderSlowCheck.getAsBoolean() || elevatorSlowCheck.getAsBoolean()) {
+    if ( driverPS4Controller.getRawButtonPressed(Constants.DriverControls.slowerButton) || extenderSlowCheck.getAsBoolean() || elevatorSlowCheck.getAsBoolean()) {
 
       slowMultiplier = DriveConstants.kSlowerMultiplier;
 
-    } else if ( driverPS4Controller.getR1ButtonPressed() ) {
+    } else if ( driverPS4Controller.getRawButtonPressed(Constants.DriverControls.slowButton) ) {
 
       slowMultiplier = DriveConstants.kSlowMultiplier;
       SmartDashboard.putBoolean("slowmode", true);

@@ -50,7 +50,7 @@ public class RobotContainer {
   public final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
   private final BucketSubsystem m_bucket = new BucketSubsystem();
 
-  // The driver's controller
+  // The drivers' controllers
   private final PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
   private final PS4Controller m_coDriverController = new PS4Controller(OIConstants.kCoDriverControllerPort);
 

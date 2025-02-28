@@ -5,6 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -161,5 +164,37 @@ public final class Constants {
     public static final double SnowblowerSpeed = 0.2; // Speed
     public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
 
+  }
+
+  public static class DriverControls
+  {
+    
+    public static PS4Controller driverPS4Controller;
+
+    //Press Option to reset the gyro
+    public static final int resetGyroButton = Button.kOptions.value;
+    
+    //Press R2 to make the intake in button
+    public static final int intakeInButton = Button.kR2.value;
+
+    //Press L2 to make the intake out button
+    public static final int intakeOutButton = Button.kL2.value;
+
+    //Press R1 to slow down
+    public static final int slowButton = Button.kR1.value;
+
+    //Press L1 to go slower than slowdown
+    public static final int slowerButton = Button.kL1.value;
+
+    //Press Circle to adjust your position when tracking apriltag with limelight
+    public static final int useLimelight = Button.kCircle.value;
+
+    //
+
+  }
+
+  public static class CoDriverControls
+  {
+    //TODO make constants for all of the buttons like DriverControls
   }
 } 
