@@ -151,7 +151,7 @@ public class ElevatorSubsystem extends CSubsystem {
         if ( distanceTo( target ) <= Constants.ElevatorSubsystem.CrappyPid.kElevatorStopThreshold ) {
             m_elevatorMotor.stopMotor();
             // Uncomment if we need a set a speed to fight the gravity when trying to hover and comment the prevois line
-            // m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kHoverSpeed );
+            // m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorHoverSpeed );
         } else if ( distanceTo( target ) > Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowDistanceThreashold ) {
             if ( s_elevatorEncoder.get() > target && m_bottomLimitSwitch.get() ) { 
                 // Go down
