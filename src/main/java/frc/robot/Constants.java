@@ -188,10 +188,11 @@ public final class Constants {
 
   }
 
-  public static class DriverControls
+  public static final class DriverControls
   {
-    
-    public static PS4Controller driverPS4Controller;
+    //TODO needs to be completely commented
+
+    //CURRENTLY UNUSED BUTTONS ON DRIVER CONTROLLER: Triangle, Cross, L3, R3, All Dpad Buttons, Touchpad, Playstation
 
     //Press Option to reset the gyro
     public static final int resetGyroButton = Button.kOptions.value;
@@ -208,15 +209,31 @@ public final class Constants {
     //Press L1 to go slower than slowdown
     public static final int slowerButton = Button.kL1.value;
 
-    //Press Circle to adjust your position when tracking apriltag with limelight
-    public static final int useLimelight = Button.kCircle.value;
+    //Press Share to adjust your position when tracking apriltag with limelight
+    //temporarily using Share button
+    public static final int useLimelight = Button.kShare.value;
 
-    //
+    public static final int elevatorUp = Button.kCircle.value;
 
+    public static final int elevatorDown = Button.kSquare.value;
   }
 
   public static class CoDriverControls
   {
     //TODO make constants for all of the buttons like DriverControls
+
+    public static final int bucketDumpPositionButton = Button.kR1.value;
+
+    public static final int bucketLoadPositionButton = Button.kL1.value;
+
+    public static final int bucketStartPositionButton = Button.kShare.value;
+
+    public static final int bucketManualForwardButton = Button.kTriangle.value;
+
+    public static final int bucketManualBackwardButton = Button.kSquare.value;
+
+    public static final int horizontalExtendButton = Button.kCircle.value;
+
+    public static final int horizontalRetractButton = Button.kCross.value;
   }
 } 
