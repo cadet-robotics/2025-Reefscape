@@ -140,6 +140,40 @@ public class ElevatorSubsystem extends CSubsystem {
         }
     }
 
+    /** Simple function to make it simple to grab the disstance to the target */
+    private static double distanceTo( double target ) {
+        return Math.abs( target * target - s_elevatorEncoder.get() * s_elevatorEncoder.get() );
+    }
+    
+    /** A worse but easier to tune version of control for the elevator if we can't get pid to work */
+    private static void crappyPID( double target ) {
+        // Use the set slow speed to get to the target
+        if ( distanceTo( target ) <= Constants.ElevatorSubsystem.CrappyPid.kElevatorStopThreshold ) {
+            m_elevatorMotor.stopMotor();
+            // Uncomment if we need a set a speed to fight the gravity when trying to hover and comment the prevois line
+            // m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorHoverSpeed );
+        } else if ( distanceTo( target ) > Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowDistanceThreashold ) {
+            if ( s_elevatorEncoder.get() > target && m_bottomLimitSwitch.get() ) { 
+                // Go down
+                m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
+            } else if ( s_elevatorEncoder.get() < target && m_topLimitSwitch.get() ) { 
+                // Go up
+                m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
+            }
+        } else {
+
+            // Full speed if distance is not within the threshold
+            if ( s_elevatorEncoder.get() > target && m_bottomLimitSwitch.get() ) { 
+                // Go down
+                m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
+            } else if ( s_elevatorEncoder.get() < target && m_topLimitSwitch.get() ) { 
+                // Go up
+                m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
+            }
+        }
+
+    }
+
     /**
      * Periodic
      * Frequently checks the elevator level and encoder position, both get sent to the dashboard.
@@ -159,6 +193,9 @@ public class ElevatorSubsystem extends CSubsystem {
         // if ( m_breakTimer.get() <= Constants.ElevatorSubsystem.kBreakEngageTime ) {
         //     m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
         // }
+
+        // Uncomment the bollow line to test when and only when ready
+        // crappyPID(Constants.ElevatorSubsystem.LevelHeights[level]);
     }
      
     /**
@@ -244,5 +281,22 @@ public class ElevatorSubsystem extends CSubsystem {
             .onEnd( ()->{
                 m_elevatorMotor.stopMotor();
             });
+    }
+
+    // TODO: at some point we can try to have this run on startup
+    /** A command that can be used to zero the elevator encoder by moving it down to the bottom limit switch */
+    public CCommand ZeroElevator() {
+        return cCommand_( "ElevatorSubsystem.ZeroElevator")
+            .onExecute( () -> {
+                // LIMIT SWITCHES ARE REVERSED
+                if ( m_bottomLimitSwitch.get() ) {
+                    m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevaotrManualSpeed );
+                } else {
+                    m_elevatorMotor.stopMotor();
+                    s_elevatorEncoder.reset();
+                }
+            })
+            // Stop the motor in the off chance that execution of onExecute stopped before it stopped the motor
+            .onEnd( () -> { m_elevatorMotor.stopMotor();});
     }
 }
