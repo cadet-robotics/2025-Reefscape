@@ -65,6 +65,9 @@ public class RobotContainer {
     // Configure default commands
   }
 
+  /**
+   * A simple method to pass the isBucketBlocking between the bucket and extender subsystems
+   */
   private void extenderBucketBlocking() { 
     m_horizontalExtender.setIsBucketBlocking( m_bucket.isBucketBlocking );
   }
