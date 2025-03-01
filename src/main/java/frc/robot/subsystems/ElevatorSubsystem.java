@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.math.controller.PIDController;
@@ -121,6 +122,12 @@ public class ElevatorSubsystem extends CSubsystem {
 
         new JoystickButton(m_coDriverController, Constants.CoDriverControls.downDPadElevatorDown )
             .whileTrue( ElevatorLevelDown() );
+
+        new JoystickButton(m_coDriverController, Button.kR2.value )
+            .whileTrue( ElevatorDoUp() );
+
+        new JoystickButton(m_coDriverController, Button.kL2.value )
+            .whileTrue( ElevatorDoDown() );
     }
 
     /** 
