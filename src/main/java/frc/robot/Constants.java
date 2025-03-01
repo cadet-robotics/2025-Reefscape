@@ -242,10 +242,10 @@ public final class Constants {
     //Press R1 on CODRIVER CONTROLLER to put the bucket into the dump position
     public static final int bucketDumpPositionButton = Button.kR1.value;
 
-    //Press Dpad-Up on CODRIVER CONTROLLER to decrease the elevator level by 1
+    //Press R2 on CODRIVER CONTROLLER to raise the elevator
     public static final int upDPadElevatorUp = Button.kR2.value;
 
-    //Press Dpad-Down on CODRIVER CONTROLLER to increase the elevator level by 1
+    //Press L2 on CODRIVER CONTROLLER to lower the elevator
     public static final int downDPadElevatorDown = Button.kL2.value;
 
     //Press Share on CODRIVER CONTROLLER to put the bucket into the start position
