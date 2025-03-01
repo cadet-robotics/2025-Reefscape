@@ -23,6 +23,9 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+//Press Cross on CODRIVER CONTROLLER to retract the "inny outty"/Horizontal Extender
+//Press Circle on CODRIVER CONTROLLER to extend the "inny outty"/Horizontal Extender//Press R1 on CODRIVER CONTROLLER to put the bucket into the dump position
+
 public class HorizontalExtenderSubsystem extends CSubsystem {
 
     // The spark max for the snowblower motor
@@ -61,13 +64,13 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
         // Extend ( Circle ) 
-        new JoystickButton(m_coDriverController, Button.kCircle.value )
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.horizontalExtendButton )
             //limit switch values are reversed
             .and( () -> frontLimitSwitchPressing()  )
                 .whileTrue( Extend() );
 
         // Retract ( Cross )
-        new JoystickButton(m_coDriverController, Button.kCross.value )
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.horizontalRetractButton )
             //limit switch values are reversed
             .and( () -> backLimitSwitchPressing() )
                 .whileTrue( Retract() );

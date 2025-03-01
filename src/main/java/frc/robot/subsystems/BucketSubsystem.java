@@ -17,6 +17,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+//Press Square on CODRIVER CONTROLLER to manually move the bucket backward
+//Press Triangle on CODRIVER CONTROLLER to manually move the bucket forward
+//Press L1 on CODRIVER CONTROLLER to put the bucket into the load position
+//Press R1 on CODRIVER CONTROLLER to put the bucket into the dump position
+//Press Share on CODRIVER CONTROLLER to put the bucket into the start position
+
 public class BucketSubsystem extends CSubsystem {
 
     // Creating a sparkmax to control the motor
@@ -59,21 +65,21 @@ public class BucketSubsystem extends CSubsystem {
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
         // BucketDump ( Right Bumper ) ( Co Driver )
-        new JoystickButton(m_coDriverController, Button.kR1.value )
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.bucketDumpPositionButton )
             .whileTrue( BucketDump() );
 
         // Bucket Load ( Left Bumper ) ( Co Driver )
-        new JoystickButton(m_coDriverController, Button.kL1.value )
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.bucketLoadPositionButton )
             .whileTrue( BucketLoad() );
 
         // Bucket Start ( Share ) ( Co Driver )
-        new JoystickButton(m_coDriverController, Button.kShare.value )
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.bucketStartPositionButton )
             .whileTrue( BucketStart() );
 
-        new JoystickButton(m_coDriverController, Button.kTriangle.value )
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.bucketManualForwardButton )
             .whileTrue( BucketForward() );
         
-        new JoystickButton(m_coDriverController, Button.kSquare.value )
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.bucketManualBackwardButton )
             .whileTrue( BucketBackward() );
     }
 

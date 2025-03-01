@@ -22,6 +22,9 @@ import frc.robot.Constants;
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
 
+//Press Square on DRIVER CONTROLLER to decrease the elevator level by 1
+//Press Circle on DRIVER CONTROLLER to increase the elevator level by 1
+
 public class ElevatorSubsystem extends CSubsystem {
 
    // Elevator motor Setup
@@ -113,10 +116,10 @@ public class ElevatorSubsystem extends CSubsystem {
         // new JoystickButton(m_driverController, Button.kCross.value )
         //     .whileTrue( DisengageBrake() );
 
-        new JoystickButton(m_driverController, Button.kCircle.value )
+        new JoystickButton(m_driverController, Constants.DriverControls.elevatorUp )
             .whileTrue( ElevatorDoUp() );
 
-        new JoystickButton(m_driverController, Button.kSquare.value )
+        new JoystickButton(m_driverController, Constants.DriverControls.elevatorDown )
             .whileTrue( ElevatorDoDown() );
     }
 
