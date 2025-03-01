@@ -109,6 +109,8 @@ public class BucketSubsystem extends CSubsystem {
         if ( !moving ) {
             // goToDesiredState();
         }
+
+        SmartDashboard.putString( "Bucket Encoder", String.valueOf(s_snowblowerEncoder.get()));
     }
 
     /**

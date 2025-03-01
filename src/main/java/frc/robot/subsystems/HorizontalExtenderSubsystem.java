@@ -102,8 +102,8 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
     @Override
     public void periodic() {
         //limit switch values are reversed
-        SmartDashboard.putBoolean("allIn", !frontLimitSwitchPressing());
-        SmartDashboard.putBoolean("allOut", !backLimitSwitchPressing());
+        SmartDashboard.putBoolean("allIn", backLimitSwitchPressing());
+        SmartDashboard.putBoolean("allOut", frontLimitSwitchPressing());
     }
 
     /**

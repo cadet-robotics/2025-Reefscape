@@ -113,10 +113,10 @@ public class ElevatorSubsystem extends CSubsystem {
         // new JoystickButton(m_driverController, Button.kCross.value )
         //     .whileTrue( DisengageBrake() );
 
-        new JoystickButton(m_driverController, Button.kCircle.value )
+        new JoystickButton(m_driverController, Constants.DriverControls.elevatorUp )
             .whileTrue( ElevatorDoUp() );
 
-        new JoystickButton(m_driverController, Button.kSquare.value )
+        new JoystickButton(m_driverController, Constants.DriverControls.elevatorDown )
             .whileTrue( ElevatorDoDown() );
     }
 
@@ -156,7 +156,7 @@ public class ElevatorSubsystem extends CSubsystem {
             if ( s_elevatorEncoder.get() > target && m_bottomLimitSwitch.get() ) { 
                 // Go down
                 m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
-            } else if ( s_elevatorEncoder.get() < target && m_topLimitSwitch.get() ) { 
+            } else if ( s_elevatorEncoder.get() < target && m_topLimitSwitch.get() ) { //  
                 // Go up
                 m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
             }
@@ -166,7 +166,7 @@ public class ElevatorSubsystem extends CSubsystem {
             if ( s_elevatorEncoder.get() > target && m_bottomLimitSwitch.get() ) { 
                 // Go down
                 m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
-            } else if ( s_elevatorEncoder.get() < target && m_topLimitSwitch.get() ) { 
+            } else if ( s_elevatorEncoder.get() < target && m_topLimitSwitch.get()  ) { // m_topLimitSwitch.get() 
                 // Go up
                 m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
             }
