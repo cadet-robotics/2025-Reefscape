@@ -106,6 +106,7 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
         //limit switch values are reversed
         SmartDashboard.putBoolean("allIn", backLimitSwitchPressing());
         SmartDashboard.putBoolean("allOut", frontLimitSwitchPressing());
+        SmartDashboard.putBoolean("ExtenderSlow", extenderSlowCheck.getAsBoolean());
     }
 
     /**

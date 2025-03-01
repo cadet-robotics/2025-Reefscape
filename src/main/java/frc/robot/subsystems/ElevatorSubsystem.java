@@ -197,6 +197,8 @@ public class ElevatorSubsystem extends CSubsystem {
         SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
         SmartDashboard.putNumber( "Encoder", s_elevatorEncoder.getPosition() );
 
+        SmartDashboard.putBoolean( "ElevatorSlow", elevatorSlowCheck.getAsBoolean() );
+
         // setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
 
         // if ( m_breakTimer.get() <= Constants.ElevatorSubsystem.kBreakEngageTime ) {

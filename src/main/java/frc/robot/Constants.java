@@ -140,7 +140,7 @@ public final class Constants {
     public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
 
     public static final double kElevaotrManualSpeed = 0.2;
-    public static final double kElevatorSlowThreashold = 1000.0;
+    public static final double kElevatorSlowThreashold = 40.0;
 
     public static final int kElevatorMotor = 1; // CAN ID
 
