@@ -40,6 +40,13 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
 
+//Press L1 on DRIVER CONTROLLER to go slower than slowdown
+//Press R1 on DRIVER CONTROLLER to slow down
+//Press Share on DRIVER CONTROLLER to adjust your position when tracking apriltag with limelight
+//Press Options on DRIVER CONTROLLER to reset the gyro
+
+
+
 public class DriveSubsystem extends CSubsystem {
 
   // Create MAXSwerveModules
@@ -109,7 +116,7 @@ public class DriveSubsystem extends CSubsystem {
     driverPS4Controller = ps4DriverController;
 
     // Reset gyro
-    new JoystickButton(driverPS4Controller, Button.kOptions.value)
+    new JoystickButton(driverPS4Controller, Constants.DriverControls.resetGyroButton)
         .whileTrue(
             GyroReset());
 
@@ -159,8 +166,6 @@ public class DriveSubsystem extends CSubsystem {
             rearRightMaxSwerveModule.getPosition()
         });
 
-    SmartDashboard.putBoolean("CirclePressed", driverPS4Controller.getCircleButtonPressed());
-
     //get input from driver PS4 Controller
     double xSpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftY(), OIConstants.kDriveDeadband);
     double ySpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftX(), OIConstants.kDriveDeadband);
@@ -170,7 +175,7 @@ public class DriveSubsystem extends CSubsystem {
     // Switches to non field-relative driving if the driver presses the Circle
     // button,
     // and switches to using the limelight
-    if (LimelightHelpers.getTV("") && driverPS4Controller.getCircleButton()) {
+    if (LimelightHelpers.getTV("") && driverPS4Controller.getRawButtonPressed(Constants.DriverControls.useLimelight)) {
       useLimeLight = true;
       final var rot_limelight = limelight_aim_proportional();
       rotationalSpeed = rot_limelight;

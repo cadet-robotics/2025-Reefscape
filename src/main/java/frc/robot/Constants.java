@@ -198,52 +198,58 @@ public final class Constants {
 
   public static final class DriverControls
   {
-    //TODO needs to be completely commented
-
     //CURRENTLY UNUSED BUTTONS ON DRIVER CONTROLLER: Triangle, Cross, L3, R3, All Dpad Buttons, Touchpad, Playstation
 
-    //Press Option to reset the gyro
-    public static final int resetGyroButton = Button.kOptions.value;
-    
-    //Press R2 to make the intake in button
-    public static final int intakeInButton = Button.kR2.value;
+    //Press Square on DRIVER CONTROLLER to decrease the elevator level by 1
+    public static final int elevatorDown = Button.kSquare.value;
 
-    //Press L2 to make the intake out button
-    public static final int intakeOutButton = Button.kL2.value;
+    //Press Circle on DRIVER CONTROLLER to increase the elevator level by 1
+    public static final int elevatorUp = Button.kCircle.value;
 
-    //Press R1 to slow down
-    public static final int slowButton = Button.kR1.value;
-
-    //Press L1 to go slower than slowdown
+    //Press L1 on DRIVER CONTROLLER to go slower than slowdown
     public static final int slowerButton = Button.kL1.value;
 
-    //Press Share to adjust your position when tracking apriltag with limelight
+    //Press R1 on DRIVER CONTROLLER to slow down
+    public static final int slowButton = Button.kR1.value;
+
+    //Press L2 on DRIVER CONTROLLER to make the intake spin outwards
+    public static final int intakeOutButton = Button.kL2.value;
+
+    //Press R2 on DRIVER CONTROLLER to make the intake spin inwards
+    public static final int intakeInButton = Button.kR2.value;
+
+    //Press Share on DRIVER CONTROLLER to adjust your position when tracking apriltag with limelight
     //temporarily using Share button
     public static final int useLimelight = Button.kShare.value;
 
-    public static final int elevatorUp = Button.kCircle.value;
-
-    public static final int elevatorDown = Button.kSquare.value;
+    //Press Options on DRIVER CONTROLLER to reset the gyro
+    public static final int resetGyroButton = Button.kOptions.value;
   }
 
   public static class CoDriverControls
   {
-    //TODO make constants for all of the buttons like DriverControls
-    // ^ Is this not already done? - Jacob
+    //CURRENTLY UNUSED BUTTONS ON CODRIVER CONTROLLER: 
 
-    public static final int bucketDumpPositionButton = Button.kR1.value;
 
-    public static final int bucketLoadPositionButton = Button.kL1.value;
-
-    public static final int bucketStartPositionButton = Button.kShare.value;
-
-    public static final int bucketManualForwardButton = Button.kTriangle.value;
-
+    //Press Square on CODRIVER CONTROLLER to manually move the bucket backward
     public static final int bucketManualBackwardButton = Button.kSquare.value;
 
+    //Press Cross on CODRIVER CONTROLLER to retract the "inny outty"/Horizontal Extender
+    public static final int horizontalRetractButton = Button.kCross.value;
+
+    //Press Circle on CODRIVER CONTROLLER to extend the "inny outty"/Horizontal Extender
     public static final int horizontalExtendButton = Button.kCircle.value;
 
-    public static final int horizontalRetractButton = Button.kCross.value;
-  }
+    //Press Triangle on CODRIVER CONTROLLER to manually move the bucket forward
+    public static final int bucketManualForwardButton = Button.kTriangle.value;
 
+    //Press L1 on CODRIVER CONTROLLER to put the bucket into the load position
+    public static final int bucketLoadPositionButton = Button.kL1.value;
+
+    //Press R1 on CODRIVER CONTROLLER to put the bucket into the dump position
+    public static final int bucketDumpPositionButton = Button.kR1.value;
+
+    //Press Share on CODRIVER CONTROLLER to put the bucket into the start position
+    public static final int bucketStartPositionButton = Button.kShare.value;
+  }
 } 

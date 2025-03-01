@@ -15,6 +15,10 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+//Press L2 on DRIVER CONTROLLER to make the intake spin outwards button
+//Press R2 on DRIVER CONTROLLER to make the intake spin inwards
+
+
 public class AlgaeSubsystem extends CSubsystem {
     
     // Creation of the two sparkmaxes that control the neo 550 motors
@@ -49,11 +53,11 @@ public class AlgaeSubsystem extends CSubsystem {
      */
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
         // Intake ( Right Trigger )
-        new JoystickButton(m_driverController, Button.kR2.value )
+        new JoystickButton(m_driverController, Constants.DriverControls.intakeInButton )
             .whileTrue( IntakeIn() );
 
         // Outtake ( Left Trigger )
-        new JoystickButton(m_driverController, Button.kL2.value )
+        new JoystickButton(m_driverController, Constants.DriverControls.intakeOutButton )
             .whileTrue( IntakeOut() );
     }
 
