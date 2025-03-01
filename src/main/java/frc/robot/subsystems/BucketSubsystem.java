@@ -5,6 +5,9 @@ import frc.robot.lib.custom.CSubsystem;
 
 import frc.robot.Configs;
 import frc.robot.Constants;
+
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -39,6 +42,10 @@ public class BucketSubsystem extends CSubsystem {
 
     // Wiether the bucket is being moved manually
     private static boolean moving = false;
+
+    public final BooleanSupplier isBucketBlocking = () -> {
+        return ( s_snowblowerEncoder.get() < Constants.BucketSubsystem.kBlockingExenderPosition );
+    };
 
     /**
     * Create an instace of the BucketSubsystem
@@ -88,12 +95,16 @@ public class BucketSubsystem extends CSubsystem {
      */
     public void goToDesiredState() {
        double attempt = m_PidController.calculate( s_snowblowerEncoder.get(), Constants.BucketSubsystem.bucketPositionArray[positionIndex]);
-       // Simple limit for PID control
-       if ( attempt < Constants.BucketSubsystem.PidMax && attempt > -Constants.BucketSubsystem.PidMax ) {
-           m_snowblowerMotor.set( attempt );
-       } else { 
-          m_snowblowerMotor.stopMotor();
-       }
+        // Simple limit for PID control
+        if ( attempt < Constants.BucketSubsystem.PidMax && attempt > -Constants.BucketSubsystem.PidMax ) {
+            m_snowblowerMotor.set( attempt );
+        } else if ( attempt < Constants.BucketSubsystem.PidMax ) { 
+            m_snowblowerMotor.set( Constants.BucketSubsystem.PidMax );
+        } else if ( attempt > -Constants.BucketSubsystem.PidMax ) { 
+            m_snowblowerMotor.set( -Constants.BucketSubsystem.PidMax );
+        } else { 
+            m_snowblowerMotor.stopMotor();
+        }
     }
     
     /**

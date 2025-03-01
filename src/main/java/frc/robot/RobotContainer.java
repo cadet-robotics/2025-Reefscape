@@ -60,10 +60,17 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     passSlowModeBooleanSuppliers();
+    extenderBucketBlocking();
 
     // Configure default commands
   }
 
+  /**
+   * A simple method to pass the isBucketBlocking between the bucket and extender subsystems
+   */
+  private void extenderBucketBlocking() { 
+    m_horizontalExtender.setIsBucketBlocking( m_bucket.isBucketBlocking );
+  }
   private void passSlowModeBooleanSuppliers() {
 
     DriveSubsystem.setSlowFunctions( 

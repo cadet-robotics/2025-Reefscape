@@ -181,6 +181,10 @@ public final class Constants {
 
   public static final class BucketSubsystem {
 
+    // The minimum value where the bucket no longer blocks movement of the encoder
+    // TODO: Tune
+    public static final double kBlockingExenderPosition = 0.5;
+    
     public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
 
     public static final int kSnowblowerMotor = 2; // CAN ID

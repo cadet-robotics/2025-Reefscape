@@ -174,7 +174,6 @@ public class ElevatorSubsystem extends CSubsystem {
                 m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
             }
         }
-
     }
 
     /**

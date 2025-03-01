@@ -43,6 +43,8 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
         // return !s_backLimitSwitch.get(); // Will only enter slow mode if the back limit switch is not pressed
     };
 
+    public static BooleanSupplier isBucketBlocking = () -> { return true; };
+
     /**
      * HorizontalSubsytemSetup
      */
@@ -94,6 +96,10 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
     public Boolean backLimitSwitchPressing() {
         //limit switch values are reversed
         return s_backLimitSwitch.get();
+    }
+
+    public void setIsBucketBlocking(BooleanSupplier isBucketBlocking) {
+        HorizontalExtenderSubsystem.isBucketBlocking = isBucketBlocking;
     }
 
     @Override
