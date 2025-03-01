@@ -22,8 +22,8 @@ import frc.robot.Constants;
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
 
-//Press Square on DRIVER CONTROLLER to decrease the elevator level by 1
-//Press Circle on DRIVER CONTROLLER to increase the elevator level by 1
+//Press Dpad-Up on CODRIVER CONTROLLER to decrease the elevator level by 1
+//Press Dpad-Down on CODRIVER CONTROLLER to increase the elevator level by 1
 
 public class ElevatorSubsystem extends CSubsystem {
 
