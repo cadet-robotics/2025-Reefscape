@@ -224,12 +224,6 @@ public final class Constants {
   {
     //CURRENTLY UNUSED BUTTONS ON CODRIVER CONTROLLER: 
 
-    //Press Dpad-Up on CODRIVER CONTROLLER to decrease the elevator level by 1
-    public static final int upDPadElevatorUp = 0;
-
-    //Press Dpad-Down on CODRIVER CONTROLLER to increase the elevator level by 1
-    public static final int downDPadElevatorDown = 180;
-
     //Press Square on CODRIVER CONTROLLER to manually move the bucket backward
     public static final int bucketManualBackwardButton = Button.kSquare.value;
 
@@ -247,6 +241,12 @@ public final class Constants {
 
     //Press R1 on CODRIVER CONTROLLER to put the bucket into the dump position
     public static final int bucketDumpPositionButton = Button.kR1.value;
+
+    //Press Dpad-Up on CODRIVER CONTROLLER to decrease the elevator level by 1
+    public static final int upDPadElevatorUp = Button.kR2.value;
+
+    //Press Dpad-Down on CODRIVER CONTROLLER to increase the elevator level by 1
+    public static final int downDPadElevatorDown = Button.kL2.value;
 
     //Press Share on CODRIVER CONTROLLER to put the bucket into the start position
     public static final int bucketStartPositionButton = Button.kShare.value;
