@@ -67,9 +67,17 @@ public class AlgaeSubsystem extends CSubsystem {
      */
     public CCommand IntakeIn() {
         return cCommand_("AccessoryMotorSubsystem.IntakeIn")
-            .onInitialize( () -> {
-                m_leftAlgaeMotor.set( -Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
-                m_rightAlgaeMotor.set( -Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
+            .onExecute( () -> {
+                m_leftAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
+                m_rightAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
+                try {
+                    Thread.sleep( Constants.AlgaeSubsystem.HoldTime);
+                } catch ( InterruptedException e ){}
+                m_leftAlgaeMotor.stopMotor();
+                m_rightAlgaeMotor.stopMotor();
+                try {
+                    Thread.sleep( Constants.AlgaeSubsystem.HoldTime);
+                } catch ( InterruptedException e ){}
             })
             .onEnd( () -> {
                 m_leftAlgaeMotor.stopMotor();
@@ -87,10 +95,14 @@ public class AlgaeSubsystem extends CSubsystem {
             .onExecute( () -> {
                 m_leftAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
                 m_rightAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
-                wait( Constants.BucketSubsystem.HoldTime );
+                try {
+                    Thread.sleep( Constants.AlgaeSubsystem.HoldTime);
+                } catch ( InterruptedException e ){}
                 m_leftAlgaeMotor.stopMotor();
                 m_rightAlgaeMotor.stopMotor();
-                wait( 400 );
+                try {
+                    Thread.sleep( Constants.AlgaeSubsystem.HoldTime);
+                } catch ( InterruptedException e ){}
 
             })
             .onEnd( () -> {

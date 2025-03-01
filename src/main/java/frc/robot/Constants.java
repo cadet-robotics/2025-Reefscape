@@ -128,6 +128,7 @@ public final class Constants {
 
   public static final class AlgaeSubsystem {
 
+    public static final long HoldTime = 50; // The time that the robot should hold down the algae motors for ( miliseconds )
     public static final int kLeftAlgaeMotor = 3; // CAN ID
     public static final int kRightAlgaeMotor = 4; // CAN ID
     public static final double kAlgaeIntakeSpeed = 0.6; // Speed
@@ -184,7 +185,6 @@ public final class Constants {
 
   public static final class BucketSubsystem {
 
-    public static final double HoldTime = 50;
     // The minimum value where the bucket no longer blocks movement of the encoder
     // TODO: Tune
     public static final double kBlockingExenderPosition = 0.2;
