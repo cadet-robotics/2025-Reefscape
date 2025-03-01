@@ -128,7 +128,8 @@ public final class Constants {
 
   public static final class AlgaeSubsystem {
 
-    public static final long HoldTime = 50; // The time that the robot should hold down the algae motors for ( miliseconds )
+    public static final long HoldTime = 250; // The time that the robot should hold down the algae motors for ( miliseconds )
+    public static final long waitTime = 750; // The amount of time to wait miminum inbetween firings of intake commands
     public static final int kLeftAlgaeMotor = 3; // CAN ID
     public static final int kRightAlgaeMotor = 4; // CAN ID
     public static final double kAlgaeIntakeSpeed = 0.6; // Speed

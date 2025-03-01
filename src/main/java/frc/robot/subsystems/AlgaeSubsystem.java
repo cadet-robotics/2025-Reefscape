@@ -76,7 +76,7 @@ public class AlgaeSubsystem extends CSubsystem {
                 m_leftAlgaeMotor.stopMotor();
                 m_rightAlgaeMotor.stopMotor();
                 try {
-                    Thread.sleep( Constants.AlgaeSubsystem.HoldTime);
+                    Thread.sleep( Constants.AlgaeSubsystem.waitTime);
                 } catch ( InterruptedException e ){}
             })
             .onEnd( () -> {
@@ -101,7 +101,7 @@ public class AlgaeSubsystem extends CSubsystem {
                 m_leftAlgaeMotor.stopMotor();
                 m_rightAlgaeMotor.stopMotor();
                 try {
-                    Thread.sleep( Constants.AlgaeSubsystem.HoldTime);
+                    Thread.sleep( Constants.AlgaeSubsystem.waitTime);
                 } catch ( InterruptedException e ){}
 
             })
