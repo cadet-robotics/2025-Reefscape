@@ -89,12 +89,16 @@ public class BucketSubsystem extends CSubsystem {
      */
     public void goToDesiredState() {
        double attempt = m_PidController.calculate( s_snowblowerEncoder.get(), Constants.BucketSubsystem.bucketPositionArray[positionIndex]);
-       // Simple limit for PID control
-       if ( attempt < Constants.BucketSubsystem.PidMax && attempt > -Constants.BucketSubsystem.PidMax ) {
-           m_snowblowerMotor.set( attempt );
-       } else { 
-          m_snowblowerMotor.stopMotor();
-       }
+        // Simple limit for PID control
+        if ( attempt < Constants.BucketSubsystem.PidMax && attempt > -Constants.BucketSubsystem.PidMax ) {
+            m_snowblowerMotor.set( attempt );
+        } else if ( attempt < Constants.BucketSubsystem.PidMax ) { 
+            m_snowblowerMotor.set( Constants.BucketSubsystem.PidMax );
+        } else if ( attempt > -Constants.BucketSubsystem.PidMax ) { 
+            m_snowblowerMotor.set( -Constants.BucketSubsystem.PidMax );
+        } else { 
+            m_snowblowerMotor.stopMotor();
+        }
     }
     
     /**
