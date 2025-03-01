@@ -8,14 +8,13 @@ import frc.robot.Constants;
 
 import java.util.function.BooleanSupplier;
 
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -33,7 +32,8 @@ public class BucketSubsystem extends CSubsystem {
     private final SparkMax m_snowblowerMotor = new SparkMax( Constants.BucketSubsystem.kSnowblowerMotor, MotorType.kBrushed );
 
     // Creating the Encoder
-    private DutyCycleEncoder s_snowblowerEncoder = new DutyCycleEncoder( 4 );
+    // private DutyCycleEncoder s_snowblowerEncoder = new DutyCycleEncoder( 4 );
+    private SparkAbsoluteEncoder s_snowblowerEncoder;
 
     // TODO: Values need to be tuned on Mikey
     private PIDController m_PidController = new PIDController(1, 0, 0);
@@ -43,8 +43,8 @@ public class BucketSubsystem extends CSubsystem {
     // Wiether the bucket is being moved manually
     private static boolean moving = false;
 
-    public final BooleanSupplier isBucketBlocking = () -> {
-        return ( s_snowblowerEncoder.get() < Constants.BucketSubsystem.kBlockingExenderPosition );
+    public  BooleanSupplier isBucketBlocking = () -> {
+        return ( s_snowblowerEncoder.getPosition() < Constants.BucketSubsystem.kBlockingExenderPosition );
     };
 
     /**
@@ -60,7 +60,10 @@ public class BucketSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters 
         );
-
+        s_snowblowerEncoder = m_snowblowerMotor.getAbsoluteEncoder();
+        // s_snowblowerEncoder.setAssumedFrequency(975.6);
+        // s_snowblowerEncoder.setDutyCycleRange(1, 1024);
+        // s_snowblowerEncoder.
     }
 
     /**
@@ -94,7 +97,7 @@ public class BucketSubsystem extends CSubsystem {
      * Sets the desired state for the motor to the selected position based on the positionIndex
      */
     public void goToDesiredState() {
-       double attempt = m_PidController.calculate( s_snowblowerEncoder.get(), Constants.BucketSubsystem.bucketPositionArray[positionIndex]);
+       double attempt = m_PidController.calculate( s_snowblowerEncoder.getPosition(), Constants.BucketSubsystem.bucketPositionArray[positionIndex]);
         // Simple limit for PID control
         if ( attempt < Constants.BucketSubsystem.PidMax && attempt > -Constants.BucketSubsystem.PidMax ) {
             m_snowblowerMotor.set( attempt );
@@ -116,7 +119,7 @@ public class BucketSubsystem extends CSubsystem {
             // goToDesiredState();
         }
 
-        SmartDashboard.putString( "Bucket Encoder", String.valueOf(s_snowblowerEncoder.get()));
+        SmartDashboard.putNumber( "Bucket Encoder", s_snowblowerEncoder.getPosition());
     }
 
     /**
@@ -168,7 +171,7 @@ public class BucketSubsystem extends CSubsystem {
                 SmartDashboard.putBoolean( "Moving forward", true );
             })
             .onExecute( () -> {
-                m_snowblowerMotor.set( Constants.BucketSubsystem.SnowblowerSpeed );
+                m_snowblowerMotor.set( Constants.BucketSubsystem.SnowblowerForwardSpeed );
             })
             .onEnd( () -> {
                 moving = false;
@@ -184,7 +187,7 @@ public class BucketSubsystem extends CSubsystem {
                 moving = true;
             })
             .onExecute( () -> {
-                m_snowblowerMotor.set( -Constants.BucketSubsystem.SnowblowerSpeed );
+                m_snowblowerMotor.set( -Constants.BucketSubsystem.SnowblowerBackwardSpeed );
             })
             .onEnd( () -> {
                 SmartDashboard.putBoolean( "Moving backward", false);

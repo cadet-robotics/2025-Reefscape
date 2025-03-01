@@ -191,7 +191,8 @@ public final class Constants {
     public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
 
     public static final int kSnowblowerMotor = 2; // CAN ID
-    public static final double SnowblowerSpeed = 0.2; // Speed
+    public static final double SnowblowerForwardSpeed = 0.4; // Speed
+    public static final double SnowblowerBackwardSpeed = 0.2; // Speed
     public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
 
   }

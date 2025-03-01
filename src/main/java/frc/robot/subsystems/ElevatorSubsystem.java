@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -9,10 +10,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -37,7 +36,7 @@ public class ElevatorSubsystem extends CSubsystem {
     private static PIDController m_elevatorController = new PIDController(1.0, 0, 0);
 
     // Encoder Setup
-    private static Encoder s_elevatorEncoder = new Encoder( Constants.ElevatorSubsystem.kElevatorEncoderA, Constants.ElevatorSubsystem.kElevatorEncoderB );
+    private static RelativeEncoder s_elevatorEncoder; // = new Encoder( Constants.ElevatorSubsystem.kElevatorEncoderA, Constants.ElevatorSubsystem.kElevatorEncoderB );
         
     // Servo Setup
     // This servo is the brake for the elevator
@@ -67,7 +66,7 @@ public class ElevatorSubsystem extends CSubsystem {
      * Checks if the robot should be in slow mode based on the position of the elevator
      */
     public final BooleanSupplier elevatorSlowCheck = ()->{
-        if ( s_elevatorEncoder.getDistance() > Constants.ElevatorSubsystem.kElevatorSlowThreashold ) {
+        if ( s_elevatorEncoder.getPosition() > Constants.ElevatorSubsystem.kElevatorSlowThreashold ) {
             return true;
         }
         return false;
@@ -83,6 +82,7 @@ public class ElevatorSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters 
         );
+        s_elevatorEncoder = m_elevatorMotor.getEncoder();
     }
 
     public void startTimer() {
@@ -129,7 +129,7 @@ public class ElevatorSubsystem extends CSubsystem {
      * @param desiredState The desired state for the motor
      */
     public void setDesiredState( double desiredState ) {
-        double move = m_elevatorController.calculate( s_elevatorEncoder.getDistance(), desiredState );
+        double move = m_elevatorController.calculate( s_elevatorEncoder.getPosition(), desiredState );
         //limit switch values are reversed
         if ( move > 0 && !m_topLimitSwitch.get() && move < Constants.ElevatorSubsystem.PidMax ) {
             m_elevatorMotor.set( move );
@@ -145,7 +145,7 @@ public class ElevatorSubsystem extends CSubsystem {
 
     /** Simple function to make it simple to grab the disstance to the target */
     private static double distanceTo( double target ) {
-        return Math.abs( target * target - s_elevatorEncoder.get() * s_elevatorEncoder.get() );
+        return Math.abs( target * target - s_elevatorEncoder.getPosition() * s_elevatorEncoder.getPosition() );
     }
     
     /** A worse but easier to tune version of control for the elevator if we can't get pid to work */
@@ -156,20 +156,20 @@ public class ElevatorSubsystem extends CSubsystem {
             // Uncomment if we need a set a speed to fight the gravity when trying to hover and comment the prevois line
             // m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorHoverSpeed );
         } else if ( distanceTo( target ) > Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowDistanceThreashold ) {
-            if ( s_elevatorEncoder.get() > target && m_bottomLimitSwitch.get() ) { 
+            if ( s_elevatorEncoder.getPosition() > target && m_bottomLimitSwitch.get() ) { 
                 // Go down
                 m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
-            } else if ( s_elevatorEncoder.get() < target && m_topLimitSwitch.get() ) { //  
+            } else if ( s_elevatorEncoder.getPosition() < target && m_topLimitSwitch.get() ) { //  
                 // Go up
                 m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
             }
         } else {
 
             // Full speed if distance is not within the threshold
-            if ( s_elevatorEncoder.get() > target && m_bottomLimitSwitch.get() ) { 
+            if ( s_elevatorEncoder.getPosition() > target && m_bottomLimitSwitch.get() ) { 
                 // Go down
                 m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
-            } else if ( s_elevatorEncoder.get() < target && m_topLimitSwitch.get()  ) { // m_topLimitSwitch.get() 
+            } else if ( s_elevatorEncoder.getPosition() < target && m_topLimitSwitch.get()  ) { // m_topLimitSwitch.get() 
                 // Go up
                 m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
             }
@@ -188,7 +188,7 @@ public class ElevatorSubsystem extends CSubsystem {
         SmartDashboard.putBoolean( "ElevatorBottom", m_bottomLimitSwitch.get() );
         SmartDashboard.putBoolean( "ElevatorTop", m_topLimitSwitch.get() );
         SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
-        SmartDashboard.putNumber( "Encoder", s_elevatorEncoder.getDistance() );
+        SmartDashboard.putNumber( "Encoder", s_elevatorEncoder.getPosition() );
 
         // setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
 
@@ -295,7 +295,7 @@ public class ElevatorSubsystem extends CSubsystem {
                     m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevaotrManualSpeed );
                 } else {
                     m_elevatorMotor.stopMotor();
-                    s_elevatorEncoder.reset();
+                    s_elevatorEncoder.setPosition( 0 );
                 }
             })
             // Stop the motor in the off chance that execution of onExecute stopped before it stopped the motor
