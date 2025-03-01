@@ -116,10 +116,10 @@ public class ElevatorSubsystem extends CSubsystem {
         // new JoystickButton(m_driverController, Button.kCross.value )
         //     .whileTrue( DisengageBrake() );
 
-        new JoystickButton(m_driverController, Constants.DriverControls.elevatorUp )
+        new JoystickButton(m_coDriverController, m_coDriverController.getPOV(Constants.CoDriverControls.upDPadElevatorUp) )
             .whileTrue( ElevatorDoUp() );
 
-        new JoystickButton(m_driverController, Constants.DriverControls.elevatorDown )
+        new JoystickButton(m_coDriverController, m_coDriverController.getPOV(Constants.CoDriverControls.downDPadElevatorDown) )
             .whileTrue( ElevatorDoDown() );
     }
 

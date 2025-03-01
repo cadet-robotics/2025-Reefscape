@@ -197,12 +197,6 @@ public final class Constants {
   {
     //CURRENTLY UNUSED BUTTONS ON DRIVER CONTROLLER: Triangle, Cross, L3, R3, All Dpad Buttons, Touchpad, Playstation
 
-    //Press Square on DRIVER CONTROLLER to decrease the elevator level by 1
-    public static final int elevatorDown = Button.kSquare.value;
-
-    //Press Circle on DRIVER CONTROLLER to increase the elevator level by 1
-    public static final int elevatorUp = Button.kCircle.value;
-
     //Press L1 on DRIVER CONTROLLER to go slower than slowdown
     public static final int slowerButton = Button.kL1.value;
 
@@ -227,6 +221,11 @@ public final class Constants {
   {
     //CURRENTLY UNUSED BUTTONS ON CODRIVER CONTROLLER: 
 
+    //Press Dpad-Up on CODRIVER CONTROLLER to decrease the elevator level by 1
+    public static final int upDPadElevatorUp = 0;
+
+    //Press Dpad-Down on CODRIVER CONTROLLER to increase the elevator level by 1
+    public static final int downDPadElevatorDown = 180;
 
     //Press Square on CODRIVER CONTROLLER to manually move the bucket backward
     public static final int bucketManualBackwardButton = Button.kSquare.value;
