@@ -57,6 +57,7 @@ public final class Configs {
         public static final SparkMaxConfig kSnowblowerConfig = new SparkMaxConfig();
         static {
                 kSnowblowerConfig
+                        .inverted(true)
                         .idleMode(IdleMode.kBrake);
         }
     } 

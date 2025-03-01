@@ -159,7 +159,7 @@ public class ElevatorSubsystem extends CSubsystem {
             if ( s_elevatorEncoder.get() > target && m_bottomLimitSwitch.get() ) { 
                 // Go down
                 m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
-            } else if ( s_elevatorEncoder.get() < target && m_topLimitSwitch.get() ) { 
+            } else if ( s_elevatorEncoder.get() < target && m_topLimitSwitch.get() ) { //  
                 // Go up
                 m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
             }
@@ -169,7 +169,7 @@ public class ElevatorSubsystem extends CSubsystem {
             if ( s_elevatorEncoder.get() > target && m_bottomLimitSwitch.get() ) { 
                 // Go down
                 m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
-            } else if ( s_elevatorEncoder.get() < target && m_topLimitSwitch.get() ) { 
+            } else if ( s_elevatorEncoder.get() < target && m_topLimitSwitch.get()  ) { // m_topLimitSwitch.get() 
                 // Go up
                 m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
             }

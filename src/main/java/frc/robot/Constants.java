@@ -63,9 +63,11 @@ public final class Constants {
     public static final boolean kGyroReversed = true;
     
     // Both of these values are changable and impact the speed of the robot in given circumstances
-    public static final double kSlowMultiplier = 2.0;
-    public static final double kSlowerMultiplier = 5.0;
+    public static final double kSlowMultiplier = 1.0;
+    public static final double kSlowerMultiplier = 1.0;
     public static final double kLimelightSpeedMultiplier = 5.0;
+    // public static final double kSlowMultiplier = 2.0;
+    // public static final double kSlowerMultiplier = 5.0;
 
   }
 
@@ -136,8 +138,9 @@ public final class Constants {
 
     public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
 
-    public static final double kElevaotrManualSpeed = 0.1;
+    public static final double kElevaotrManualSpeed = 0.2;
     public static final double kElevatorSlowThreashold = 1000.0;
+
     public static final int kElevatorMotor = 1; // CAN ID
 
     public static final int kElevatorBrake = 0; // RLS ID
@@ -183,7 +186,7 @@ public final class Constants {
 
     // The minimum value where the bucket no longer blocks movement of the encoder
     // TODO: Tune
-    public static final double kBlockingExenderPosition = 0.5;
+    public static final double kBlockingExenderPosition = 0.2;
     
     public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
 
