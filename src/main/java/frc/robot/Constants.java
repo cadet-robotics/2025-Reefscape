@@ -128,7 +128,7 @@ public final class Constants {
 
   public static final class AlgaeSubsystem {
 
-    public static final long HoldTime = 250; // The time that the robot should hold down the algae motors for ( miliseconds )
+    public static final long HoldTime = 1000; // The time that the robot should hold down the algae motors for ( miliseconds )
     public static final long waitTime = 750; // The amount of time to wait miminum inbetween firings of intake commands
     public static final int kLeftAlgaeMotor = 3; // CAN ID
     public static final int kRightAlgaeMotor = 4; // CAN ID
@@ -140,7 +140,7 @@ public final class Constants {
 
     public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
 
-    public static final double kElevaotrManualSpeed = 0.2;
+    public static final double kElevaotrManualSpeed = 0.4;
     public static final double kElevatorSlowThreashold = 40.0;
 
     public static final int kElevatorMotor = 1; // CAN ID
@@ -193,8 +193,8 @@ public final class Constants {
     public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
 
     public static final int kSnowblowerMotor = 2; // CAN ID
-    public static final double SnowblowerForwardSpeed = 0.4; // Speed
-    public static final double SnowblowerBackwardSpeed = 0.2; // Speed
+    public static final double SnowblowerForwardSpeed = 0.6; // Speed
+    public static final double SnowblowerBackwardSpeed = 0.4; // Speed
     public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
 
   }
@@ -209,35 +209,19 @@ public final class Constants {
     //Press R1 on DRIVER CONTROLLER to slow down
     public static final int slowButton = Button.kR1.value;
 
-    //Press L2 on DRIVER CONTROLLER to make the intake spin outwards
-    public static final int intakeOutButton = Button.kL2.value;
-
-    //Press R2 on DRIVER CONTROLLER to make the intake spin inwards
-    public static final int intakeInButton = Button.kR2.value;
 
     //Press Share on DRIVER CONTROLLER to adjust your position when tracking apriltag with limelight
     //temporarily using Share button
-    public static final int useLimelight = Button.kShare.value;
+    public static final int useLimelight = Button.kCircle.value;
 
     //Press Options on DRIVER CONTROLLER to reset the gyro
     public static final int resetGyroButton = Button.kOptions.value;
-  }
 
-  public static class CoDriverControls
-  {
-    //CURRENTLY UNUSED BUTTONS ON CODRIVER CONTROLLER: 
+    //Press Square on DRIVEr CONTROLLER to manually move the bucket backward
+    public static final int bucketManualBackwardButton = Button.kL2.value;
 
-    //Press Square on CODRIVER CONTROLLER to manually move the bucket backward
-    public static final int bucketManualBackwardButton = Button.kSquare.value;
-
-    //Press Cross on CODRIVER CONTROLLER to retract the "inny outty"/Horizontal Extender
-    public static final int horizontalRetractButton = Button.kCross.value;
-
-    //Press Circle on CODRIVER CONTROLLER to extend the "inny outty"/Horizontal Extender
-    public static final int horizontalExtendButton = Button.kCircle.value;
-
-    //Press Triangle on CODRIVER CONTROLLER to manually move the bucket forward
-    public static final int bucketManualForwardButton = Button.kTriangle.value;
+    //Press Triangle on DRIVER CONTROLLER to manually move the bucket forward
+    public static final int bucketManualForwardButton = Button.kR2.value;
 
     //Press L1 on CODRIVER CONTROLLER to put the bucket into the load position
     public static final int bucketLoadPositionButton = Button.kL1.value;
@@ -245,13 +229,31 @@ public final class Constants {
     //Press R1 on CODRIVER CONTROLLER to put the bucket into the dump position
     public static final int bucketDumpPositionButton = Button.kR1.value;
 
-    //Press R2 on CODRIVER CONTROLLER to raise the elevator
-    public static final int upDPadElevatorUp = Button.kR2.value;
-
-    //Press L2 on CODRIVER CONTROLLER to lower the elevator
-    public static final int downDPadElevatorDown = Button.kL2.value;
+    public static final int enableBreak = Button.kShare.value;
 
     //Press Share on CODRIVER CONTROLLER to put the bucket into the start position
-    public static final int bucketStartPositionButton = Button.kShare.value;
+    public static final int bucketStartPositionButton = Button.kTriangle.value;
+
   }
-} 
+
+  public static class CoDriverControls
+  {
+    //CURRENTLY UNUSED BUTTONS ON CODRIVER CONTROLLER: 
+
+    //Press Cross on CODRIVER CONTROLLER to retract the "inny outty"/Horizontal Extender
+    public static final int horizontalRetractButton = Button.kSquare.value;
+
+    //Press Circle on CODRIVER CONTROLLER to extend the "inny outty"/Horizontal Extender
+    public static final int horizontalExtendButton = Button.kCross.value;
+
+    //Press L2 on DRIVER CONTROLLER to make the intake spin outwards
+    public static final int intakeOutButton = Button.kTriangle.value;
+
+    //Press R2 on DRIVER CONTROLLER to make the intake spin inwards
+    public static final int intakeInButton = Button.kCircle.value;
+  
+    public static final int elevaotrDownManual = Button.kL2.value;
+    public static final int elevatorUpManual = Button.kR2.value;
+
+    }
+  } 

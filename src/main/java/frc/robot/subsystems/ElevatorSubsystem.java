@@ -110,23 +110,26 @@ public class ElevatorSubsystem extends CSubsystem {
         //         .whileTrue( ElevatorLevelDown() );
 
         // EngageBrake ( Right Bumper )
-        // new JoystickButton(m_driverController, Button.kTriangle.value )
-        //    .whileTrue( EngageBrake() );
+        new JoystickButton(m_driverController, Constants.DriverControls.enableBreak )
+           .whileTrue( EngageBrake() );
 
         // DisengageBrake ( Left Bumper )
-        // new JoystickButton(m_driverController, Button.kCross.value )
+        // new JoystickButton(m_driverController, m_driverController.getPOV() )
+        //     .and( () -> { return m_driverController.getPOV() == 0;} )
         //     .whileTrue( DisengageBrake() );
 
-        new JoystickButton(m_coDriverController, Constants.CoDriverControls.upDPadElevatorUp )
-            .whileTrue( ElevatorLevelUp() );
+        // new JoystickButton(m_coDriverController, m_coDriverController.getPOV() )
+        //     .and( () -> { return m_coDriverController.getPOV() == 0; } )
+        //     .whileTrue( ElevatorLevelUp() );
 
-        new JoystickButton(m_coDriverController, Constants.CoDriverControls.downDPadElevatorDown )
-            .whileTrue( ElevatorLevelDown() );
+        // new JoystickButton(m_coDriverController, m_coDriverController.getPOV() )
+        //     .and( () -> { return m_coDriverController.getPOV() == 180; } )
+        //     .whileTrue( ElevatorLevelDown() );
 
-        new JoystickButton(m_coDriverController, Button.kR2.value )
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevatorUpManual )
             .whileTrue( ElevatorDoUp() );
 
-        new JoystickButton(m_coDriverController, Button.kL2.value )
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevaotrDownManual )
             .whileTrue( ElevatorDoDown() );
     }
 

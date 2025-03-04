@@ -75,21 +75,21 @@ public class BucketSubsystem extends CSubsystem {
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
         // BucketDump ( Right Bumper ) ( Co Driver )
-        new JoystickButton(m_coDriverController, Constants.CoDriverControls.bucketDumpPositionButton )
+        new JoystickButton( m_driverController, Constants.DriverControls.bucketDumpPositionButton )
             .whileTrue( BucketDump() );
 
         // Bucket Load ( Left Bumper ) ( Co Driver )
-        new JoystickButton(m_coDriverController, Constants.CoDriverControls.bucketLoadPositionButton )
+        new JoystickButton(m_driverController, Constants.DriverControls.bucketLoadPositionButton )
             .whileTrue( BucketLoad() );
 
         // Bucket Start ( Share ) ( Co Driver )
-        new JoystickButton(m_coDriverController, Constants.CoDriverControls.bucketStartPositionButton )
+        new JoystickButton(m_driverController, Constants.DriverControls.bucketStartPositionButton )
             .whileTrue( BucketStart() );
 
-        new JoystickButton(m_coDriverController, Constants.CoDriverControls.bucketManualForwardButton )
+        new JoystickButton(m_driverController, Constants.DriverControls.bucketManualForwardButton )
             .whileTrue( BucketForward() );
         
-        new JoystickButton(m_coDriverController, Constants.CoDriverControls.bucketManualBackwardButton )
+        new JoystickButton(m_driverController, Constants.DriverControls.bucketManualBackwardButton )
             .whileTrue( BucketBackward() );
     }
 
