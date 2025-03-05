@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -9,10 +10,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -21,6 +21,9 @@ import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
+
+//Press R2 on CODRIVER CONTROLLER to raise the elevator
+//Press L2 on CODRIVER CONTROLLER to lower the elevator
 
 public class ElevatorSubsystem extends CSubsystem {
 
@@ -34,7 +37,7 @@ public class ElevatorSubsystem extends CSubsystem {
     private static PIDController m_elevatorController = new PIDController(1.0, 0, 0);
 
     // Encoder Setup
-    private static Encoder s_elevatorEncoder = new Encoder( Constants.ElevatorSubsystem.kElevatorEncoderA, Constants.ElevatorSubsystem.kElevatorEncoderB );
+    private static RelativeEncoder s_elevatorEncoder; // = new Encoder( Constants.ElevatorSubsystem.kElevatorEncoderA, Constants.ElevatorSubsystem.kElevatorEncoderB );
         
     // Servo Setup
     // This servo is the brake for the elevator
@@ -64,7 +67,7 @@ public class ElevatorSubsystem extends CSubsystem {
      * Checks if the robot should be in slow mode based on the position of the elevator
      */
     public final BooleanSupplier elevatorSlowCheck = ()->{
-        if ( s_elevatorEncoder.getDistance() > Constants.ElevatorSubsystem.kElevatorSlowThreashold ) {
+        if ( s_elevatorEncoder.getPosition() > Constants.ElevatorSubsystem.kElevatorSlowThreashold ) {
             return true;
         }
         return false;
@@ -80,6 +83,7 @@ public class ElevatorSubsystem extends CSubsystem {
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters 
         );
+        s_elevatorEncoder = m_elevatorMotor.getEncoder();
     }
 
     public void startTimer() {
@@ -106,17 +110,26 @@ public class ElevatorSubsystem extends CSubsystem {
         //         .whileTrue( ElevatorLevelDown() );
 
         // EngageBrake ( Right Bumper )
-        // new JoystickButton(m_driverController, Button.kTriangle.value )
-        //    .whileTrue( EngageBrake() );
+        new JoystickButton(m_driverController, Constants.DriverControls.enableBreak )
+           .whileTrue( EngageBrake() );
 
         // DisengageBrake ( Left Bumper )
-        // new JoystickButton(m_driverController, Button.kCross.value )
+        // new JoystickButton(m_driverController, m_driverController.getPOV() )
+        //     .and( () -> { return m_driverController.getPOV() == 0;} )
         //     .whileTrue( DisengageBrake() );
 
-        new JoystickButton(m_driverController, Button.kCircle.value )
+        // new JoystickButton(m_coDriverController, m_coDriverController.getPOV() )
+        //     .and( () -> { return m_coDriverController.getPOV() == 0; } )
+        //     .whileTrue( ElevatorLevelUp() );
+
+        // new JoystickButton(m_coDriverController, m_coDriverController.getPOV() )
+        //     .and( () -> { return m_coDriverController.getPOV() == 180; } )
+        //     .whileTrue( ElevatorLevelDown() );
+
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevatorUpManual )
             .whileTrue( ElevatorDoUp() );
 
-        new JoystickButton(m_driverController, Button.kSquare.value )
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevaotrDownManual )
             .whileTrue( ElevatorDoDown() );
     }
 
@@ -126,16 +139,49 @@ public class ElevatorSubsystem extends CSubsystem {
      * @param desiredState The desired state for the motor
      */
     public void setDesiredState( double desiredState ) {
-        double move = m_elevatorController.calculate( s_elevatorEncoder.getDistance(), desiredState );
+        double move = m_elevatorController.calculate( s_elevatorEncoder.getPosition(), desiredState );
         //limit switch values are reversed
-        if ( move > 0 && !m_topLimitSwitch.get() ) {
-            m_elevatorMotor.set( move/100.0 );
+        if ( move > 0 && !m_topLimitSwitch.get() && move < Constants.ElevatorSubsystem.PidMax ) {
+            m_elevatorMotor.set( move );
         } else {
             //limit switch values are reversed
-            if ( move < 0 && !m_bottomLimitSwitch.get() ) {
-                m_elevatorMotor.set( move/100.0 );
+            if ( move < 0 && !m_bottomLimitSwitch.get() && move > -Constants.ElevatorSubsystem.PidMax ) {
+                m_elevatorMotor.set( move );
             } else {
-                m_elevatorMotor.set( 0);
+                m_elevatorMotor.stopMotor();
+            }
+        }
+    }
+
+    /** Simple function to make it simple to grab the disstance to the target */
+    private static double distanceTo( double target ) {
+        return Math.abs( target * target - s_elevatorEncoder.getPosition() * s_elevatorEncoder.getPosition() );
+    }
+    
+    /** A worse but easier to tune version of control for the elevator if we can't get pid to work */
+    private static void crappyPID( double target ) {
+        // Use the set slow speed to get to the target
+        if ( distanceTo( target ) <= Constants.ElevatorSubsystem.CrappyPid.kElevatorStopThreshold ) {
+            m_elevatorMotor.stopMotor();
+            // Uncomment if we need a set a speed to fight the gravity when trying to hover and comment the prevois line
+            // m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorHoverSpeed );
+        } else if ( distanceTo( target ) > Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowDistanceThreashold ) {
+            if ( s_elevatorEncoder.getPosition() > target && m_bottomLimitSwitch.get() ) { 
+                // Go down
+                m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
+            } else if ( s_elevatorEncoder.getPosition() < target && m_topLimitSwitch.get() ) { //  
+                // Go up
+                m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
+            }
+        } else {
+
+            // Full speed if distance is not within the threshold
+            if ( s_elevatorEncoder.getPosition() > target && m_bottomLimitSwitch.get() ) { 
+                // Go down
+                m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
+            } else if ( s_elevatorEncoder.getPosition() < target && m_topLimitSwitch.get()  ) { // m_topLimitSwitch.get() 
+                // Go up
+                m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
             }
         }
     }
@@ -152,13 +198,22 @@ public class ElevatorSubsystem extends CSubsystem {
         SmartDashboard.putBoolean( "ElevatorBottom", m_bottomLimitSwitch.get() );
         SmartDashboard.putBoolean( "ElevatorTop", m_topLimitSwitch.get() );
         SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
-        SmartDashboard.putNumber( "Encoder", s_elevatorEncoder.getDistance() );
+        SmartDashboard.putNumber( "Encoder", s_elevatorEncoder.getPosition() );
+
+        SmartDashboard.putBoolean( "ElevatorSlow", elevatorSlowCheck.getAsBoolean() );
+        if ( !m_bottomLimitSwitch.get() )
+        {
+            s_elevatorEncoder.setPosition(0);
+        }
 
         // setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
 
         // if ( m_breakTimer.get() <= Constants.ElevatorSubsystem.kBreakEngageTime ) {
         //     m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
         // }
+
+        // Uncomment the bollow line to test when and only when ready
+        // crappyPID(Constants.ElevatorSubsystem.LevelHeights[level]);
     }
      
     /**

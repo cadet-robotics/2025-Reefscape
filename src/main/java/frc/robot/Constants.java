@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -63,8 +64,10 @@ public final class Constants {
     
     // Both of these values are changable and impact the speed of the robot in given circumstances
     public static final double kSlowMultiplier = 2.0;
-    public static final double kSlowerMultiplier = 5.0;
+    public static final double kSlowerMultiplier = 4.0;
     public static final double kLimelightSpeedMultiplier = 5.0;
+    // public static final double kSlowMultiplier = 2.0;
+    // public static final double kSlowerMultiplier = 5.0;
 
   }
 
@@ -125,6 +128,8 @@ public final class Constants {
 
   public static final class AlgaeSubsystem {
 
+    public static final long HoldTime = 1000; // The time that the robot should hold down the algae motors for ( miliseconds )
+    public static final long waitTime = 750; // The amount of time to wait miminum inbetween firings of intake commands
     public static final int kLeftAlgaeMotor = 3; // CAN ID
     public static final int kRightAlgaeMotor = 4; // CAN ID
     public static final double kAlgaeIntakeSpeed = 0.6; // Speed
@@ -133,8 +138,11 @@ public final class Constants {
 
   public static final class ElevatorSubsystem {
 
-    public static final double kElevaotrManualSpeed = 0.1;
-    public static final double kElevatorSlowThreashold = 1000.0;
+    public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
+
+    public static final double kElevaotrManualSpeed = 0.4;
+    public static final double kElevatorSlowThreashold = 40.0;
+
     public static final int kElevatorMotor = 1; // CAN ID
 
     public static final int kElevatorBrake = 0; // RLS ID
@@ -153,13 +161,99 @@ public final class Constants {
     public static final double kServoDisenagedPos = 1.0; // Position
   
     public static final double kBreakEngageTime = 119.5;
+
+    public static final class CrappyPid {
+      // TODO: tune all values
+
+
+      // The slower speed to be used by the elevator when within the slow distance threshold
+      public static double kElevatorSlowSpeed = 0.05;
+
+      // Defualt speed for the elevator
+      public static double kElevatorNormSpeed = 0.1;
+      
+      // The speed the elevator will hover at ( must be enabled in elevatorSubsystem )
+      public static double kElevatorHoverSpeed = 0.01;
+
+      // The distance when the elevator should stop, or use the however speed instead of moving slowly
+      public static double kElevatorStopThreshold = 200.0;
+
+      // The distance where crappy pid should use a slow speed instead of the normal one
+      public static double kElevatorSlowDistanceThreashold = 500.0;
+
+    }
   }
 
   public static final class BucketSubsystem {
 
+    // The minimum value where the bucket no longer blocks movement of the encoder
+    // TODO: Tune
+    public static final double kBlockingExenderPosition = 0.2;
+    
+    public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
+
     public static final int kSnowblowerMotor = 2; // CAN ID
-    public static final double SnowblowerSpeed = 0.2; // Speed
+    public static final double SnowblowerForwardSpeed = 0.6; // Speed
+    public static final double SnowblowerBackwardSpeed = 0.4; // Speed
     public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
 
   }
-} 
+
+  public static final class DriverControls
+  {
+    //CURRENTLY UNUSED BUTTONS ON DRIVER CONTROLLER: Triangle, Cross, L3, R3, All Dpad Buttons, Touchpad, Playstation
+
+    //Press L1 on DRIVER CONTROLLER to go slower than slowdown
+    public static final int slowerButton = Button.kL1.value;
+
+    //Press R1 on DRIVER CONTROLLER to slow down
+    public static final int slowButton = Button.kR1.value;
+
+
+    //Press Share on DRIVER CONTROLLER to adjust your position when tracking apriltag with limelight
+    //temporarily using Share button
+    public static final int useLimelight = Button.kCircle.value;
+
+    //Press Options on DRIVER CONTROLLER to reset the gyro
+    public static final int resetGyroButton = Button.kOptions.value;
+
+    //Press Square on DRIVEr CONTROLLER to manually move the bucket backward
+    public static final int bucketManualBackwardButton = Button.kL2.value;
+
+    //Press Triangle on DRIVER CONTROLLER to manually move the bucket forward
+    public static final int bucketManualForwardButton = Button.kR2.value;
+
+    //Press L1 on CODRIVER CONTROLLER to put the bucket into the load position
+    public static final int bucketLoadPositionButton = Button.kL1.value;
+
+    //Press R1 on CODRIVER CONTROLLER to put the bucket into the dump position
+    public static final int bucketDumpPositionButton = Button.kR1.value;
+
+    public static final int enableBreak = Button.kShare.value;
+
+    //Press Share on CODRIVER CONTROLLER to put the bucket into the start position
+    public static final int bucketStartPositionButton = Button.kTriangle.value;
+
+  }
+
+  public static class CoDriverControls
+  {
+    //CURRENTLY UNUSED BUTTONS ON CODRIVER CONTROLLER: 
+
+    //Press Cross on CODRIVER CONTROLLER to retract the "inny outty"/Horizontal Extender
+    public static final int horizontalRetractButton = Button.kSquare.value;
+
+    //Press Circle on CODRIVER CONTROLLER to extend the "inny outty"/Horizontal Extender
+    public static final int horizontalExtendButton = Button.kCross.value;
+
+    //Press L2 on DRIVER CONTROLLER to make the intake spin outwards
+    public static final int intakeOutButton = Button.kTriangle.value;
+
+    //Press R2 on DRIVER CONTROLLER to make the intake spin inwards
+    public static final int intakeInButton = Button.kCircle.value;
+  
+    public static final int elevaotrDownManual = Button.kL2.value;
+    public static final int elevatorUpManual = Button.kR2.value;
+
+    }
+  } 

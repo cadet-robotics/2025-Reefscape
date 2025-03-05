@@ -12,8 +12,11 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+//Press L2 on DRIVER CONTROLLER to make the intake spin outwards button
+//Press R2 on DRIVER CONTROLLER to make the intake spin inwards
+
 
 public class AlgaeSubsystem extends CSubsystem {
     
@@ -49,11 +52,11 @@ public class AlgaeSubsystem extends CSubsystem {
      */
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
         // Intake ( Right Trigger )
-        new JoystickButton(m_driverController, Button.kR2.value )
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.intakeInButton )
             .whileTrue( IntakeIn() );
 
         // Outtake ( Left Trigger )
-        new JoystickButton(m_driverController, Button.kL2.value )
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.intakeOutButton )
             .whileTrue( IntakeOut() );
     }
 
@@ -64,9 +67,17 @@ public class AlgaeSubsystem extends CSubsystem {
      */
     public CCommand IntakeIn() {
         return cCommand_("AccessoryMotorSubsystem.IntakeIn")
-            .onInitialize( () -> {
-                m_leftAlgaeMotor.set( -Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
-                m_rightAlgaeMotor.set( -Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
+            .onExecute( () -> {
+                m_leftAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
+                m_rightAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
+                try {
+                    Thread.sleep( Constants.AlgaeSubsystem.HoldTime);
+                } catch ( InterruptedException e ){}
+                m_leftAlgaeMotor.stopMotor();
+                m_rightAlgaeMotor.stopMotor();
+                try {
+                    Thread.sleep( Constants.AlgaeSubsystem.waitTime);
+                } catch ( InterruptedException e ){}
             })
             .onEnd( () -> {
                 m_leftAlgaeMotor.stopMotor();
@@ -81,9 +92,18 @@ public class AlgaeSubsystem extends CSubsystem {
      */
     public CCommand IntakeOut() {
         return cCommand_("AccessoryMotorSubsystem.IntakeOut")
-            .onInitialize( () -> {
+            .onExecute( () -> {
                 m_leftAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
                 m_rightAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
+                try {
+                    Thread.sleep( Constants.AlgaeSubsystem.HoldTime);
+                } catch ( InterruptedException e ){}
+                m_leftAlgaeMotor.stopMotor();
+                m_rightAlgaeMotor.stopMotor();
+                try {
+                    Thread.sleep( Constants.AlgaeSubsystem.waitTime);
+                } catch ( InterruptedException e ){}
+
             })
             .onEnd( () -> {
                 m_leftAlgaeMotor.stopMotor();

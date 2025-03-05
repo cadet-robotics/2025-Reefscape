@@ -50,13 +50,14 @@ public final class Configs {
                     // to 10 degrees will go through 0 rather than the other direction which is a
                     // longer route.
                     .positionWrappingEnabled(true)
-                    .positionWrappingInputRange(0, turningFactor);
+                    .positionWrappingInputRange(0, turningFactor );
         }
     }
     public final class HorizontalExtenderSubsystem {
         public static final SparkMaxConfig kSnowblowerConfig = new SparkMaxConfig();
         static {
                 kSnowblowerConfig
+                        .inverted(true)
                         .idleMode(IdleMode.kBrake);
         }
     } 

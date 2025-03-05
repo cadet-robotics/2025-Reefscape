@@ -28,7 +28,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 
 import frc.robot.Constants;
 import frc.robot.Constants.OIConstants;
@@ -39,6 +38,13 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
+
+//Press L1 on DRIVER CONTROLLER to go slower than slowdown
+//Press R1 on DRIVER CONTROLLER to slow down
+//Press Share on DRIVER CONTROLLER to adjust your position when tracking apriltag with limelight
+//Press Options on DRIVER CONTROLLER to reset the gyro
+
+
 
 public class DriveSubsystem extends CSubsystem {
 
@@ -76,6 +82,9 @@ public class DriveSubsystem extends CSubsystem {
   private static BooleanSupplier elevatorSlowCheck = ()->{return true;}; // Setting the default values in case it never gets inintalized
   private static BooleanSupplier extenderSlowCheck = ()->{return true;};
 
+  // This value determines if the `limeLightDriveCommand` is actively being called
+  private boolean limeLightDriving = false;
+
   // Odometry class for tracking robot pose
   SwerveDriveOdometry swerveDriveOdemtry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -109,7 +118,7 @@ public class DriveSubsystem extends CSubsystem {
     driverPS4Controller = ps4DriverController;
 
     // Reset gyro
-    new JoystickButton(driverPS4Controller, Button.kOptions.value)
+    new JoystickButton(driverPS4Controller, Constants.DriverControls.resetGyroButton)
         .whileTrue(
             GyroReset());
 
@@ -130,11 +139,11 @@ public class DriveSubsystem extends CSubsystem {
   @Override
   public void periodic() {
     
-    if ( driverPS4Controller.getL1ButtonPressed() || extenderSlowCheck.getAsBoolean() || elevatorSlowCheck.getAsBoolean()) {
+    if ( driverPS4Controller.getRawButtonPressed(Constants.DriverControls.slowerButton) || elevatorSlowCheck.getAsBoolean()) {
 
       slowMultiplier = DriveConstants.kSlowerMultiplier;
 
-    } else if ( driverPS4Controller.getR1ButtonPressed() ) {
+    } else if ( driverPS4Controller.getRawButtonPressed(Constants.DriverControls.slowButton) || extenderSlowCheck.getAsBoolean()  ) {
 
       slowMultiplier = DriveConstants.kSlowMultiplier;
       SmartDashboard.putBoolean("slowmode", true);
@@ -146,6 +155,7 @@ public class DriveSubsystem extends CSubsystem {
       SmartDashboard.putBoolean( "slowmode", false);
 
     }
+
     // Update the odometry in the periodic block
     SmartDashboard.putNumber("Gyro", gyroAHRS.getAngle());
     boolean useLimeLight = false;
@@ -159,30 +169,30 @@ public class DriveSubsystem extends CSubsystem {
             rearRightMaxSwerveModule.getPosition()
         });
 
-    SmartDashboard.putBoolean("CirclePressed", driverPS4Controller.getCircleButtonPressed());
+    if ( !limeLightDriving ) {
+      //get input from driver PS4 Controller
+      double xSpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftY(), OIConstants.kDriveDeadband);
+      double ySpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftX(), OIConstants.kDriveDeadband);
+      double rotationalSpeed = -MathUtil.applyDeadband(driverPS4Controller.getRightX(), OIConstants.kDriveDeadband);
+      boolean fieldRelative = true;
 
-    //get input from driver PS4 Controller
-    double xSpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftY(), OIConstants.kDriveDeadband);
-    double ySpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftX(), OIConstants.kDriveDeadband);
-    double rotationalSpeed = -MathUtil.applyDeadband(driverPS4Controller.getRightX(), OIConstants.kDriveDeadband);
-    boolean fieldRelative = true;
+      // Switches to non field-relative driving if the driver presses the Circle
+      // button,
+      // and switches to using the limelight
+      if ( LimelightHelpers.getTV("") && driverPS4Controller.getRawButtonPressed(Constants.DriverControls.useLimelight)) {
+        useLimeLight = true;
+        final var rot_limelight = limelight_aim_proportional();
+        rotationalSpeed = rot_limelight;
 
-    // Switches to non field-relative driving if the driver presses the Circle
-    // button,
-    // and switches to using the limelight
-    if (LimelightHelpers.getTV("") && driverPS4Controller.getCircleButton()) {
-      useLimeLight = true;
-      final var rot_limelight = limelight_aim_proportional();
-      rotationalSpeed = rot_limelight;
+        final var forward_limelight = limelight_range_proportional();
+        xSpeed = forward_limelight/10.0;
 
-      final var forward_limelight = limelight_range_proportional();
-      xSpeed = forward_limelight/10.0;
+        // while using Limelight, turn off field-relative driving.
+        fieldRelative = false;
+      }
 
-      // while using Limelight, turn off field-relative driving.
-      fieldRelative = false;
+      this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative, useLimeLight );
     }
-
-    this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative, useLimeLight );
   }
 
   /**
@@ -394,5 +404,30 @@ public ChassisSpeeds getChassisSpeeds() {
           zeroHeading();
           resetEncoders();
         });
+  }
+
+  public CCommand LimeLightDriveCommand() {
+    return cCommand_( "DriveSubsystem.LimeLightDrive" )
+    .onInitialize( () -> {
+      limeLightDriving = true;
+    })
+    .onExecute( () -> {
+
+      double ySpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftX(), OIConstants.kDriveDeadband);
+      boolean useLimeLight = true;
+      final var rot_limelight = limelight_aim_proportional();
+      double rotationalSpeed = rot_limelight;
+
+      final var forward_limelight = limelight_range_proportional();
+      double xSpeed = forward_limelight/10.0;
+
+      // while using Limelight, turn off field-relative driving.
+      boolean fieldRelative = false;
+
+      this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative, useLimeLight );
+    })
+    .onEnd( () -> {
+      limeLightDriving = false;
+    } );
   }
 }
