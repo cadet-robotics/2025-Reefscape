@@ -157,10 +157,10 @@ public class ElevatorSubsystem extends CSubsystem {
         // Limit switches are reversed
         if ( desiredPosition > s_elevatorEncoder.getPosition() && !( m_topLimitSwitch.get() ) ) {
             pidController.setReference( desiredPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0 );
+        // Limit swtiches are reversed
         } else if ( desiredPosition < s_elevatorEncoder.getPosition() && !( m_bottomLimitSwitch.get() ) ) {
             pidController.setReference( desiredPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0 );
         }
-        
 
     }
 
@@ -210,7 +210,7 @@ public class ElevatorSubsystem extends CSubsystem {
         //limit switch values are reversed 
         SmartDashboard.putBoolean( "ElevatorBottom", m_bottomLimitSwitch.get() );
         SmartDashboard.putBoolean( "ElevatorTop", m_topLimitSwitch.get() );
-        SmartDashboard.putString( "ElevatorLevel", Constants.ElevatorSubsystem.LevelNames[level] );
+        SmartDashboard.putNumber( "ElevatorLevel", level );
         SmartDashboard.putNumber( "Encoder", s_elevatorEncoder.getPosition() );
 
         SmartDashboard.putBoolean( "ElevatorSlow", elevatorSlowCheck.getAsBoolean() );
