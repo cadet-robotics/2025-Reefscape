@@ -147,24 +147,20 @@ public class ElevatorSubsystem extends CSubsystem {
      * @param desiredState The desired state for the motor
      */
     public void setDesiredState( double desiredState ) {
-        // double move = m_elevatorController.calculate( s_elevatorEncoder.getPosition(), desiredState );
-        // //limit switch values are reversed
-        // if ( move > 0 && !m_topLimitSwitch.get() && move < Constants.ElevatorSubsystem.PidMax ) {
-        //     m_elevatorMotor.set( move );
-        // } else {
-        //     //limit switch values are reversed
-        //     if ( move < 0 && !m_bottomLimitSwitch.get() && move > -Constants.ElevatorSubsystem.PidMax ) {
-        //         m_elevatorMotor.set( move );
-        //     } else {
-        //         m_elevatorMotor.stopMotor();
-        //     }
-        // }
 
         TrapezoidProfileState = elevatorProfile.calculate( TimedRobot.kDefaultPeriod, TrapezoidProfileState, new TrapezoidProfile.State( desiredState, 0 ));
-        SmartDashboard.putNumber( "State" , TrapezoidProfileState.position );
+        double desiredPosition = TrapezoidProfileState.position;
+    
+        SmartDashboard.putNumber( "State" ,  desiredPosition );
         SmartDashboard.putNumber( "DesiredState" , desiredState );
+
+        // Limit switches are reversed
+        if ( desiredPosition > s_elevatorEncoder.getPosition() && !( m_topLimitSwitch.get() ) ) {
+            pidController.setReference( desiredPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0 );
+        } else if ( desiredPosition < s_elevatorEncoder.getPosition() && !( m_bottomLimitSwitch.get() ) ) {
+            pidController.setReference( desiredPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0 );
+        }
         
-        pidController.setReference(TrapezoidProfileState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0 );
 
     }
 
