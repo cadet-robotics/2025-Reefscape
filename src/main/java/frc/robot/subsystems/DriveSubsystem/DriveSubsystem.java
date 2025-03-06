@@ -122,6 +122,10 @@ public class DriveSubsystem extends CSubsystem {
         .whileTrue(
             GyroReset());
 
+    new JoystickButton(driverPS4Controller, Constants.DriverControls.useLimelight)
+        .whileTrue(
+            LimeLightDriveCommand());
+
     // Slow Down Button
     // new JoystickButton(driverPS4Controller, Button.kR2.value)
     //     .whileTrue(
@@ -179,17 +183,19 @@ public class DriveSubsystem extends CSubsystem {
       // Switches to non field-relative driving if the driver presses the Circle
       // button,
       // and switches to using the limelight
-      if ( LimelightHelpers.getTV("") && driverPS4Controller.getRawButtonPressed(Constants.DriverControls.useLimelight)) {
-        useLimeLight = true;
-        final var rot_limelight = limelight_aim_proportional();
-        rotationalSpeed = rot_limelight;
+      // if ( LimelightHelpers.getTV("") && driverPS4Controller.getRawButtonPressed(Constants.DriverControls.useLimelight)) {
+        
+        // useLimeLight = true;
+        // final var rot_limelight = limelight_aim_proportional();
+        // rotationalSpeed = rot_limelight;
 
-        final var forward_limelight = limelight_range_proportional();
-        xSpeed = forward_limelight/10.0;
+        // final var forward_limelight = limelight_range_proportional();
+        // xSpeed = forward_limelight/10.0;
 
-        // while using Limelight, turn off field-relative driving.
-        fieldRelative = false;
-      }
+        // // while using Limelight, turn off field-relative driving.
+        // fieldRelative = false;
+
+      // }
 
       this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative, useLimeLight );
     }
