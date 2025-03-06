@@ -3,17 +3,23 @@ package frc.robot.subsystems;
 import java.util.function.BooleanSupplier;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -33,8 +39,13 @@ public class ElevatorSubsystem extends CSubsystem {
         MotorType.kBrushless 
     );
 
+    private static final SparkClosedLoopController pidController = m_elevatorMotor.getClosedLoopController();
+
     // TODO: Pid tuning should be conducted on Mikey
     private static PIDController m_elevatorController = new PIDController(1.0, 0, 0);
+
+    private static final TrapezoidProfile elevatorProfile = new TrapezoidProfile( new TrapezoidProfile.Constraints(90,200));
+    private static TrapezoidProfile.State TrapezoidProfileState = new TrapezoidProfile.State();
 
     // Encoder Setup
     private static RelativeEncoder s_elevatorEncoder; // = new Encoder( Constants.ElevatorSubsystem.kElevatorEncoderA, Constants.ElevatorSubsystem.kElevatorEncoderB );
@@ -117,20 +128,17 @@ public class ElevatorSubsystem extends CSubsystem {
         // new JoystickButton(m_driverController, m_driverController.getPOV() )
         //     .and( () -> { return m_driverController.getPOV() == 0;} )
         //     .whileTrue( DisengageBrake() );
+        new JoystickButton(m_coDriverController, Button.kR1.value )
+            .whileTrue( ElevatorLevelUp() );
 
-        // new JoystickButton(m_coDriverController, m_coDriverController.getPOV() )
-        //     .and( () -> { return m_coDriverController.getPOV() == 0; } )
-        //     .whileTrue( ElevatorLevelUp() );
+        new JoystickButton(m_coDriverController, Button.kL1.value )
+            .whileTrue( ElevatorLevelDown() );
 
-        // new JoystickButton(m_coDriverController, m_coDriverController.getPOV() )
-        //     .and( () -> { return m_coDriverController.getPOV() == 180; } )
-        //     .whileTrue( ElevatorLevelDown() );
+        // new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevatorUpManual )
+        //     .whileTrue( ElevatorDoUp() );
 
-        new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevatorUpManual )
-            .whileTrue( ElevatorDoUp() );
-
-        new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevaotrDownManual )
-            .whileTrue( ElevatorDoDown() );
+        // new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevaotrDownManual )
+        //     .whileTrue( ElevatorDoDown() );
     }
 
     /** 
@@ -139,18 +147,25 @@ public class ElevatorSubsystem extends CSubsystem {
      * @param desiredState The desired state for the motor
      */
     public void setDesiredState( double desiredState ) {
-        double move = m_elevatorController.calculate( s_elevatorEncoder.getPosition(), desiredState );
-        //limit switch values are reversed
-        if ( move > 0 && !m_topLimitSwitch.get() && move < Constants.ElevatorSubsystem.PidMax ) {
-            m_elevatorMotor.set( move );
-        } else {
-            //limit switch values are reversed
-            if ( move < 0 && !m_bottomLimitSwitch.get() && move > -Constants.ElevatorSubsystem.PidMax ) {
-                m_elevatorMotor.set( move );
-            } else {
-                m_elevatorMotor.stopMotor();
-            }
-        }
+        // double move = m_elevatorController.calculate( s_elevatorEncoder.getPosition(), desiredState );
+        // //limit switch values are reversed
+        // if ( move > 0 && !m_topLimitSwitch.get() && move < Constants.ElevatorSubsystem.PidMax ) {
+        //     m_elevatorMotor.set( move );
+        // } else {
+        //     //limit switch values are reversed
+        //     if ( move < 0 && !m_bottomLimitSwitch.get() && move > -Constants.ElevatorSubsystem.PidMax ) {
+        //         m_elevatorMotor.set( move );
+        //     } else {
+        //         m_elevatorMotor.stopMotor();
+        //     }
+        // }
+
+        TrapezoidProfileState = elevatorProfile.calculate( TimedRobot.kDefaultPeriod, TrapezoidProfileState, new TrapezoidProfile.State( desiredState, 0 ));
+        SmartDashboard.putNumber( "State" , TrapezoidProfileState.position );
+        SmartDashboard.putNumber( "DesiredState" , desiredState );
+        
+        pidController.setReference(TrapezoidProfileState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0 );
+
     }
 
     /** Simple function to make it simple to grab the disstance to the target */
@@ -166,9 +181,11 @@ public class ElevatorSubsystem extends CSubsystem {
             // Uncomment if we need a set a speed to fight the gravity when trying to hover and comment the prevois line
             // m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorHoverSpeed );
         } else if ( distanceTo( target ) > Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowDistanceThreashold ) {
+            // LIMIT SWITCH IS INVERTED
             if ( s_elevatorEncoder.getPosition() > target && m_bottomLimitSwitch.get() ) { 
                 // Go down
                 m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
+            // LIMIT SWITCH IS INVERTED
             } else if ( s_elevatorEncoder.getPosition() < target && m_topLimitSwitch.get() ) { //  
                 // Go up
                 m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
@@ -206,7 +223,7 @@ public class ElevatorSubsystem extends CSubsystem {
             s_elevatorEncoder.setPosition(0);
         }
 
-        // setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
+        setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
 
         // if ( m_breakTimer.get() <= Constants.ElevatorSubsystem.kBreakEngageTime ) {
         //     m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
@@ -224,8 +241,9 @@ public class ElevatorSubsystem extends CSubsystem {
     public CCommand ElevatorLevelUp() {
         return cCommand_( "ElevatorSubsystem.ElevatorLevelUp" )
             .onInitialize( () -> {
-                if ( level < 8 ) {
+                if ( level < 9 ) {
                     level = level + 1;
+                    TrapezoidProfileState = new TrapezoidProfile.State( s_elevatorEncoder.getPosition(), s_elevatorEncoder.getVelocity()/60);
                 }
             });
     }
@@ -239,6 +257,7 @@ public class ElevatorSubsystem extends CSubsystem {
             .onInitialize( () -> {
                 if ( level > 0 ) {
                     level = level - 1;
+                    TrapezoidProfileState = new TrapezoidProfile.State( s_elevatorEncoder.getPosition(), s_elevatorEncoder.getVelocity()/60);
                 }
             });
     }

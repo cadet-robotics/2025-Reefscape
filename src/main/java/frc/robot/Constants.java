@@ -153,8 +153,8 @@ public final class Constants {
     public static final int kElevatorEncoderA = 2; // DIO ID
     public static final int kElevatorEncoderB = 3; // DIO ID 
 
-    public static String[] LevelNames = { "AlgaeFloor", "ScoreAlgae", "Trough", "PreClimb", "Intake", "ReefLevel2", "ReefLevel3", "AlgaeTop", "ReefTop" };
-    public static double[] LevelHeights = { 0.0, 10000.0, 20000.0, 30000.0, 40000.0, 50000.0, 60000.0, 70000.0, 80000.0, 90.0000 };
+    public static String[] LevelNames = { "Trough", "ScoreAlgae", "CoralStation", "PreClimb", "AlgaeMid", "ReefLevel2", "ReefLevel3", "AlgaeTop", "ReefTop" };
+    public static double[] LevelHeights = {  0.0, 7.0, 17.7, 38.374, 44.052, 18.22, 18.223, 47.7, 72.646, 90.0 };
 
     // TODO: The following values need to be tuned on Mikey
     public static final double kServoEnagedPos = 1.0; // Postion
@@ -170,16 +170,16 @@ public final class Constants {
       public static double kElevatorSlowSpeed = 0.05;
 
       // Defualt speed for the elevator
-      public static double kElevatorNormSpeed = 0.1;
+      public static double kElevatorNormSpeed = 0.3;
       
       // The speed the elevator will hover at ( must be enabled in elevatorSubsystem )
       public static double kElevatorHoverSpeed = 0.01;
 
       // The distance when the elevator should stop, or use the however speed instead of moving slowly
-      public static double kElevatorStopThreshold = 200.0;
+      public static double kElevatorStopThreshold = 0.03;
 
       // The distance where crappy pid should use a slow speed instead of the normal one
-      public static double kElevatorSlowDistanceThreashold = 500.0;
+      public static double kElevatorSlowDistanceThreashold = 2.0;
 
     }
   }
@@ -195,7 +195,7 @@ public final class Constants {
     public static final int kSnowblowerMotor = 2; // CAN ID
     public static final double SnowblowerForwardSpeed = 0.6; // Speed
     public static final double SnowblowerBackwardSpeed = 0.4; // Speed
-    public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
+    public static final double[] bucketPositionArray = {0.0,0.9,0.75}; // Positions
 
   }
 

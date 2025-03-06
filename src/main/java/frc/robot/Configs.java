@@ -78,7 +78,13 @@ public final class Configs {
         public static SparkMaxConfig kElevatorMotorConfig = new SparkMaxConfig();
         static {
                 kElevatorMotorConfig
-                        .idleMode(IdleMode.kBrake);
+                        .idleMode(IdleMode.kBrake)
+                        .closedLoop
+                                .p( 1.0 )
+                                .i( 0 )
+                                .d( 0 )
+                                .feedbackSensor( FeedbackSensor.kPrimaryEncoder );
+                                
         }
     }
 
@@ -89,5 +95,4 @@ public final class Configs {
                         .idleMode(IdleMode.kBrake);
         }
     }
-    
-}
+}   
