@@ -240,7 +240,8 @@ public class DriveSubsystem extends CSubsystem {
     // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the
     // rightmost edge of
     // your limelight 3 feed, tx should return roughly 31 degrees.
-    double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
+    double targetingAngularVelocity = LimelightHelpers.getTXNC("limelight") * kP;
+    // double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
 
     // convert to radians per second for our drive method
     targetingAngularVelocity *= Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;
@@ -258,10 +259,19 @@ public class DriveSubsystem extends CSubsystem {
   // "ta" (area) for target ranging rather than "ty"
   double limelight_range_proportional() {
     double kP = .1;
-    double targetingForwardSpeed = LimelightHelpers.getTA("limelight") * kP;
+    // double targetingForwardSpeed = LimelightHelpers.getTA("limelight") * kP;
+    double targetingForwardSpeed = 1 - LimelightHelpers.getTA("limelight");
     targetingForwardSpeed *= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
     // targetingForwardSpeed *= -1.0;
     return targetingForwardSpeed;
+  }
+
+  //Does not work
+  public double limelight_side_proportional() {
+    double kP = .1;
+    double targetingSidewaysSpeed = LimelightHelpers.getTX("limelight") * kP;
+    targetingSidewaysSpeed *= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
+    return targetingSidewaysSpeed;
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds) {
@@ -273,7 +283,7 @@ public class DriveSubsystem extends CSubsystem {
     rearLeftMaxSwerveModule.setDesiredState(swerveModuleStates[2]);
     rearRightMaxSwerveModule.setDesiredState(swerveModuleStates[3]);
   }
-public ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     SwerveModuleState[] swerveModuleStates = new SwerveModuleState[] {
         frontLeftMaxSwerveModule.getState(),
         frontRightMaxSwerveModule.getState(),
@@ -282,6 +292,8 @@ public ChassisSpeeds getChassisSpeeds() {
     };
     return DriveConstants.kDriveKinematics.toChassisSpeeds(swerveModuleStates);
   }
+
+  
 
   /**
    * Returns the currently-estimated pose of the robot.
@@ -404,12 +416,15 @@ public ChassisSpeeds getChassisSpeeds() {
 
       double ySpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftX(), OIConstants.kDriveDeadband);
       boolean useLimeLight = true;
+
       final var rot_limelight = limelight_aim_proportional();
       double rotationalSpeed = rot_limelight;
 
       final var forward_limelight = limelight_range_proportional();
-      // double xSpeed = forward_limelight/10.0;
       double xSpeed = forward_limelight;
+
+      // final var sideways_limelight = limelight_side_proportional();
+      // double ySpeed = sideways_limelight;
 
       // while using Limelight, turn off field-relative driving.
       boolean fieldRelative = false;
