@@ -49,6 +49,7 @@ public class ElevatorSubsystem extends CSubsystem {
 
     // Encoder Setup
     private static RelativeEncoder s_elevatorEncoder; // = new Encoder( Constants.ElevatorSubsystem.kElevatorEncoderA, Constants.ElevatorSubsystem.kElevatorEncoderB );
+    private static boolean isManual = true;
         
     // Servo Setup
     // This servo is the brake for the elevator
@@ -74,6 +75,7 @@ public class ElevatorSubsystem extends CSubsystem {
     // This should be a value between 0 and 8 ( There are 9 levels but a 0 based system will be used )
     private static int level = 0;
 
+    private static boolean wasManual = true;
     /**
      * Checks if the robot should be in slow mode based on the position of the elevator
      */
@@ -134,11 +136,11 @@ public class ElevatorSubsystem extends CSubsystem {
         new JoystickButton(m_coDriverController, Button.kL1.value )
             .whileTrue( ElevatorLevelDown() );
 
-        // new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevatorUpManual )
-        //     .whileTrue( ElevatorDoUp() );
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevatorUpManual )
+            .whileTrue( ElevatorDoUp() );
 
-        // new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevaotrDownManual )
-        //     .whileTrue( ElevatorDoDown() );
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevaotrDownManual )
+            .whileTrue( ElevatorDoDown() );
     }
 
     /** 
@@ -155,12 +157,12 @@ public class ElevatorSubsystem extends CSubsystem {
         SmartDashboard.putNumber( "DesiredState" , desiredState );
 
         // Limit switches are reversed
-        if ( desiredPosition > s_elevatorEncoder.getPosition() && !( m_topLimitSwitch.get() ) ) {
+        // if ( desiredPosition > s_elevatorEncoder.getPosition() && !( m_topLimitSwitch.get() ) ) {
             pidController.setReference( desiredPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0 );
         // Limit swtiches are reversed
-        } else if ( desiredPosition < s_elevatorEncoder.getPosition() && !( m_bottomLimitSwitch.get() ) ) {
-            pidController.setReference( desiredPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0 );
-        }
+        // } else if ( desiredPosition < s_elevatorEncoder.getPosition() && !( m_bottomLimitSwitch.get() ) ) {
+            // pidController.setReference( desiredPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0 );
+        // }
 
     }
 
@@ -169,36 +171,6 @@ public class ElevatorSubsystem extends CSubsystem {
         return Math.abs( target * target - s_elevatorEncoder.getPosition() * s_elevatorEncoder.getPosition() );
     }
     
-    /** A worse but easier to tune version of control for the elevator if we can't get pid to work */
-    private static void crappyPID( double target ) {
-        // Use the set slow speed to get to the target
-        if ( distanceTo( target ) <= Constants.ElevatorSubsystem.CrappyPid.kElevatorStopThreshold ) {
-            m_elevatorMotor.stopMotor();
-            // Uncomment if we need a set a speed to fight the gravity when trying to hover and comment the prevois line
-            // m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorHoverSpeed );
-        } else if ( distanceTo( target ) > Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowDistanceThreashold ) {
-            // LIMIT SWITCH IS INVERTED
-            if ( s_elevatorEncoder.getPosition() > target && m_bottomLimitSwitch.get() ) { 
-                // Go down
-                m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
-            // LIMIT SWITCH IS INVERTED
-            } else if ( s_elevatorEncoder.getPosition() < target && m_topLimitSwitch.get() ) { //  
-                // Go up
-                m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorSlowSpeed );
-            }
-        } else {
-
-            // Full speed if distance is not within the threshold
-            if ( s_elevatorEncoder.getPosition() > target && m_bottomLimitSwitch.get() ) { 
-                // Go down
-                m_elevatorMotor.set( -Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
-            } else if ( s_elevatorEncoder.getPosition() < target && m_topLimitSwitch.get()  ) { // m_topLimitSwitch.get() 
-                // Go up
-                m_elevatorMotor.set( Constants.ElevatorSubsystem.CrappyPid.kElevatorNormSpeed );
-            }
-        }
-    }
-
     /**
      * Periodic
      * Frequently checks the elevator level and encoder position, both get sent to the dashboard.
@@ -219,7 +191,12 @@ public class ElevatorSubsystem extends CSubsystem {
             s_elevatorEncoder.setPosition(0);
         }
 
-        setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
+        if ( !isManual ) {
+            if ( wasManual ) {
+                    TrapezoidProfileState = new TrapezoidProfile.State( s_elevatorEncoder.getPosition(), s_elevatorEncoder.getVelocity()/60);
+            }
+            setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
+        }
 
         // if ( m_breakTimer.get() <= Constants.ElevatorSubsystem.kBreakEngageTime ) {
         //     m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
@@ -227,6 +204,7 @@ public class ElevatorSubsystem extends CSubsystem {
 
         // Uncomment the bollow line to test when and only when ready
         // crappyPID(Constants.ElevatorSubsystem.LevelHeights[level]);
+        wasManual = isManual;
     }
      
     /**
@@ -237,9 +215,10 @@ public class ElevatorSubsystem extends CSubsystem {
     public CCommand ElevatorLevelUp() {
         return cCommand_( "ElevatorSubsystem.ElevatorLevelUp" )
             .onInitialize( () -> {
-                if ( level < 9 ) {
+                isManual = false;
+                if ( level < 8 ) {
                     level = level + 1;
-                    TrapezoidProfileState = new TrapezoidProfile.State( s_elevatorEncoder.getPosition(), s_elevatorEncoder.getVelocity()/60);
+                    // TrapezoidProfileState = new TrapezoidProfile.State( s_elevatorEncoder.getPosition(), s_elevatorEncoder.getVelocity()/60);
                 }
             });
     }
@@ -251,9 +230,10 @@ public class ElevatorSubsystem extends CSubsystem {
     public CCommand ElevatorLevelDown() {
         return cCommand_( "ElevatorSubsystem.ElevatorLevelDown" )
             .onInitialize( () -> {
+                isManual = false;
                 if ( level > 0 ) {
                     level = level - 1;
-                    TrapezoidProfileState = new TrapezoidProfile.State( s_elevatorEncoder.getPosition(), s_elevatorEncoder.getVelocity()/60);
+                    // TrapezoidProfileState = new TrapezoidProfile.State( s_elevatorEncoder.getPosition(), s_elevatorEncoder.getVelocity()/60);
                 }
             });
     }
@@ -288,6 +268,7 @@ public class ElevatorSubsystem extends CSubsystem {
         return cCommand_( "ElevatorSubsystem.ElevatorDoUp")
             // Filler code TODO: must be changed when migrating to mikey
             .onExecute( () -> {
+                isManual = true;
                 // Limit Switches are reversed
                 if ( m_topLimitSwitch.get() ) {
                     m_elevatorMotor.set( Constants.ElevatorSubsystem.kElevaotrManualSpeed);
@@ -304,6 +285,7 @@ public class ElevatorSubsystem extends CSubsystem {
         return cCommand_( "ElevatorSubsystem.ElevaotrDoDown")
             // Filler code TODO: must be changed when migrating to mikey
             .onInitialize( () -> {
+                isManual = true;
                 // LIMIT SWITCHES ARE REVERSED
                 if ( m_bottomLimitSwitch.get() ) {
                     m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevaotrManualSpeed);
@@ -312,7 +294,6 @@ public class ElevatorSubsystem extends CSubsystem {
                 }
             })
             .onEnd( ()->{
-                m_elevatorMotor.stopMotor();
             });
     }
 }

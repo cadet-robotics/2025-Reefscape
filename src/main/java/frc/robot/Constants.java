@@ -153,8 +153,8 @@ public final class Constants {
     public static final int kElevatorEncoderA = 2; // DIO ID
     public static final int kElevatorEncoderB = 3; // DIO ID 
 
-    public static String[] LevelNames = { "Trough", "ScoreAlgae", "CoralStation", "PreClimb", "AlgaeMid", "ReefLevel2", "ReefLevel3", "AlgaeTop", "ReefTop" };
-    public static double[] LevelHeights = {  0.0, 7.0, 17.7, 38.374, 44.052, 18.22, 18.223, 47.7, 72.646, 90.0 };
+    public static String[] LevelNames = { "Trough", "ScoreAlgae", "AlgaeMid", "ReefLevel2", "CoralStation", "PreClimb", "ReefLevel3", "AlgaeTop", "ReefTop" };
+    public static double[] LevelHeights = {  0.0, 7.0, 17.7, 18.22, 18.223, 38.374, 44.052, 47.7, 72.646, 93.0 };
 
     // TODO: The following values need to be tuned on Mikey
     public static final double kServoEnagedPos = 1.0; // Postion
@@ -190,7 +190,7 @@ public final class Constants {
     // TODO: Tune
     public static final double kBlockingExenderPosition = 0.2;
     
-    public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
+    public static final double PidMax = 0.8; // The maximum speed pid is allowed to go
 
     public static final int kSnowblowerMotor = 2; // CAN ID
     public static final double SnowblowerForwardSpeed = 0.6; // Speed

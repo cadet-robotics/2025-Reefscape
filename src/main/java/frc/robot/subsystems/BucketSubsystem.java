@@ -116,7 +116,7 @@ public class BucketSubsystem extends CSubsystem {
     public void periodic ()
     {
         if ( !moving ) {
-            // goToDesiredState();
+            goToDesiredState();
         }
 
         SmartDashboard.putNumber( "Bucket Encoder", s_snowblowerEncoder.getPosition());
@@ -129,10 +129,8 @@ public class BucketSubsystem extends CSubsystem {
     public CCommand BucketStart() {
         return cCommand_( "BucketSubsystem.BucketStart" )
             .onInitialize( () -> {
+                moving = false;
                 positionIndex = 0;
-            })
-            .onEnd( () -> {
-                m_snowblowerMotor.stopMotor();
             });
     }
 
@@ -143,10 +141,8 @@ public class BucketSubsystem extends CSubsystem {
     public CCommand BucketDump() {
         return cCommand_( "BucketSubsystem.BucketDump" )
             .onInitialize( () -> {
+                moving = false;
                 positionIndex = 1;
-            })
-            .onEnd( () -> {
-                m_snowblowerMotor.stopMotor();
             });
     }
 
@@ -157,10 +153,8 @@ public class BucketSubsystem extends CSubsystem {
     public CCommand BucketLoad () {
         return cCommand_( "BucketSubsystem.BucketLoad" )
             .onInitialize( () -> {
+                moving = false;
                 positionIndex = 2;
-            })
-            .onEnd( () -> {
-                m_snowblowerMotor.stopMotor();
             });
     }
 
@@ -174,7 +168,6 @@ public class BucketSubsystem extends CSubsystem {
                 m_snowblowerMotor.set( Constants.BucketSubsystem.SnowblowerForwardSpeed );
             })
             .onEnd( () -> {
-                moving = false;
                 SmartDashboard.putBoolean( "Moving forward", true );
                 m_snowblowerMotor.stopMotor();
             });
@@ -191,7 +184,6 @@ public class BucketSubsystem extends CSubsystem {
             })
             .onEnd( () -> {
                 SmartDashboard.putBoolean( "Moving backward", false);
-                moving = false;
                 m_snowblowerMotor.stopMotor();
             });
     }
