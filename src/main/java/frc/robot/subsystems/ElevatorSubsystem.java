@@ -156,7 +156,7 @@ public class ElevatorSubsystem extends CSubsystem {
 
         new JoystickButton(m_driverController, Constants.DriverControls.moveToTopReef )
             .whileTrue( new RunCommand(()->{
-                level = 9;
+                level = 8;
                 isManual = false;
             },
             this
