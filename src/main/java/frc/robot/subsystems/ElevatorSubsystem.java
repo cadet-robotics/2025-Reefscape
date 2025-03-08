@@ -49,7 +49,7 @@ public class ElevatorSubsystem extends CSubsystem {
     private static TrapezoidProfile.State TrapezoidProfileState = new TrapezoidProfile.State();
 
     // Encoder Setup
-    private static RelativeEncoder s_elevatorEncoder; // = new Encoder( Constants.ElevatorSubsystem.kElevatorEncoderA, Constants.ElevatorSubsystem.kElevatorEncoderB );
+    public static RelativeEncoder s_elevatorEncoder; // = new Encoder( Constants.ElevatorSubsystem.kElevatorEncoderA, Constants.ElevatorSubsystem.kElevatorEncoderB );
     private static boolean isManual = true;
         
     // Servo Setup
