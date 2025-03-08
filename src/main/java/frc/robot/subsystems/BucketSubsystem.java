@@ -108,7 +108,7 @@ public class BucketSubsystem extends CSubsystem {
         SmartDashboard.putNumber( "MoveTargetState", attempt );
         // Simple limit for PID control
         // if ( attempt < Constants.BucketSubsystem.PidMax && attempt > -Constants.BucketSubsystem.PidMax ) {
-            m_snowblowerMotor.set( attempt * 2.0 );
+            m_snowblowerMotor.set( attempt * 3.0 );
         // } else if ( attempt < Constants.BucketSubsystem.PidMax ) { 
         //     m_snowblowerMotor.set( Constants.BucketSubsystem.PidMax );
         // } else if ( attempt > -Constants.BucketSubsystem.PidMax ) { 
