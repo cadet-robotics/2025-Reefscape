@@ -161,6 +161,8 @@ public class ElevatorSubsystem extends CSubsystem {
             },
             this
             ));
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.disbaleBreak )
+            .whileTrue( DisengageBrake() );
     }
 
     /** 

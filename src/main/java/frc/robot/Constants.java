@@ -158,7 +158,7 @@ public final class Constants {
 
     // TODO: The following values need to be tuned on Mikey
     public static final double kServoEnagedPos = 1.0; // Postion
-    public static final double kServoDisenagedPos = 1.0; // Position
+    public static final double kServoDisenagedPos = 0.0; // Position
   
     public static final double kBreakEngageTime = 119.5;
 
@@ -241,6 +241,8 @@ public final class Constants {
   }
   public static final class CoDriverControls {
    
+    public static final int disbaleBreak = Button.kShare.value;
+
     public static final int horizontalRetractButton = Button.kSquare.value;
 
     //Press Circle on CODRIVER CONTROLLER to extend the "inny outty"/Horizontal Extender
