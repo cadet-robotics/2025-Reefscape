@@ -11,6 +11,7 @@ import frc.robot.Constants.OIConstants;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -86,6 +87,11 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    
+
+  
+    new JoystickButton( m_coDriverController, Constants.CoDriverControls.horizontalExtendButton )
+      .whileTrue( new SequentialCommandGroup( m_horizontalExtender.Extend(), m_intake.IntakeOut() ));
     
     // Intake buttons
     m_intake.buttonBindings(m_driverController, m_coDriverController);
