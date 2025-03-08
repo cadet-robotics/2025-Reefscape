@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.revrobotics.spark.config.SmartMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
@@ -92,7 +93,8 @@ public final class Configs {
         public static final SparkMaxConfig kSnowblowerConfig = new SparkMaxConfig();
         static {
                 kSnowblowerConfig
-                        .idleMode(IdleMode.kBrake);
+                        .idleMode(IdleMode.kBrake)
+                        .smartCurrentLimit( Constants.BucketSubsystem.kCurrentLimit );
         }
     }
 }   

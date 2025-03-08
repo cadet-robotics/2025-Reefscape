@@ -128,8 +128,7 @@ public final class Constants {
 
   public static final class AlgaeSubsystem {
 
-    public static final long HoldTime = 1000; // The time that the robot should hold down the algae motors for ( miliseconds )
-    public static final long waitTime = 750; // The amount of time to wait miminum inbetween firings of intake commands
+    public static final double HoldTime = 1; // The time that the robot should hold down the algae motors for ( Seconds )
     public static final int kLeftAlgaeMotor = 3; // CAN ID
     public static final int kRightAlgaeMotor = 4; // CAN ID
     public static final double kAlgaeIntakeSpeed = 0.6; // Speed
@@ -186,6 +185,7 @@ public final class Constants {
 
   public static final class BucketSubsystem {
 
+    public static final int kCurrentLimit = 10;
     // The minimum value where the bucket no longer blocks movement of the encoder
     // TODO: Tune
     public static final double kBlockingExenderPosition = 0.2;
@@ -233,14 +233,9 @@ public final class Constants {
 
     //Press Share on CODRIVER CONTROLLER to put the bucket into the start position
     public static final int bucketStartPositionButton = Button.kTriangle.value;
-
   }
-
-  public static class CoDriverControls
-  {
-    //CURRENTLY UNUSED BUTTONS ON CODRIVER CONTROLLER: 
-
-    //Press Cross on CODRIVER CONTROLLER to retract the "inny outty"/Horizontal Extender
+  public static final class CoDriverControls {
+   
     public static final int horizontalRetractButton = Button.kSquare.value;
 
     //Press Circle on CODRIVER CONTROLLER to extend the "inny outty"/Horizontal Extender

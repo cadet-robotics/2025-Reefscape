@@ -41,7 +41,7 @@ public class BucketSubsystem extends CSubsystem {
     private static int positionIndex = 0;
 
     // Wiether the bucket is being moved manually
-    private static boolean moving = false;
+    private static boolean isManual = false;
 
     public  BooleanSupplier isBucketBlocking = () -> {
         return ( s_snowblowerEncoder.getPosition() < Constants.BucketSubsystem.kBlockingExenderPosition );
@@ -98,6 +98,8 @@ public class BucketSubsystem extends CSubsystem {
      */
     public void goToDesiredState() {
         double attempt = m_PidController.calculate( Math.abs( 1 - s_snowblowerEncoder.getPosition() ) , 1 - Constants.BucketSubsystem.bucketPositionArray[positionIndex]);
+        SmartDashboard.putNumber( "SetIndex", positionIndex );
+        SmartDashboard.putNumber( "SetPoint", attempt );
         // Simple limit for PID control
         if ( attempt < Constants.BucketSubsystem.PidMax && attempt > -Constants.BucketSubsystem.PidMax ) {
             m_snowblowerMotor.set( attempt );
@@ -115,7 +117,7 @@ public class BucketSubsystem extends CSubsystem {
      */
     public void periodic ()
     {
-        if ( !moving ) {
+        if ( !isManual ) {
             goToDesiredState();
         }
 
@@ -129,7 +131,7 @@ public class BucketSubsystem extends CSubsystem {
     public CCommand BucketStart() {
         return cCommand_( "BucketSubsystem.BucketStart" )
             .onInitialize( () -> {
-                moving = false;
+                isManual = false;
                 positionIndex = 0;
             });
     }
@@ -141,7 +143,7 @@ public class BucketSubsystem extends CSubsystem {
     public CCommand BucketDump() {
         return cCommand_( "BucketSubsystem.BucketDump" )
             .onInitialize( () -> {
-                moving = false;
+                isManual = false;
                 positionIndex = 1;
             });
     }
@@ -153,7 +155,7 @@ public class BucketSubsystem extends CSubsystem {
     public CCommand BucketLoad () {
         return cCommand_( "BucketSubsystem.BucketLoad" )
             .onInitialize( () -> {
-                moving = false;
+                isManual = false;
                 positionIndex = 2;
             });
     }
@@ -161,7 +163,7 @@ public class BucketSubsystem extends CSubsystem {
     public CCommand BucketForward() {
         return cCommand_( "BucketSubsystem.BucketForward")
             .onInitialize( () -> {
-                moving = true;
+                isManual = true;
                 SmartDashboard.putBoolean( "Moving forward", true );
             })
             .onExecute( () -> {
@@ -177,7 +179,7 @@ public class BucketSubsystem extends CSubsystem {
         return cCommand_( "BucketSubsystem.BucketBackward")
             .onInitialize( () -> {
                 SmartDashboard.putBoolean( "Moving backward", true );
-                moving = true;
+                isManual = true;
             })
             .onExecute( () -> {
                 m_snowblowerMotor.set( -Constants.BucketSubsystem.SnowblowerBackwardSpeed );

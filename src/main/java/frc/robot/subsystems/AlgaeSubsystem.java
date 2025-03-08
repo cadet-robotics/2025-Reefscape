@@ -12,6 +12,8 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 //Press L2 on DRIVER CONTROLLER to make the intake spin outwards button
@@ -65,24 +67,17 @@ public class AlgaeSubsystem extends CSubsystem {
      *  Spins the intake motors inwards to gather an algae
      *  AlgaeSubsystem
      */
-    public CCommand IntakeIn() {
+    public ParallelRaceGroup IntakeIn() {
         return cCommand_("AccessoryMotorSubsystem.IntakeIn")
             .onExecute( () -> {
                 m_leftAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
                 m_rightAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
-                try {
-                    Thread.sleep( Constants.AlgaeSubsystem.HoldTime);
-                } catch ( InterruptedException e ){}
-                m_leftAlgaeMotor.stopMotor();
-                m_rightAlgaeMotor.stopMotor();
-                try {
-                    Thread.sleep( Constants.AlgaeSubsystem.waitTime);
-                } catch ( InterruptedException e ){}
             })
             .onEnd( () -> {
                 m_leftAlgaeMotor.stopMotor();
                 m_rightAlgaeMotor.stopMotor();
-            });
+            })
+            .withTimeout(Constants.AlgaeSubsystem.HoldTime);
     }
 
     /*
@@ -95,15 +90,6 @@ public class AlgaeSubsystem extends CSubsystem {
             .onExecute( () -> {
                 m_leftAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
                 m_rightAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
-                try {
-                    Thread.sleep( Constants.AlgaeSubsystem.HoldTime);
-                } catch ( InterruptedException e ){}
-                m_leftAlgaeMotor.stopMotor();
-                m_rightAlgaeMotor.stopMotor();
-                try {
-                    Thread.sleep( Constants.AlgaeSubsystem.waitTime);
-                } catch ( InterruptedException e ){}
-
             })
             .onEnd( () -> {
                 m_leftAlgaeMotor.stopMotor();
