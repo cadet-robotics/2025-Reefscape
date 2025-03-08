@@ -26,7 +26,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS4Controller;
 
 import frc.robot.Constants;
@@ -38,6 +38,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 //Press L1 on DRIVER CONTROLLER to go slower than slowdown
 //Press R1 on DRIVER CONTROLLER to slow down
@@ -112,6 +117,39 @@ public class DriveSubsystem extends CSubsystem {
     gyroAHRS.reset();
     gyroAHRS.setAngleAdjustment(180.0);
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+
+    RobotConfig config;
+    try{
+      config = RobotConfig.fromGUISettings();
+
+    // Configure AutoBuilder last
+    AutoBuilder.configure(
+            this::getPose, // Robot pose supplier
+            this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+            config, // The robot configuration
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+  }catch(Exception e){
+    //DriverStation.reportError(error:"Failed to load pathplanner config and configure autobuilder", e.getStackTrace());
+    System.out.println("Failed to load pathplanner config and configure autobuilder");
+  }
   }
 
   public void buttonBindings(PS4Controller ps4DriverController, PS4Controller ps4CodriverController) {
