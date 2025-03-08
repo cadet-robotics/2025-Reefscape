@@ -109,7 +109,7 @@ public class RobotContainer {
     m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
 
     // Elevator Buttons
-    //m_elevatorSubsystem.buttonBindings(m_driverController, m_coDriverController);
+    m_elevatorSubsystem.buttonBindings(m_driverController, m_coDriverController);
   }
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
