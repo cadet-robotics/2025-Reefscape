@@ -239,7 +239,9 @@ public class DriveSubsystem extends CSubsystem {
 
     // The speed multiplier is used to slow down the robot when it is controlled by the limelight
     double speedMultiplier;
-    if ( limeLightDrive ) {
+    if ( elevatorSlowCheck.getAsBoolean() ) {
+      speedMultiplier = 4.0;
+    } else if ( limeLightDrive ) {
       speedMultiplier = DriveConstants.kLimelightSpeedMultiplier;
     } else {
       speedMultiplier = 1.0;

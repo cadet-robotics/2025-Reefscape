@@ -64,7 +64,6 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
      */
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
-
         // Retract ( Cross )
         new JoystickButton(m_coDriverController, Constants.CoDriverControls.horizontalRetractButton )
             //limit switch values are reversed
