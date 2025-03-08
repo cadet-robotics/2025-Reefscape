@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.Configs;
@@ -146,6 +147,20 @@ public class ElevatorSubsystem extends CSubsystem {
 
         new JoystickButton(m_coDriverController, Constants.CoDriverControls.elevaotrDownManual )
             .whileTrue( ElevatorDoDown() );
+
+        new JoystickButton(m_driverController, Constants.DriverControls.bucketLoadPositionButton )
+            .whileTrue( new RunCommand( () -> {
+                level = 3;
+                isManual = false;
+            }, this ));
+
+        new JoystickButton(m_driverController, Constants.DriverControls.moveToTopReef )
+            .whileTrue( new RunCommand(()->{
+                level = 9;
+                isManual = false;
+            },
+            this
+        ));
     }
 
     /** 

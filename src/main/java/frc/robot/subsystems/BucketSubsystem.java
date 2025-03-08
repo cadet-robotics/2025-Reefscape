@@ -95,6 +95,9 @@ public class BucketSubsystem extends CSubsystem {
         
         new JoystickButton(m_driverController, Constants.DriverControls.bucketManualBackwardButton )
             .whileTrue( BucketBackward() );
+
+        new JoystickButton(m_driverController, Constants.DriverControls.moveToTopReef )
+            .whileTrue( BucketTopDump() );
     }
 
     /**
@@ -102,18 +105,17 @@ public class BucketSubsystem extends CSubsystem {
      */
     public void goToDesiredState() {
         double attempt = m_PidController.calculate( Math.abs( 1 - s_snowblowerEncoder.getPosition() ) , 1 - Constants.BucketSubsystem.bucketPositionArray[positionIndex]);
-        SmartDashboard.putNumber( "SetIndex", positionIndex );
-        SmartDashboard.putNumber( "SetPoint", attempt );
+        SmartDashboard.putNumber( "MoveTargetState", attempt );
         // Simple limit for PID control
-        if ( attempt < Constants.BucketSubsystem.PidMax && attempt > -Constants.BucketSubsystem.PidMax ) {
-            m_snowblowerMotor.set( attempt );
-        } else if ( attempt < Constants.BucketSubsystem.PidMax ) { 
-            m_snowblowerMotor.set( Constants.BucketSubsystem.PidMax );
-        } else if ( attempt > -Constants.BucketSubsystem.PidMax ) { 
-            m_snowblowerMotor.set( -Constants.BucketSubsystem.PidMax );
-        } else { 
-            m_snowblowerMotor.stopMotor();
-        }
+        // if ( attempt < Constants.BucketSubsystem.PidMax && attempt > -Constants.BucketSubsystem.PidMax ) {
+            m_snowblowerMotor.set( attempt * 2.0 );
+        // } else if ( attempt < Constants.BucketSubsystem.PidMax ) { 
+        //     m_snowblowerMotor.set( Constants.BucketSubsystem.PidMax );
+        // } else if ( attempt > -Constants.BucketSubsystem.PidMax ) { 
+        //     m_snowblowerMotor.set( -Constants.BucketSubsystem.PidMax );
+        // } else { 
+        //     m_snowblowerMotor.stopMotor();
+        // }
     }
     
     /**
@@ -149,6 +151,20 @@ public class BucketSubsystem extends CSubsystem {
             .onInitialize( () -> {
                 isManual = false;
                 positionIndex = 1;
+            })
+            .onEnd( () -> {
+                positionIndex = 2;
+            });
+    }
+
+    public CCommand BucketTopDump() {
+        return cCommand_( "BucketSubsystem.BucketTopDump" )
+            .onInitialize( () -> {
+                isManual = false;
+                positionIndex = 3;
+            })
+            .onEnd( () -> {
+                positionIndex = 2;
             });
     }
 

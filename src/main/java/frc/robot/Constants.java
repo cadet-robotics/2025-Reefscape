@@ -190,13 +190,13 @@ public final class Constants {
     // TODO: Tune
     public static final double kBlockingExenderPosition = 0.2;
     
-    public static final double PidMax = 0.8; // The maximum speed pid is allowed to go
+    public static final double PidMax = 1; // The maximum speed pid is allowed to go
 
     public static final int kSnowblowerMotor = 2; // CAN ID
     public static final double SnowblowerForwardSpeed = 0.6; // Speed
     public static final double SnowblowerBackwardSpeed = 0.4; // Speed
-    public static final double[] bucketPositionArray = {0.0,0.9,0.75}; // Positions
-
+    public static final double[] bucketPositionArray = { 0.99, 0.715, 0.884, 0.64 }; // Positions
+// Top dump 64
   }
 
   public static final class DriverControls
@@ -233,6 +233,8 @@ public final class Constants {
 
     //Press Share on CODRIVER CONTROLLER to put the bucket into the start position
     public static final int bucketStartPositionButton = Button.kTriangle.value;
+    
+    public static final int moveToTopReef = Button.kCross.value;
   }
   public static final class CoDriverControls {
    
