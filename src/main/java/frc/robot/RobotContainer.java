@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.PS4Controller.Button;
 
 import frc.robot.Constants.OIConstants;
@@ -23,6 +23,10 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 
 // import java.io.BufferedWriter;
 import java.util.List;
@@ -42,7 +46,7 @@ import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 public class RobotContainer {
 
   // The robot's subsystems
-  private final AlgaeSubsystem m_intake = new AlgaeSubsystem();
+  //private final AlgaeSubsystem m_intake = new AlgaeSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final HorizontalExtenderSubsystem m_horizontalExtender = new HorizontalExtenderSubsystem();
   public final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
@@ -51,7 +55,7 @@ public class RobotContainer {
   // The drivers' controllers
   private final PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
   private final PS4Controller m_coDriverController = new PS4Controller(OIConstants.kCoDriverControllerPort);
-
+  private final SendableChooser<Command> autoChooser;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -62,6 +66,15 @@ public class RobotContainer {
     passSlowModeBooleanSuppliers();
     extenderBucketBlocking();
 
+    // Configure the button bindings
+    String [] autos = new String[] {"test 1", "test 2"};
+  
+    autoChooser = AutoBuilder.buildAutoChooser("test 1");
+
+    SmartDashboard.putStringArray("Auto List", autos );
+    SmartDashboard.putData("Auto Selector", autoChooser);
+
+
     // Configure default commands
   }
 
@@ -69,14 +82,14 @@ public class RobotContainer {
    * A simple method to pass the isBucketBlocking between the bucket and extender subsystems
    */
   private void extenderBucketBlocking() { 
-    m_horizontalExtender.setIsBucketBlocking( m_bucket.isBucketBlocking );
+    //m_horizontalExtender.setIsBucketBlocking( m_bucket.isBucketBlocking );
   }
   private void passSlowModeBooleanSuppliers() {
 
-    DriveSubsystem.setSlowFunctions( 
-      m_elevatorSubsystem.elevatorSlowCheck, 
-      m_horizontalExtender.extenderSlowCheck 
-    );
+    //DriveSubsystem.setSlowFunctions( 
+      //m_elevatorSubsystem.elevatorSlowCheck, 
+      //m_horizontalExtender.extenderSlowCheck 
+    //);
   }
 
   /**
@@ -91,67 +104,24 @@ public class RobotContainer {
   private void configureButtonBindings() {
     
     // Intake buttons
-    m_intake.buttonBindings(m_driverController, m_coDriverController);
+    //m_intake.buttonBindings(m_driverController, m_coDriverController);
 
     // Bucket System
-    m_bucket.buttonBindings(m_driverController, m_coDriverController );
+    //m_bucket.buttonBindings(m_driverController, m_coDriverController );
 
     // Swerve Drive buttons
-    m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
+    //m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
 
     // Horizontal Extender buttons
-    m_horizontalExtender.buttonBindings(m_driverController, m_coDriverController);
+    //m_horizontalExtender.buttonBindings(m_driverController, m_coDriverController);
 
     // Swerve Drive buttons
     m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
 
     // Elevator Buttons
-    m_elevatorSubsystem.buttonBindings(m_driverController, m_coDriverController);
-
-}
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
+    //m_elevatorSubsystem.buttonBindings(m_driverController, m_coDriverController);
+  }
   public Command getAutonomousCommand() {
-    // Create config for trajectory
-    TrajectoryConfig config = new TrajectoryConfig(
-        AutoConstants.kMaxSpeedMetersPerSecond,
-        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-        // Add kinematics to ensure max speed is actually obeyed
-        .setKinematics(DriveConstants.kDriveKinematics);
-
-    // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-        // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
-        config);
-
-    var thetaController = new ProfiledPIDController(
-        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-        exampleTrajectory,
-        m_robotDrive::getPose, // Functional interface to feed supplier
-        DriveConstants.kDriveKinematics,
-
-        // Position controllers
-        new PIDController(AutoConstants.kPXController, 0, 0),
-        new PIDController(AutoConstants.kPYController, 0, 0),
-        thetaController,
-        m_robotDrive::setModuleStates,
-        m_robotDrive);
-
-    // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
-
-    // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
+    return autoChooser.getSelected();
   }
 }

@@ -62,10 +62,11 @@ public final class Constants {
 
     public static final boolean kGyroReversed = true;
     
-    // Both of these values are changable and impact the speed of the robot in given circumstances
+    // Both of these values are changable and impact the speed or time robot moves for in given circumstances
     public static final double kSlowMultiplier = 2.0;
     public static final double kSlowerMultiplier = 4.0;
     public static final double kLimelightSpeedMultiplier = 5.0;
+    public static final double HoldTime = 0.365;
     // public static final double kSlowMultiplier = 2.0;
     // public static final double kSlowerMultiplier = 5.0;
 
@@ -212,7 +213,9 @@ public final class Constants {
 
     //Press Share on DRIVER CONTROLLER to adjust your position when tracking apriltag with limelight
     //temporarily using Share button
-    public static final int useLimelight = Button.kCircle.value;
+    public static final int useLimelightRight = Button.kCircle.value;
+
+    public static final int useLimelightLeft = Button.kSquare.value;
 
     //Press Options on DRIVER CONTROLLER to reset the gyro
     public static final int resetGyroButton = Button.kOptions.value;
