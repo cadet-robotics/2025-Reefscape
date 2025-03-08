@@ -21,6 +21,8 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -154,13 +156,13 @@ public class ElevatorSubsystem extends CSubsystem {
                 isManual = false;
             }, this ));
 
-        new JoystickButton(m_driverController, Constants.DriverControls.moveToTopReef )
-            .whileTrue( new RunCommand(()->{
-                level = 8;
-                isManual = false;
-            },
-            this
-        ));
+        // new JoystickButton(m_driverController, Constants.DriverControls.moveToTopReef )
+        //     .whileTrue( new RunCommand(()->{
+        //         level = 8;
+        //         isManual = false;
+        //     },
+        //     this
+        // ));
     }
 
     /** 
@@ -315,5 +317,13 @@ public class ElevatorSubsystem extends CSubsystem {
             })
             .onEnd( ()->{
             });
+    }
+
+    public ParallelRaceGroup ElevatorTop() {
+        return cCommand_( "ElevatorSubsystem.ElevatorTop")
+            .onInitialize( () -> {
+                    isManual = false;
+                    level = 8;
+            }).withTimeout( 0.8 );
     }
 }
