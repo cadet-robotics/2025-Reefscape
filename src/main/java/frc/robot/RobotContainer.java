@@ -70,11 +70,10 @@ public class RobotContainer {
     //m_horizontalExtender.setIsBucketBlocking( m_bucket.isBucketBlocking );
   }
   private void passSlowModeBooleanSuppliers() {
-
-    //DriveSubsystem.setSlowFunctions( 
-      //m_elevatorSubsystem.elevatorSlowCheck, 
-      //m_horizontalExtender.extenderSlowCheck 
-    //);
+    DriveSubsystem.setSlowFunctions( 
+      m_elevatorSubsystem.elevatorSlowCheck, 
+      m_horizontalExtender.extenderSlowCheck 
+    );
   }
 
   /**
