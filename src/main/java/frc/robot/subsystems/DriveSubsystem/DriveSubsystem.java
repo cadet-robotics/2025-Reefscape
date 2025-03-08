@@ -34,6 +34,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.lib.Limelight.LimelightHelpers;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.lib.custom.CCommand;
@@ -160,9 +161,13 @@ public class DriveSubsystem extends CSubsystem {
         .whileTrue(
             GyroReset());
 
-    new JoystickButton(driverPS4Controller, Constants.DriverControls.useLimelight)
+    new JoystickButton(driverPS4Controller, Constants.DriverControls.useLimelightRight)
         .whileTrue(
             LimeLightDriveCommand());
+
+    new JoystickButton(driverPS4Controller, Constants.DriverControls.useLimelightLeft)
+        .whileTrue(
+            LimeLightAdjustLeftPost());
 
     // Slow Down Button
     // new JoystickButton(driverPS4Controller, Button.kR2.value)
@@ -278,8 +283,8 @@ public class DriveSubsystem extends CSubsystem {
     // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the
     // rightmost edge of
     // your limelight 3 feed, tx should return roughly 31 degrees.
-    double targetingAngularVelocity = LimelightHelpers.getTXNC("limelight") * kP;
-    // double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
+    // double targetingAngularVelocity = LimelightHelpers.getTXNC("limelight") * kP;
+    double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
 
     // convert to radians per second for our drive method
     targetingAngularVelocity *= Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond;
@@ -298,7 +303,8 @@ public class DriveSubsystem extends CSubsystem {
   double limelight_range_proportional() {
     double kP = .1;
     // double targetingForwardSpeed = LimelightHelpers.getTA("limelight") * kP;
-    double targetingForwardSpeed = 1 - LimelightHelpers.getTA("limelight");
+    // double targetingForwardSpeed = 1 - LimelightHelpers.getTA("limelight");
+    double targetingForwardSpeed = 1;
     targetingForwardSpeed *= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
     // targetingForwardSpeed *= -1.0;
     return targetingForwardSpeed;
@@ -472,5 +478,66 @@ public class DriveSubsystem extends CSubsystem {
     .onEnd( () -> {
       limeLightDriving = false;
     } );
+  }
+
+  // public CCommand LimeLightDriveLeftPost() {
+  //   return cCommand_( "DriveSubsystem.LimeLightDrive" )
+  //   .onInitialize( () -> {
+  //     limeLightDriving = true;
+  //   })
+  //   .onExecute( () -> {
+
+  //     double ySpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftX(), OIConstants.kDriveDeadband);
+  //     boolean useLimeLight = true;
+
+  //     final var rot_limelight = limelight_aim_proportional();
+  //     double rotationalSpeed = rot_limelight;
+
+  //     final var forward_limelight = limelight_range_proportional();
+  //     double xSpeed = forward_limelight;
+
+  //     // final var sideways_limelight = limelight_side_proportional();
+  //     // double ySpeed = sideways_limelight;
+
+  //     // while using Limelight, turn off field-relative driving.
+  //     boolean fieldRelative = false;
+
+  //     this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative, useLimeLight );
+  //   })
+  //   .onEnd( () -> {
+  //     LimeLightAdjustLeft();
+  //     limeLightDriving = false;
+  //   } );
+  // }
+
+  public ParallelRaceGroup LimeLightAdjustLeftPost() {
+        return cCommand_("DriveSubsystem.LimeLightAdjustLeft")
+            .onExecute( () -> {
+              frontLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(4.0, Rotation2d.fromDegrees(90)));
+              frontRightMaxSwerveModule.setDesiredState(new SwerveModuleState(4.0, Rotation2d.fromDegrees(90)));
+              rearRightMaxSwerveModule.setDesiredState(new SwerveModuleState(4.0, Rotation2d.fromDegrees(90)));
+              rearLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(4.0, Rotation2d.fromDegrees(90)));
+
+
+                // double xSpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftY(), OIConstants.kDriveDeadband);
+                // double rotationalSpeed = -MathUtil.applyDeadband(driverPS4Controller.getRightX(), OIConstants.kDriveDeadband);
+
+                // double ySpeed = 10.0 * Constants.DriveConstants.kMaxSpeedMetersPerSecond;
+
+                // boolean useLimelight = false;
+                // boolean fieldRelative = false;
+
+                // this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative, useLimelight );
+
+
+                
+            })
+            .onEnd( () -> {
+              frontLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)));
+              frontRightMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)));
+              rearRightMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)));
+              rearLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)));
+            })
+            .withTimeout(Constants.DriveConstants.HoldTime);
   }
 }
