@@ -27,7 +27,7 @@ public final class Constants {
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
+    public static final double kMaxSpeedMetersPerSecond = 6;
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
     // Chassis configuration
@@ -62,10 +62,11 @@ public final class Constants {
 
     public static final boolean kGyroReversed = true;
     
-    // Both of these values are changable and impact the speed of the robot in given circumstances
+    // Both of these values are changable and impact the speed or time robot moves for in given circumstances
     public static final double kSlowMultiplier = 2.0;
     public static final double kSlowerMultiplier = 4.0;
     public static final double kLimelightSpeedMultiplier = 5.0;
+    public static final double HoldTime = 0.365;
     // public static final double kSlowMultiplier = 2.0;
     // public static final double kSlowerMultiplier = 5.0;
 
@@ -128,8 +129,7 @@ public final class Constants {
 
   public static final class AlgaeSubsystem {
 
-    public static final long HoldTime = 1000; // The time that the robot should hold down the algae motors for ( miliseconds )
-    public static final long waitTime = 750; // The amount of time to wait miminum inbetween firings of intake commands
+    public static final double HoldTime = 1; // The time that the robot should hold down the algae motors for ( Seconds )
     public static final int kLeftAlgaeMotor = 3; // CAN ID
     public static final int kRightAlgaeMotor = 4; // CAN ID
     public static final double kAlgaeIntakeSpeed = 0.6; // Speed
@@ -153,12 +153,12 @@ public final class Constants {
     public static final int kElevatorEncoderA = 2; // DIO ID
     public static final int kElevatorEncoderB = 3; // DIO ID 
 
-    public static String[] LevelNames = { "AlgaeFloor", "ScoreAlgae", "Trough", "PreClimb", "Intake", "ReefLevel2", "ReefLevel3", "AlgaeTop", "ReefTop" };
-    public static double[] LevelHeights = { 0.0, 10000.0, 20000.0, 30000.0, 40000.0, 50000.0, 60000.0, 70000.0, 80000.0, 90.0000 };
+    public static String[] LevelNames = { "Trough", "ScoreAlgae", "AlgaeMid", "CoralStation", "PreClimb", "ReefLevel3", "AlgaeTop", "ReefTop" };
+    public static double[] LevelHeights = {  0.0, 7.0, 17.7, 18.223, 38.374, 44.052, 47.7, 72.646, 90.0 };
 
     // TODO: The following values need to be tuned on Mikey
     public static final double kServoEnagedPos = 1.0; // Postion
-    public static final double kServoDisenagedPos = 1.0; // Position
+    public static final double kServoDisenagedPos = 0.0; // Position
   
     public static final double kBreakEngageTime = 119.5;
 
@@ -170,33 +170,34 @@ public final class Constants {
       public static double kElevatorSlowSpeed = 0.05;
 
       // Defualt speed for the elevator
-      public static double kElevatorNormSpeed = 0.1;
+      public static double kElevatorNormSpeed = 0.3;
       
       // The speed the elevator will hover at ( must be enabled in elevatorSubsystem )
       public static double kElevatorHoverSpeed = 0.01;
 
       // The distance when the elevator should stop, or use the however speed instead of moving slowly
-      public static double kElevatorStopThreshold = 200.0;
+      public static double kElevatorStopThreshold = 0.03;
 
       // The distance where crappy pid should use a slow speed instead of the normal one
-      public static double kElevatorSlowDistanceThreashold = 500.0;
+      public static double kElevatorSlowDistanceThreashold = 2.0;
 
     }
   }
 
   public static final class BucketSubsystem {
 
+    public static final int kCurrentLimit = 10;
     // The minimum value where the bucket no longer blocks movement of the encoder
     // TODO: Tune
     public static final double kBlockingExenderPosition = 0.2;
     
-    public static final double PidMax = 0.2; // The maximum speed pid is allowed to go
+    public static final double PidMax = 1; // The maximum speed pid is allowed to go
 
     public static final int kSnowblowerMotor = 2; // CAN ID
     public static final double SnowblowerForwardSpeed = 0.6; // Speed
     public static final double SnowblowerBackwardSpeed = 0.4; // Speed
-    public static final double[] bucketPositionArray = {0.0,0.25,0.75}; // Positions
-
+    public static final double[] bucketPositionArray = { 0.99, 0.715, 0.884, 0.64 }; // Positions
+// Top dump 64
   }
 
   public static final class DriverControls
@@ -212,7 +213,9 @@ public final class Constants {
 
     //Press Share on DRIVER CONTROLLER to adjust your position when tracking apriltag with limelight
     //temporarily using Share button
-    public static final int useLimelight = Button.kCircle.value;
+    public static final int useLimelightRight = Button.kCircle.value;
+
+    public static final int useLimelightLeft = Button.kSquare.value;
 
     //Press Options on DRIVER CONTROLLER to reset the gyro
     public static final int resetGyroButton = Button.kOptions.value;
@@ -233,14 +236,13 @@ public final class Constants {
 
     //Press Share on CODRIVER CONTROLLER to put the bucket into the start position
     public static final int bucketStartPositionButton = Button.kTriangle.value;
-
+    
+    public static final int moveToTopReef = Button.kCross.value;
   }
+  public static final class CoDriverControls {
+   
+    public static final int disbaleBreak = Button.kShare.value;
 
-  public static class CoDriverControls
-  {
-    //CURRENTLY UNUSED BUTTONS ON CODRIVER CONTROLLER: 
-
-    //Press Cross on CODRIVER CONTROLLER to retract the "inny outty"/Horizontal Extender
     public static final int horizontalRetractButton = Button.kSquare.value;
 
     //Press Circle on CODRIVER CONTROLLER to extend the "inny outty"/Horizontal Extender

@@ -26,7 +26,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS4Controller;
 
 import frc.robot.Constants;
@@ -34,10 +34,15 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.lib.Limelight.LimelightHelpers;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 //Press L1 on DRIVER CONTROLLER to go slower than slowdown
 //Press R1 on DRIVER CONTROLLER to slow down
@@ -112,6 +117,39 @@ public class DriveSubsystem extends CSubsystem {
     gyroAHRS.reset();
     gyroAHRS.setAngleAdjustment(180.0);
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+
+    RobotConfig config;
+    try{
+      config = RobotConfig.fromGUISettings();
+
+    // Configure AutoBuilder last
+    AutoBuilder.configure(
+            this::getPose, // Robot pose supplier
+            this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+            config, // The robot configuration
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+  }catch(Exception e){
+    //DriverStation.reportError(error:"Failed to load pathplanner config and configure autobuilder", e.getStackTrace());
+    System.out.println("Failed to load pathplanner config and configure autobuilder");
+  }
   }
 
   public void buttonBindings(PS4Controller ps4DriverController, PS4Controller ps4CodriverController) {
@@ -121,6 +159,14 @@ public class DriveSubsystem extends CSubsystem {
     new JoystickButton(driverPS4Controller, Constants.DriverControls.resetGyroButton)
         .whileTrue(
             GyroReset());
+
+    new JoystickButton(driverPS4Controller, Constants.DriverControls.useLimelightRight)
+        .whileTrue(
+            LimeLightDriveCommand());
+
+    new JoystickButton(driverPS4Controller, Constants.DriverControls.useLimelightLeft)
+        .whileTrue(
+            LimeLightAdjustLeftPost());
 
     // Slow Down Button
     // new JoystickButton(driverPS4Controller, Button.kR2.value)
@@ -176,21 +222,6 @@ public class DriveSubsystem extends CSubsystem {
       double rotationalSpeed = -MathUtil.applyDeadband(driverPS4Controller.getRightX(), OIConstants.kDriveDeadband);
       boolean fieldRelative = true;
 
-      // Switches to non field-relative driving if the driver presses the Circle
-      // button,
-      // and switches to using the limelight
-      if ( LimelightHelpers.getTV("") && driverPS4Controller.getRawButtonPressed(Constants.DriverControls.useLimelight)) {
-        useLimeLight = true;
-        final var rot_limelight = limelight_aim_proportional();
-        rotationalSpeed = rot_limelight;
-
-        final var forward_limelight = limelight_range_proportional();
-        xSpeed = forward_limelight/10.0;
-
-        // while using Limelight, turn off field-relative driving.
-        fieldRelative = false;
-      }
-
       this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative, useLimeLight );
     }
   }
@@ -208,7 +239,9 @@ public class DriveSubsystem extends CSubsystem {
 
     // The speed multiplier is used to slow down the robot when it is controlled by the limelight
     double speedMultiplier;
-    if ( limeLightDrive ) {
+    if ( elevatorSlowCheck.getAsBoolean() ) {
+      speedMultiplier = 4.0;
+    } else if ( limeLightDrive ) {
       speedMultiplier = DriveConstants.kLimelightSpeedMultiplier;
     } else {
       speedMultiplier = 1.0;
@@ -251,6 +284,7 @@ public class DriveSubsystem extends CSubsystem {
     // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the
     // rightmost edge of
     // your limelight 3 feed, tx should return roughly 31 degrees.
+    // double targetingAngularVelocity = LimelightHelpers.getTXNC("limelight") * kP;
     double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
 
     // convert to radians per second for our drive method
@@ -269,10 +303,20 @@ public class DriveSubsystem extends CSubsystem {
   // "ta" (area) for target ranging rather than "ty"
   double limelight_range_proportional() {
     double kP = .1;
-    double targetingForwardSpeed = LimelightHelpers.getTA("limelight") * kP;
+    // double targetingForwardSpeed = LimelightHelpers.getTA("limelight") * kP;
+    // double targetingForwardSpeed = 1 - LimelightHelpers.getTA("limelight");
+    double targetingForwardSpeed = 1;
     targetingForwardSpeed *= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
     // targetingForwardSpeed *= -1.0;
     return targetingForwardSpeed;
+  }
+
+  //Does not work
+  public double limelight_side_proportional() {
+    double kP = .1;
+    double targetingSidewaysSpeed = LimelightHelpers.getTX("limelight") * kP;
+    targetingSidewaysSpeed *= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
+    return targetingSidewaysSpeed;
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds) {
@@ -284,7 +328,7 @@ public class DriveSubsystem extends CSubsystem {
     rearLeftMaxSwerveModule.setDesiredState(swerveModuleStates[2]);
     rearRightMaxSwerveModule.setDesiredState(swerveModuleStates[3]);
   }
-public ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     SwerveModuleState[] swerveModuleStates = new SwerveModuleState[] {
         frontLeftMaxSwerveModule.getState(),
         frontRightMaxSwerveModule.getState(),
@@ -293,6 +337,8 @@ public ChassisSpeeds getChassisSpeeds() {
     };
     return DriveConstants.kDriveKinematics.toChassisSpeeds(swerveModuleStates);
   }
+
+  
 
   /**
    * Returns the currently-estimated pose of the robot.
@@ -415,11 +461,15 @@ public ChassisSpeeds getChassisSpeeds() {
 
       double ySpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftX(), OIConstants.kDriveDeadband);
       boolean useLimeLight = true;
+
       final var rot_limelight = limelight_aim_proportional();
       double rotationalSpeed = rot_limelight;
 
       final var forward_limelight = limelight_range_proportional();
-      double xSpeed = forward_limelight/10.0;
+      double xSpeed = forward_limelight;
+
+      // final var sideways_limelight = limelight_side_proportional();
+      // double ySpeed = sideways_limelight;
 
       // while using Limelight, turn off field-relative driving.
       boolean fieldRelative = false;
@@ -430,4 +480,76 @@ public ChassisSpeeds getChassisSpeeds() {
       limeLightDriving = false;
     } );
   }
+
+  // public CCommand LimeLightDriveLeftPost() {
+  //   return cCommand_( "DriveSubsystem.LimeLightDrive" )
+  //   .onInitialize( () -> {
+  //     limeLightDriving = true;
+  //   })
+  //   .onExecute( () -> {
+
+  //     double ySpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftX(), OIConstants.kDriveDeadband);
+  //     boolean useLimeLight = true;
+
+  //     final var rot_limelight = limelight_aim_proportional();
+  //     double rotationalSpeed = rot_limelight;
+
+  //     final var forward_limelight = limelight_range_proportional();
+  //     double xSpeed = forward_limelight;
+
+  //     // final var sideways_limelight = limelight_side_proportional();
+  //     // double ySpeed = sideways_limelight;
+
+  //     // while using Limelight, turn off field-relative driving.
+  //     boolean fieldRelative = false;
+
+  //     this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative, useLimeLight );
+  //   })
+  //   .onEnd( () -> {
+  //     LimeLightAdjustLeft();
+  //     limeLightDriving = false;
+  //   } );
+  // }
+
+  public ParallelRaceGroup LimeLightAdjustLeftPost() {
+        return cCommand_("DriveSubsystem.LimeLightAdjustLeft")
+            .onExecute( () -> {
+              frontLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(4.0, Rotation2d.fromDegrees(90)));
+              frontRightMaxSwerveModule.setDesiredState(new SwerveModuleState(4.0, Rotation2d.fromDegrees(90)));
+              rearRightMaxSwerveModule.setDesiredState(new SwerveModuleState(4.0, Rotation2d.fromDegrees(90)));
+              rearLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(4.0, Rotation2d.fromDegrees(90)));
+
+
+                // double xSpeed = MathUtil.applyDeadband(driverPS4Controller.getLeftY(), OIConstants.kDriveDeadband);
+                // double rotationalSpeed = -MathUtil.applyDeadband(driverPS4Controller.getRightX(), OIConstants.kDriveDeadband);
+
+                // double ySpeed = 10.0 * Constants.DriveConstants.kMaxSpeedMetersPerSecond;
+
+                // boolean useLimelight = false;
+                // boolean fieldRelative = false;
+
+                // this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative, useLimelight );
+
+
+                
+            })
+            .onEnd( () -> {
+              frontLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)));
+              frontRightMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)));
+              rearRightMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)));
+              rearLeftMaxSwerveModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)));
+            })
+            .withTimeout(Constants.DriveConstants.HoldTime);
+  }
+
+  // public ParallelRaceGroup AdjustLeft() {
+  //   return cCommand_("DriveSubsystem.AdjustLeft")
+  //   .onInitialize( () -> {
+  //     .
+
+  //   }                                                                                                                                                        1233
+  //   .onEnd( () -> {
+
+  //   }).withTimeout():
+  // }
 }

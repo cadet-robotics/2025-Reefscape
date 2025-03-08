@@ -41,7 +41,7 @@ public class BucketSubsystem extends CSubsystem {
     private static int positionIndex = 0;
 
     // Wiether the bucket is being moved manually
-    private static boolean moving = false;
+    private static boolean isManual = false;
 
     public  BooleanSupplier isBucketBlocking = () -> {
         return ( s_snowblowerEncoder.getPosition() < Constants.BucketSubsystem.kBlockingExenderPosition );
@@ -64,6 +64,10 @@ public class BucketSubsystem extends CSubsystem {
         // s_snowblowerEncoder.setAssumedFrequency(975.6);
         // s_snowblowerEncoder.setDutyCycleRange(1, 1024);
         // s_snowblowerEncoder.
+    }
+
+    public void OnDisable() {
+        isManual = true;
     }
 
     /**
@@ -91,23 +95,27 @@ public class BucketSubsystem extends CSubsystem {
         
         new JoystickButton(m_driverController, Constants.DriverControls.bucketManualBackwardButton )
             .whileTrue( BucketBackward() );
+
+        new JoystickButton(m_driverController, Constants.DriverControls.moveToTopReef )
+            .whileTrue( BucketTopDump() );
     }
 
     /**
      * Sets the desired state for the motor to the selected position based on the positionIndex
      */
     public void goToDesiredState() {
-       double attempt = m_PidController.calculate( s_snowblowerEncoder.getPosition(), Constants.BucketSubsystem.bucketPositionArray[positionIndex]);
+        double attempt = m_PidController.calculate( Math.abs( 1 - s_snowblowerEncoder.getPosition() ) , 1 - Constants.BucketSubsystem.bucketPositionArray[positionIndex]);
+        SmartDashboard.putNumber( "MoveTargetState", attempt );
         // Simple limit for PID control
-        if ( attempt < Constants.BucketSubsystem.PidMax && attempt > -Constants.BucketSubsystem.PidMax ) {
-            m_snowblowerMotor.set( attempt );
-        } else if ( attempt < Constants.BucketSubsystem.PidMax ) { 
-            m_snowblowerMotor.set( Constants.BucketSubsystem.PidMax );
-        } else if ( attempt > -Constants.BucketSubsystem.PidMax ) { 
-            m_snowblowerMotor.set( -Constants.BucketSubsystem.PidMax );
-        } else { 
-            m_snowblowerMotor.stopMotor();
-        }
+        // if ( attempt < Constants.BucketSubsystem.PidMax && attempt > -Constants.BucketSubsystem.PidMax ) {
+            m_snowblowerMotor.set( attempt * 3.0 );
+        // } else if ( attempt < Constants.BucketSubsystem.PidMax ) { 
+        //     m_snowblowerMotor.set( Constants.BucketSubsystem.PidMax );
+        // } else if ( attempt > -Constants.BucketSubsystem.PidMax ) { 
+        //     m_snowblowerMotor.set( -Constants.BucketSubsystem.PidMax );
+        // } else { 
+        //     m_snowblowerMotor.stopMotor();
+        // }
     }
     
     /**
@@ -115,8 +123,8 @@ public class BucketSubsystem extends CSubsystem {
      */
     public void periodic ()
     {
-        if ( !moving ) {
-            // goToDesiredState();
+        if ( !isManual ) {
+            goToDesiredState();
         }
 
         SmartDashboard.putNumber( "Bucket Encoder", s_snowblowerEncoder.getPosition());
@@ -129,10 +137,8 @@ public class BucketSubsystem extends CSubsystem {
     public CCommand BucketStart() {
         return cCommand_( "BucketSubsystem.BucketStart" )
             .onInitialize( () -> {
+                isManual = false;
                 positionIndex = 0;
-            })
-            .onEnd( () -> {
-                m_snowblowerMotor.stopMotor();
             });
     }
 
@@ -143,10 +149,22 @@ public class BucketSubsystem extends CSubsystem {
     public CCommand BucketDump() {
         return cCommand_( "BucketSubsystem.BucketDump" )
             .onInitialize( () -> {
+                isManual = false;
                 positionIndex = 1;
             })
             .onEnd( () -> {
-                m_snowblowerMotor.stopMotor();
+                positionIndex = 2;
+            });
+    }
+
+    public CCommand BucketTopDump() {
+        return cCommand_( "BucketSubsystem.BucketTopDump" )
+            .onInitialize( () -> {
+                isManual = false;
+                positionIndex = 3;
+            })
+            .onEnd( () -> {
+                positionIndex = 2;
             });
     }
 
@@ -157,24 +175,21 @@ public class BucketSubsystem extends CSubsystem {
     public CCommand BucketLoad () {
         return cCommand_( "BucketSubsystem.BucketLoad" )
             .onInitialize( () -> {
+                isManual = false;
                 positionIndex = 2;
-            })
-            .onEnd( () -> {
-                m_snowblowerMotor.stopMotor();
             });
     }
 
     public CCommand BucketForward() {
         return cCommand_( "BucketSubsystem.BucketForward")
             .onInitialize( () -> {
-                moving = true;
+                isManual = true;
                 SmartDashboard.putBoolean( "Moving forward", true );
             })
             .onExecute( () -> {
                 m_snowblowerMotor.set( Constants.BucketSubsystem.SnowblowerForwardSpeed );
             })
             .onEnd( () -> {
-                moving = false;
                 SmartDashboard.putBoolean( "Moving forward", true );
                 m_snowblowerMotor.stopMotor();
             });
@@ -184,14 +199,13 @@ public class BucketSubsystem extends CSubsystem {
         return cCommand_( "BucketSubsystem.BucketBackward")
             .onInitialize( () -> {
                 SmartDashboard.putBoolean( "Moving backward", true );
-                moving = true;
+                isManual = true;
             })
             .onExecute( () -> {
                 m_snowblowerMotor.set( -Constants.BucketSubsystem.SnowblowerBackwardSpeed );
             })
             .onEnd( () -> {
                 SmartDashboard.putBoolean( "Moving backward", false);
-                moving = false;
                 m_snowblowerMotor.stopMotor();
             });
     }
