@@ -8,33 +8,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.PS4Controller.Button;
 
 import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 
-
-// import java.io.BufferedWriter;
-import java.util.List;
-
-import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.BucketSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.HorizontalExtenderSubsystem;
+import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 
 /*
@@ -46,7 +30,7 @@ import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
 public class RobotContainer {
 
   // The robot's subsystems
-  //private final AlgaeSubsystem m_intake = new AlgaeSubsystem();
+  private final AlgaeSubsystem m_intake = new AlgaeSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final HorizontalExtenderSubsystem m_horizontalExtender = new HorizontalExtenderSubsystem();
   public final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
@@ -104,16 +88,16 @@ public class RobotContainer {
   private void configureButtonBindings() {
     
     // Intake buttons
-    //m_intake.buttonBindings(m_driverController, m_coDriverController);
+    m_intake.buttonBindings(m_driverController, m_coDriverController);
 
     // Bucket System
-    //m_bucket.buttonBindings(m_driverController, m_coDriverController );
+    m_bucket.buttonBindings(m_driverController, m_coDriverController );
 
     // Swerve Drive buttons
-    //m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
+    m_robotDrive.buttonBindings(m_driverController, m_coDriverController);
 
     // Horizontal Extender buttons
-    //m_horizontalExtender.buttonBindings(m_driverController, m_coDriverController);
+    m_horizontalExtender.buttonBindings(m_driverController, m_coDriverController);
 
     // Swerve Drive buttons
     m_robotDrive.buttonBindings(m_driverController, m_coDriverController);

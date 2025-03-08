@@ -160,7 +160,7 @@ public class ElevatorSubsystem extends CSubsystem {
                 isManual = false;
             },
             this
-        ));
+            ));
     }
 
     /** 
