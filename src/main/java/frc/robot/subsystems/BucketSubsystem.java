@@ -66,6 +66,10 @@ public class BucketSubsystem extends CSubsystem {
         // s_snowblowerEncoder.
     }
 
+    public void OnDisable() {
+        isManual = true;
+    }
+
     /**
      * Does all of the button bindings for the subsystem
      *

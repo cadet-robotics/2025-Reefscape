@@ -152,8 +152,8 @@ public final class Constants {
     public static final int kElevatorEncoderA = 2; // DIO ID
     public static final int kElevatorEncoderB = 3; // DIO ID 
 
-    public static String[] LevelNames = { "Trough", "ScoreAlgae", "AlgaeMid", "ReefLevel2", "CoralStation", "PreClimb", "ReefLevel3", "AlgaeTop", "ReefTop" };
-    public static double[] LevelHeights = {  0.0, 7.0, 17.7, 18.22, 18.223, 38.374, 44.052, 47.7, 72.646, 93.0 };
+    public static String[] LevelNames = { "Trough", "ScoreAlgae", "AlgaeMid", "CoralStation", "PreClimb", "ReefLevel3", "AlgaeTop", "ReefTop" };
+    public static double[] LevelHeights = {  0.0, 7.0, 17.7, 18.223, 38.374, 44.052, 47.7, 72.646, 90.0 };
 
     // TODO: The following values need to be tuned on Mikey
     public static final double kServoEnagedPos = 1.0; // Postion

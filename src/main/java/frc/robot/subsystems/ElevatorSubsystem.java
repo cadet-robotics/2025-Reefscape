@@ -86,6 +86,11 @@ public class ElevatorSubsystem extends CSubsystem {
         return false;
     };
 
+    public void OnDisable() {
+        level = 0;
+        isManual = true;
+    }
+
     /**
      * Creates the elevator subsystem
      */

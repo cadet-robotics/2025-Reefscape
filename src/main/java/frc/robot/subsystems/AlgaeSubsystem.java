@@ -70,8 +70,8 @@ public class AlgaeSubsystem extends CSubsystem {
     public ParallelRaceGroup IntakeIn() {
         return cCommand_("AccessoryMotorSubsystem.IntakeIn")
             .onExecute( () -> {
-                m_leftAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
-                m_rightAlgaeMotor.set( Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
+                m_leftAlgaeMotor.set( -Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
+                m_rightAlgaeMotor.set( -Constants.AlgaeSubsystem.kAlgaeIntakeSpeed );
             })
             .onEnd( () -> {
                 m_leftAlgaeMotor.stopMotor();
