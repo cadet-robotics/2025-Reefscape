@@ -91,6 +91,7 @@ public class ElevatorSubsystem extends CSubsystem {
         level = 0;
         isManual = true;
         wasManual = true;
+        m_elevatorMotor.stopMotor();
     }
 
     /**

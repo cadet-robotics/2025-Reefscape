@@ -68,6 +68,7 @@ public class BucketSubsystem extends CSubsystem {
 
     public void OnDisable() {
         isManual = true;
+        m_snowblowerMotor.stopMotor();
     }
 
     /**
