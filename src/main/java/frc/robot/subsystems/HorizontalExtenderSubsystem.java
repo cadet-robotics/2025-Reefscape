@@ -126,9 +126,9 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
                     //limit switch values are reversed
                     if ( !frontLimitSwitchPressing() ) {
                         m_horizontalExtenderMotor.stopMotor();
-                        return;
+                    } else {
+                       m_horizontalExtenderMotor.set( Constants.HorzontalExtenderSubsystem.kExtendSpeed );
                     }
-                    m_horizontalExtenderMotor.set( Constants.HorzontalExtenderSubsystem.kExtendSpeed );
                 }
             })
             // Regardless of which mode we use, stopping the motor is required
@@ -136,7 +136,8 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
                 SmartDashboard.putBoolean( "moveOut", false );
                 m_horizontalExtenderMotor.stopMotor();
             })
-            .isFinished( () -> { return !frontLimitSwitchPressing(); });
+            // Limit switch values are reversed
+            .isFinished( () -> { return !s_frontLimitSwitch.get(); });
     }
 
 
