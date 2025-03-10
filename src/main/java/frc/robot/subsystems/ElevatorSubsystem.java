@@ -131,8 +131,8 @@ public class ElevatorSubsystem extends CSubsystem {
         //         .whileTrue( ElevatorLevelDown() );
 
         // EngageBrake ( Right Bumper )
-        new JoystickButton(m_driverController, Constants.DriverControls.enableBreak )
-           .whileTrue( EngageBrake() );
+        // new JoystickButton(m_driverController, Constants.DriverControls.enableBreak )
+        //    .whileTrue( EngageBrake() );
 
         // DisengageBrake ( Left Bumper )
         // new JoystickButton(m_driverController, m_driverController.getPOV() )
