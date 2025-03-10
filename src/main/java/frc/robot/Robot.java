@@ -58,7 +58,10 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    m_robotContainer.m_elevatorSubsystem.OnDisable();
+    m_robotContainer.m_bucket.OnDisable();
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -88,12 +91,9 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    m_robotContainer.m_elevatorSubsystem.OnDisable();
-    m_robotContainer.m_bucket.OnDisable();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    // TODO: commented out and should be gradually uncommneted to test more features on mikey
     // m_robotContainer.m_elevatorSubsystem.startTimer();
   }
 
