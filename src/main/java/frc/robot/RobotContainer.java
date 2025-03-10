@@ -63,7 +63,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Raise Elevator", m_elevatorSubsystem.ElevatorLevelUp());
     NamedCommands.registerCommand("lower Elevator", m_elevatorSubsystem.ElevatorLevelDown());
 
-     String [] autos = new String[] {"Do Nothing","CenterLeftMid","CenterRightMid","LeftMid","RightMid","ScoreAuto","rotoTest"};
+     String [] autos = new String[] {"Do Nothing","CenterLeftMid","CenterRightMid","LeftMid","RightMid","ScoreAuto"};
   
     autoChooser = AutoBuilder.buildAutoChooser("Do Nothing");
 
