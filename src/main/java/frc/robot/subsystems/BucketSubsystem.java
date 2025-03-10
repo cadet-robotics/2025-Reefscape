@@ -107,7 +107,7 @@ public class BucketSubsystem extends CSubsystem {
         double attempt = m_PidController.calculate( Math.abs( 1 - s_snowblowerEncoder.getPosition() ) , 1 - Constants.BucketSubsystem.bucketPositionArray[positionIndex]);
         SmartDashboard.putNumber( "MoveTargetState", attempt );
         // PID + Feedforward
-        m_snowblowerMotor.set( attempt * 3.0 + (( 1 - s_snowblowerEncoder.getPosition() > 0.1 )?0.1:0 ));
+        m_snowblowerMotor.set( attempt * 3.0 + (( 1 - s_snowblowerEncoder.getPosition() < 0.1 )?0.1:0 ));
     }
     
     /**
