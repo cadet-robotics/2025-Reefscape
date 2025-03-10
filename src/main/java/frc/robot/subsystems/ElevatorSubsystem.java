@@ -90,6 +90,7 @@ public class ElevatorSubsystem extends CSubsystem {
     public void OnDisable() {
         level = 0;
         isManual = true;
+        wasManual = true;
     }
 
     /**
@@ -206,18 +207,16 @@ public class ElevatorSubsystem extends CSubsystem {
 
         if ( !isManual ) {
             if ( wasManual ) {
-                    TrapezoidProfileState = new TrapezoidProfile.State( s_elevatorEncoder.getPosition(), s_elevatorEncoder.getVelocity()/60);
+                TrapezoidProfileState = new TrapezoidProfile.State( s_elevatorEncoder.getPosition(), s_elevatorEncoder.getVelocity()/60);
             }
             setDesiredState( Constants.ElevatorSubsystem.LevelHeights[level] );
         }
 
+        wasManual = isManual;
+
         // if ( m_breakTimer.get() <= Constants.ElevatorSubsystem.kBreakEngageTime ) {
         //     m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
         // }
-
-        // Uncomment the bollow line to test when and only when ready
-        // crappyPID(Constants.ElevatorSubsystem.LevelHeights[level]);
-        wasManual = isManual;
     }
      
     /**
