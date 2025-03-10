@@ -64,12 +64,6 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
      */
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
-        // Extend ( Circle ) 
-        new JoystickButton(m_coDriverController, Constants.CoDriverControls.horizontalExtendButton )
-            //limit switch values are reversed
-            .and( () -> frontLimitSwitchPressing()  )
-                .whileTrue( Extend() );
-
         // Retract ( Cross )
         new JoystickButton(m_coDriverController, Constants.CoDriverControls.horizontalRetractButton )
             //limit switch values are reversed
@@ -132,16 +126,18 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
                     //limit switch values are reversed
                     if ( !frontLimitSwitchPressing() ) {
                         m_horizontalExtenderMotor.stopMotor();
-                        return;
+                    } else {
+                       m_horizontalExtenderMotor.set( Constants.HorzontalExtenderSubsystem.kExtendSpeed );
                     }
-                    m_horizontalExtenderMotor.set( Constants.HorzontalExtenderSubsystem.kExtendSpeed );
                 }
             })
             // Regardless of which mode we use, stopping the motor is required
             .onEnd( () -> {
                 SmartDashboard.putBoolean( "moveOut", false );
                 m_horizontalExtenderMotor.stopMotor();
-            });
+            })
+            // Limit switch values are reversed
+            .isFinished( () -> { return !s_frontLimitSwitch.get(); });
     }
 
 
