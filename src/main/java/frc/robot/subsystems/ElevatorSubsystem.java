@@ -70,6 +70,9 @@ public class ElevatorSubsystem extends CSubsystem {
           Constants.ElevatorSubsystem.kBottomLimitSwitch
     );
 
+    // Tracks if the elevator has been zeroed yet
+    private static boolean hasBeenZeroed = false;
+
     private static Timer m_breakTimer = new Timer();
 
     // The number corresponding to the level of the elevator
@@ -201,9 +204,12 @@ public class ElevatorSubsystem extends CSubsystem {
         SmartDashboard.putNumber( "Encoder", s_elevatorEncoder.getPosition() );
 
         SmartDashboard.putBoolean( "ElevatorSlow", elevatorSlowCheck.getAsBoolean() );
-        if ( !m_bottomLimitSwitch.get() )
-        {
-            s_elevatorEncoder.setPosition(0);
+        if ( !hasBeenZeroed ) {
+            if ( !m_bottomLimitSwitch.get() )
+            {
+                s_elevatorEncoder.setPosition(0);
+            }
+            hasBeenZeroed = true;
         }
 
         if ( !isManual ) {
