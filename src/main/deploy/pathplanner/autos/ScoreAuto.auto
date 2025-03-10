@@ -13,7 +13,37 @@
         {
           "type": "named",
           "data": {
-            "name": null
+            "name": "Raise Elevator"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Raise Elevator"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Raise Elevator"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Bucket Dump"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Bucket Reset"
           }
         }
       ]
