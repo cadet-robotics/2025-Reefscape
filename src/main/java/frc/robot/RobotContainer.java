@@ -18,13 +18,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.PS4Controller.Button;
-
+import frc.robot.Configs.MAXSwerveModule;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.BucketSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.HorizontalExtenderSubsystem;
 import frc.robot.subsystems.DriveSubsystem.DriveSubsystem;
+import frc.robot.subsystems.MAXSwerveModule
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -62,8 +63,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("Bucket Reset", m_bucket.BucketStart());
     NamedCommands.registerCommand("Raise Elevator", m_elevatorSubsystem.ElevatorLevelUp());
     NamedCommands.registerCommand("lower Elevator", m_elevatorSubsystem.ElevatorLevelDown());
+    NamedCommands.registerCommand("manual run",m_robotDrive.autoDrive());
 
-     String [] autos = new String[] {"Do Nothing","CenterLeftMid","CenterRightMid","LeftMid","RightMid","ScoreAuto"};
+     String [] autos = new String[] {"Do Nothing","CenterLeftMid","CenterRightMid","LeftMid","RightMid","ScoreAuto","manual run"};
   
     autoChooser = AutoBuilder.buildAutoChooser("Do Nothing");
 

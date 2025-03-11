@@ -34,6 +34,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.lib.Limelight.LimelightHelpers;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -154,6 +155,8 @@ public class DriveSubsystem extends CSubsystem {
 
   public void buttonBindings(PS4Controller ps4DriverController, PS4Controller ps4CodriverController) {
     driverPS4Controller = ps4DriverController;
+
+    
 
     // Reset gyro
     new JoystickButton(driverPS4Controller, Constants.DriverControls.resetGyroButton)
@@ -317,6 +320,10 @@ public class DriveSubsystem extends CSubsystem {
     double targetingSidewaysSpeed = LimelightHelpers.getTX("limelight") * kP;
     targetingSidewaysSpeed *= Constants.AutoConstants.kMaxSpeedMetersPerSecond;
     return targetingSidewaysSpeed;
+  }
+
+  public Command autoDrive () {
+    return run(()->{driveRobotRelative(new ChassisSpeeds(-1,0,0));}).withTimeout(1).finallyDo(()->{driveRobotRelative(new ChassisSpeeds(0,0,0));});
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds) {
