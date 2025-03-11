@@ -69,6 +69,10 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
             //limit switch values are reversed
             .and( () -> backLimitSwitchPressing() )
                 .whileTrue( Retract() );
+        new JoystickButton(m_coDriverController, Constants.CoDriverControls.horizontalExtendButton )
+            //limit switch values are reversed
+            .and( () -> frontLimitSwitchPressing() )
+                .whileTrue( Extend() );
     }
 
     /**
