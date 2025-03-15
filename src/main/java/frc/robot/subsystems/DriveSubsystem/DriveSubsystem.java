@@ -92,15 +92,7 @@ public class DriveSubsystem extends CSubsystem {
   private boolean limeLightDriving = false;
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry swerveDriveOdemtry = new SwerveDriveOdometry(
-      DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(gyroAHRS.getAngle()),
-      new SwerveModulePosition[] {
-          frontLeftMaxSwerveModule.getPosition(),
-          frontRightMaxSwerveModule.getPosition(),
-          rearLeftMaxSwerveModule.getPosition(),
-          rearRightMaxSwerveModule.getPosition()
-      });
+  SwerveDriveOdometry swerveDriveOdemtry;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -116,8 +108,16 @@ public class DriveSubsystem extends CSubsystem {
 
     // Usage reporting for MAXSwerve template
     gyroAHRS.reset();
-    gyroAHRS.setAngleAdjustment(180.0);
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+    swerveDriveOdemtry = new SwerveDriveOdometry(
+      DriveConstants.kDriveKinematics,
+      Rotation2d.fromDegrees(  gyroAHRS.getAngle()),
+      new SwerveModulePosition[] {
+          frontLeftMaxSwerveModule.getPosition(),
+          frontRightMaxSwerveModule.getPosition(),
+          rearLeftMaxSwerveModule.getPosition(),
+          rearRightMaxSwerveModule.getPosition()
+      });
 
     RobotConfig config;
     try{
@@ -210,7 +210,7 @@ public class DriveSubsystem extends CSubsystem {
     boolean useLimeLight = false;
 
     swerveDriveOdemtry.update(
-        Rotation2d.fromDegrees(gyroAHRS.getAngle()),
+        Rotation2d.fromDegrees( gyroAHRS.getAngle()),
         new SwerveModulePosition[] {
             frontLeftMaxSwerveModule.getPosition(),
             frontRightMaxSwerveModule.getPosition(),
@@ -255,9 +255,12 @@ public class DriveSubsystem extends CSubsystem {
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond/speedMultiplier/slowMultiplier;
     double rotationDelivered = rotation * DriveConstants.kMaxAngularSpeed/speedMultiplier/slowMultiplier;
 
+    Rotation2d rotFactor = DriverStation.getAlliance().orElse( DriverStation.Alliance.Blue).equals( DriverStation.Alliance.Blue ) ?
+    Rotation2d.kZero : Rotation2d.kPi;
+
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotationDelivered, Rotation2d.fromDegrees(-1.0 * gyroAHRS.getAngle()))
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotationDelivered, swerveDriveOdemtry.getPoseMeters().getRotation().rotateBy(rotFactor))//Rotation2d.fromDegrees(-1.0 * gyroAHRS.getAngle()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotationDelivered));
     
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -361,7 +364,7 @@ public class DriveSubsystem extends CSubsystem {
    *
    * @param pose2d The pose to which to set the odometry.
    */
-  public void resetOdometry(Pose2d pose2d) {
+  private void resetOdometry(Pose2d pose2d) {
     swerveDriveOdemtry.resetPosition(
         Rotation2d.fromDegrees(gyroAHRS.getAngle()),
         new SwerveModulePosition[] {
@@ -397,7 +400,12 @@ public class DriveSubsystem extends CSubsystem {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    gyroAHRS.reset();
+    this.resetOdometry(
+        new Pose2d(swerveDriveOdemtry.getPoseMeters().getTranslation(),
+        DriverStation.getAlliance().orElse( DriverStation.Alliance.Blue).equals( DriverStation.Alliance.Blue ) ?
+          Rotation2d.kZero : Rotation2d.kPi
+      ));
+    //gyroAHRS.reset();
   }
 
   /**
@@ -453,9 +461,9 @@ public class DriveSubsystem extends CSubsystem {
   public CCommand GyroReset() {
     return cCommand_("DriveSubsystem.GyroReset")
         .onExecute(() -> {
-          resetOdometry(getPose());
+          // resetOdometry(getPose());
           zeroHeading();
-          resetEncoders();
+          // resetEncoders();
         });
   }
 
