@@ -84,7 +84,7 @@
                   "name": "Bucket Dump"
                 }
               },
-              {
+              {, "Forwards"
                 "type": "wait",
                 "data": {
                   "waitTime": 1.5

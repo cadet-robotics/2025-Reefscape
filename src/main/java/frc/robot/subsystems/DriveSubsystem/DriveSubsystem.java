@@ -111,7 +111,7 @@ public class DriveSubsystem extends CSubsystem {
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
     swerveDriveOdemtry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(  gyroAHRS.getAngle()),
+      Rotation2d.fromDegrees( -gyroAHRS.getAngle()),
       new SwerveModulePosition[] {
           frontLeftMaxSwerveModule.getPosition(),
           frontRightMaxSwerveModule.getPosition(),
@@ -210,7 +210,9 @@ public class DriveSubsystem extends CSubsystem {
     boolean useLimeLight = false;
 
     swerveDriveOdemtry.update(
-        Rotation2d.fromDegrees( gyroAHRS.getAngle()),
+        Rotation2d.fromDegrees( -
+        
+        gyroAHRS.getAngle()),
         new SwerveModulePosition[] {
             frontLeftMaxSwerveModule.getPosition(),
             frontRightMaxSwerveModule.getPosition(),

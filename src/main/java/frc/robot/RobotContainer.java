@@ -64,13 +64,12 @@ public class RobotContainer {
     NamedCommands.registerCommand("Raise Elevator", m_elevatorSubsystem.ElevatorLevelUp());
     NamedCommands.registerCommand("lower Elevator", m_elevatorSubsystem.ElevatorLevelDown());
     NamedCommands.registerCommand("manual run",m_robotDrive.autoDrive());
-    NamedCommands.registerCommand("Limelight Drive", m_robotDrive.LimeLightDriveCommand());
     NamedCommands.registerCommand("Extend", m_horizontalExtender.Extend() );
     NamedCommands.registerCommand("Retract", m_horizontalExtender.Retract() );
     NamedCommands.registerCommand("IntakeIn", m_intake.IntakeIn() );
     NamedCommands.registerCommand("IntakeOut", m_intake.IntakeOut() );
 
-     String [] autos = new String[] {"Do Nothing","CenterLeftMid","CenterRightMid","LeftMid","RightMid","ScoreAuto","manual run", "Test go Left", "Test Go Right" };
+     String [] autos = new String[] {"Do Nothing","CenterLeftMid","CenterRightMid","LeftMid","RightMid","ScoreAuto","manual run", "Test go Left", "Test Go Right", "Forwards" };
   
     autoChooser = AutoBuilder.buildAutoChooser("Do Nothing");
 
