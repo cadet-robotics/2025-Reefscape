@@ -9,13 +9,19 @@
           "data": {
             "commands": [
               {
-                "type": "sequential",
+                "type": "race",
                 "data": {
                   "commands": [
                     {
                       "type": "path",
                       "data": {
                         "pathName": "ScorePath"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Limelight Drive"
                       }
                     }
                   ]

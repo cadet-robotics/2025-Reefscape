@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-// import java.io.BufferedWriter;
-import java.util.List;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -16,9 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import edu.wpi.first.wpilibj.PS4Controller.Button;
-import frc.robot.Configs.MAXSwerveModule;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.BucketSubsystem;
@@ -61,6 +55,7 @@ public class RobotContainer {
     // Configure default commands
     NamedCommands.registerCommand("Bucket Dump", m_bucket.BucketDump());
     NamedCommands.registerCommand("Bucket Reset", m_bucket.BucketStart());
+    NamedCommands.registerCommand("Bucket Load", m_bucket.BucketLoad());
     NamedCommands.registerCommand("Raise Elevator", m_elevatorSubsystem.ElevatorLevelUp());
     NamedCommands.registerCommand("lower Elevator", m_elevatorSubsystem.ElevatorLevelDown());
     NamedCommands.registerCommand("manual run",m_robotDrive.autoDrive());
@@ -69,6 +64,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Retract", m_horizontalExtender.Retract() );
     NamedCommands.registerCommand("IntakeIn", m_intake.IntakeIn() );
     NamedCommands.registerCommand("IntakeOut", m_intake.IntakeOut() );
+    NamedCommands.registerCommand("Elevator Load Pos", m_elevatorSubsystem.ElevatorLoadPos() );
 
      String [] autos = new String[] {"Do Nothing","CenterLeftMid","CenterRightMid","LeftMid","RightMid","ScoreAuto","manual run", "Test go Left", "Test Go Right" };
   

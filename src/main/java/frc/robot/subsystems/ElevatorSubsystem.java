@@ -7,21 +7,18 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.Servo;
+// import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.Configs;
@@ -42,9 +39,6 @@ public class ElevatorSubsystem extends CSubsystem {
 
     private static final SparkClosedLoopController pidController = m_elevatorMotor.getClosedLoopController();
 
-    // TODO: Pid tuning should be conducted on Mikey
-    private static PIDController m_elevatorController = new PIDController(1.0, 0, 0);
-
     private static final TrapezoidProfile elevatorProfile = new TrapezoidProfile( new TrapezoidProfile.Constraints(90,200));
     private static TrapezoidProfile.State TrapezoidProfileState = new TrapezoidProfile.State();
 
@@ -52,11 +46,11 @@ public class ElevatorSubsystem extends CSubsystem {
     public static RelativeEncoder s_elevatorEncoder; // = new Encoder( Constants.ElevatorSubsystem.kElevatorEncoderA, Constants.ElevatorSubsystem.kElevatorEncoderB );
     private static boolean isManual = true;
         
-    // Servo Setup
-    // This servo is the brake for the elevator
-    private static final Servo m_elevatorBrake = new Servo( 
-        Constants.ElevatorSubsystem.kElevatorBrake 
-    );
+    // // Servo Setup
+    // // This servo is the brake for the elevator
+    // private static final Servo m_elevatorBrake = new Servo( 
+    //     Constants.ElevatorSubsystem.kElevatorBrake 
+    // );
 
     // Top Limit Switch Setup
     // Limit SwitchES ARE REVERSED
@@ -154,11 +148,7 @@ public class ElevatorSubsystem extends CSubsystem {
             .whileTrue( ElevatorDoDown() );
 
         new JoystickButton(m_driverController, Constants.DriverControls.bucketLoadPositionButton )
-            .whileTrue( new RunCommand( () -> {
-                level = 3;
-                isManual = false;
-            }, this ));
-
+            .whileTrue( ElevatorLoadPos() );
     }
 
     /** 
@@ -184,11 +174,6 @@ public class ElevatorSubsystem extends CSubsystem {
 
     }
 
-    /** Simple function to make it simple to grab the disstance to the target */
-    private static double distanceTo( double target ) {
-        return Math.abs( target * target - s_elevatorEncoder.getPosition() * s_elevatorEncoder.getPosition() );
-    }
-    
     /**
      * Periodic
      * Frequently checks the elevator level and encoder position, both get sent to the dashboard.
@@ -257,35 +242,32 @@ public class ElevatorSubsystem extends CSubsystem {
             });
     }
 
-    /**
-     * EngageBreak
-     * Moves the brake to the brake position
-     * Elevator Subsystem
-     */
-    public CCommand EngageBrake() {
-        return cCommand_( "ElevatorSubsystem.EngageBrake")
-            // Filler code TODO: must be changed when migrating to mikey
-            .onInitialize( () -> {
-                m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
-            });
-    }
+    // /**
+    //  * EngageBreak
+    //  * Moves the brake to the brake position
+    //  * Elevator Subsystem
+    //  */
+    // public CCommand EngageBrake() {
+    //     return cCommand_( "ElevatorSubsystem.EngageBrake")
+    //         .onInitialize( () -> {
+    //             m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoEnagedPos );
+    //         });
+    // }
 
-    /**
-     * DisengageBrake
-     * Moves the brake to the starting position
-     * Elevator Subsystem
-     */
-    public CCommand DisengageBrake() {
-        return cCommand_( "ElevatorSubsystem.DisengageBrake")
-            // Filler code TODO: must be changed when migrating to mikey
-            .onInitialize( () -> {
-                m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoDisenagedPos );
-            });
-    }
+    // /**
+    //  * DisengageBrake
+    //  * Moves the brake to the starting position
+    //  * Elevator Subsystem
+    //  */
+    // public CCommand DisengageBrake() {
+    //     return cCommand_( "ElevatorSubsystem.DisengageBrake")
+    //         .onInitialize( () -> {
+    //             m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoDisenagedPos );
+    //         });
+    // }
 
     public CCommand ElevatorDoUp() {
         return cCommand_( "ElevatorSubsystem.ElevatorDoUp")
-            // Filler code TODO: must be changed when migrating to mikey
             .onExecute( () -> {
                 isManual = true;
                 // Limit Switches are reversed
@@ -302,7 +284,6 @@ public class ElevatorSubsystem extends CSubsystem {
     
     public CCommand ElevatorDoDown() {
         return cCommand_( "ElevatorSubsystem.ElevaotrDoDown")
-            // Filler code TODO: must be changed when migrating to mikey
             .onInitialize( () -> {
                 isManual = true;
                 // LIMIT SWITCHES ARE REVERSED
@@ -312,7 +293,14 @@ public class ElevatorSubsystem extends CSubsystem {
                     m_elevatorMotor.stopMotor();
                 }
             })
-            .onEnd( ()->{
+            .onEnd( () -> {
+            });
+    }
+    public CCommand ElevatorLoadPos() {
+        return cCommand_( "ElevatorSubsystem.ElevatorLoadPos")
+            .onInitialize( () -> {
+                level = 3;
+                isManual = false;
             });
     }
 }

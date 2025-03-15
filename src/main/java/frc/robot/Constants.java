@@ -156,39 +156,17 @@ public final class Constants {
     public static String[] LevelNames = { "Trough", "ScoreAlgae", "AlgaeMid", "CoralStation", "PreClimb", "ReefLevel3", "AlgaeTop", "ReefTop" };
     public static double[] LevelHeights = {  0.0, 7.0, 17.7, 18.223, 38.374, 44.052, 47.7, 72.646, 90.0 };
 
-    // TODO: The following values need to be tuned on Mikey
     public static final double kServoEnagedPos = 1.0; // Postion
     public static final double kServoDisenagedPos = 0.0; // Position
   
     public static final double kBreakEngageTime = 119.5;
 
-    public static final class CrappyPid {
-      // TODO: tune all values
-
-
-      // The slower speed to be used by the elevator when within the slow distance threshold
-      public static double kElevatorSlowSpeed = 0.05;
-
-      // Defualt speed for the elevator
-      public static double kElevatorNormSpeed = 0.3;
-      
-      // The speed the elevator will hover at ( must be enabled in elevatorSubsystem )
-      public static double kElevatorHoverSpeed = 0.01;
-
-      // The distance when the elevator should stop, or use the however speed instead of moving slowly
-      public static double kElevatorStopThreshold = 0.03;
-
-      // The distance where crappy pid should use a slow speed instead of the normal one
-      public static double kElevatorSlowDistanceThreashold = 2.0;
-
-    }
   }
 
   public static final class BucketSubsystem {
 
     public static final int kCurrentLimit = 10;
     // The minimum value where the bucket no longer blocks movement of the encoder
-    // TODO: Tune
     public static final double kBlockingExenderPosition = 0.2;
     
     public static final double PidMax = 1; // The maximum speed pid is allowed to go

@@ -308,7 +308,7 @@ public class DriveSubsystem extends CSubsystem {
   // if your limelight and target are mounted at the same or similar heights,use
   // "ta" (area) for target ranging rather than "ty"
   double limelight_range_proportional() {
-    double kP = .1;
+    // double kP = .1;
     // double targetingForwardSpeed = LimelightHelpers.getTA("limelight") * kP;
     // double targetingForwardSpeed = 1 - LimelightHelpers.getTA("limelight");
     double targetingForwardSpeed = 1;

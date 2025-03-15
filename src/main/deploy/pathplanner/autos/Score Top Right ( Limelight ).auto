@@ -9,13 +9,19 @@
           "data": {
             "commands": [
               {
-                "type": "sequential",
+                "type": "race",
                 "data": {
                   "commands": [
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "ScorePath"
+                        "pathName": "Score Right"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Limelight Drive"
                       }
                     }
                   ]
@@ -330,6 +336,63 @@
                           {
                             "type": "wait",
                             "data": {
+                              "waitTime": 0.05
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "race",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "lower Elevator"
+                            }
+                          },
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 0.05
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "race",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "lower Elevator"
+                            }
+                          },
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 0.05
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "race",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "lower Elevator"
+                            }
+                          },
+                          {
+                            "type": "wait",
+                            "data": {
                               "waitTime": 0.5
                             }
                           }
@@ -346,7 +409,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Bucket Load"
+                        "name": "Bucket Reset"
                       }
                     },
                     {
@@ -362,86 +425,9 @@
           }
         },
         {
-          "type": "race",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Extend"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.5
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "IntakeIn"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Extend"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Algae Throw"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Retract"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "IntakeOut"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.5
-                }
-              }
-            ]
+            "pathName": "Back Right to Coral Station"
           }
         }
       ]

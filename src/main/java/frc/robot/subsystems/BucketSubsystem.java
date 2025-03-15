@@ -35,7 +35,6 @@ public class BucketSubsystem extends CSubsystem {
     // private DutyCycleEncoder s_snowblowerEncoder = new DutyCycleEncoder( 4 );
     private SparkAbsoluteEncoder s_snowblowerEncoder;
 
-    // TODO: Values need to be tuned on Mikey
     private PIDController m_PidController = new PIDController(1, 0, 0);
 
     private static int positionIndex = 0;
@@ -132,7 +131,8 @@ public class BucketSubsystem extends CSubsystem {
             .onInitialize( () -> {
                 isManual = false;
                 positionIndex = 0;
-            });
+            })
+            .isFinished( s_snowblowerEncoder.getPosition() == Constants.BucketSubsystem.bucketPositionArray[1] );
     }
 
     /** 
@@ -170,7 +170,10 @@ public class BucketSubsystem extends CSubsystem {
             .onInitialize( () -> {
                 isManual = false;
                 positionIndex = 2;
-            });
+            })
+            .isFinished( 
+                s_snowblowerEncoder.getPosition() == Constants.BucketSubsystem.bucketPositionArray[3]
+            );
     }
 
     public CCommand BucketForward() {

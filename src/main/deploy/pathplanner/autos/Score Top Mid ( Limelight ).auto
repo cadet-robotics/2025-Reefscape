@@ -409,7 +409,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Bucket Reset"
+                        "name": "Bucket Load"
                       }
                     },
                     {
