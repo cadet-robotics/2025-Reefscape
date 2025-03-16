@@ -7,7 +7,6 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -18,7 +17,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -41,9 +39,6 @@ public class ElevatorSubsystem extends CSubsystem {
     );
 
     private static final SparkClosedLoopController pidController = m_elevatorMotor.getClosedLoopController();
-
-    // TODO: Pid tuning should be conducted on Mikey
-    private static PIDController m_elevatorController = new PIDController(1.0, 0, 0);
 
     private static final TrapezoidProfile elevatorProfile = new TrapezoidProfile( new TrapezoidProfile.Constraints(90,200));
     private static TrapezoidProfile.State TrapezoidProfileState = new TrapezoidProfile.State();
@@ -80,6 +75,7 @@ public class ElevatorSubsystem extends CSubsystem {
     private static int level = 0;
 
     private static boolean wasManual = true;
+
     /**
      * Checks if the robot should be in slow mode based on the position of the elevator
      */
@@ -90,11 +86,19 @@ public class ElevatorSubsystem extends CSubsystem {
         return false;
     };
 
+    /**
+     * Function called when the robot gets disabled
+     * This is used to make re-enabling the robot safe regardless of prior state
+     */
     public void OnDisable() {
         level = 0;
         isManual = true;
         wasManual = true;
         m_elevatorMotor.stopMotor();
+    }
+
+    public void startTimer() {
+        m_breakTimer.start();
     }
 
     /**
@@ -110,8 +114,12 @@ public class ElevatorSubsystem extends CSubsystem {
         s_elevatorEncoder = m_elevatorMotor.getEncoder();
     }
 
-    public void startTimer() {
-        m_breakTimer.start();
+    private boolean topLimitPressed() {
+        return !m_topLimitSwitch.get();
+    }
+
+    private boolean bottomLimitPressed() {
+        return !m_bottomLimitSwitch.get();
     }
 
     /**
@@ -122,25 +130,14 @@ public class ElevatorSubsystem extends CSubsystem {
      */
     public void buttonBindings( PS4Controller m_driverController, PS4Controller m_coDriverController ) {
 
-        // Should be dpad up with a 10 degree margin for error on either side
-        // ElevatorLevelUp ( Dpad Up ) ( Co Driver )
-        // new JoystickButton( m_coDriverController, m_driverController.getPOV() )
-        //     .and( () -> Math.abs( m_coDriverController.getPOV() - 0 ) < 10)
-        //         .whileTrue( ElevatorLevelUp() );
-        // // ElevatorLevelDown ( Dpad Down ) ( Co Driver )
-        // // Should be dpad down with a 10 degree margin for error on either side
-        //  new JoystickButton( m_coDriverController, m_driverController.getPOV() )
-        //     .and( () -> Math.abs( m_coDriverController.getPOV() - 180 ) < 10)
-        //         .whileTrue( ElevatorLevelDown() );
-
         // EngageBrake ( Right Bumper )
         // new JoystickButton(m_driverController, Constants.DriverControls.enableBreak )
         //    .whileTrue( EngageBrake() );
 
         // DisengageBrake ( Left Bumper )
-        // new JoystickButton(m_driverController, m_driverController.getPOV() )
-        //     .and( () -> { return m_driverController.getPOV() == 0;} )
+        // new JoystickButton(m_driverController, Constatns.CoDriverControls.disableBreak )
         //     .whileTrue( DisengageBrake() );
+
         new JoystickButton(m_coDriverController, Button.kR1.value )
             .whileTrue( ElevatorLevelUp() );
 
@@ -157,7 +154,9 @@ public class ElevatorSubsystem extends CSubsystem {
             .whileTrue( new RunCommand( () -> {
                 level = 3;
                 isManual = false;
-            }, this ));
+            }, 
+            this 
+        ));
 
     }
 
@@ -174,21 +173,10 @@ public class ElevatorSubsystem extends CSubsystem {
         SmartDashboard.putNumber( "State" ,  desiredPosition );
         SmartDashboard.putNumber( "DesiredState" , desiredState );
 
-        // Limit switches are reversed
-        // if ( desiredPosition > s_elevatorEncoder.getPosition() && !( m_topLimitSwitch.get() ) ) {
-            pidController.setReference( desiredPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0 );
-        // Limit swtiches are reversed
-        // } else if ( desiredPosition < s_elevatorEncoder.getPosition() && !( m_bottomLimitSwitch.get() ) ) {
-            // pidController.setReference( desiredPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0 );
-        // }
+        pidController.setReference( desiredPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0 );
 
     }
 
-    /** Simple function to make it simple to grab the disstance to the target */
-    private static double distanceTo( double target ) {
-        return Math.abs( target * target - s_elevatorEncoder.getPosition() * s_elevatorEncoder.getPosition() );
-    }
-    
     /**
      * Periodic
      * Frequently checks the elevator level and encoder position, both get sent to the dashboard.
@@ -197,15 +185,14 @@ public class ElevatorSubsystem extends CSubsystem {
     @Override
     public void periodic() {
 
-        //limit switch values are reversed 
-        SmartDashboard.putBoolean( "ElevatorBottom", m_bottomLimitSwitch.get() );
-        SmartDashboard.putBoolean( "ElevatorTop", m_topLimitSwitch.get() );
+        SmartDashboard.putBoolean( "ElevatorBottom", bottomLimitPressed() );
+        SmartDashboard.putBoolean( "ElevatorTop", topLimitPressed() );
         SmartDashboard.putNumber( "ElevatorLevel", level );
         SmartDashboard.putNumber( "Encoder", s_elevatorEncoder.getPosition() );
-
         SmartDashboard.putBoolean( "ElevatorSlow", elevatorSlowCheck.getAsBoolean() );
+
         if ( !hasBeenZeroed ) {
-            if ( !m_bottomLimitSwitch.get() )
+            if ( bottomLimitPressed() )
             {
                 s_elevatorEncoder.setPosition(0);
             }
@@ -277,7 +264,6 @@ public class ElevatorSubsystem extends CSubsystem {
      */
     public CCommand DisengageBrake() {
         return cCommand_( "ElevatorSubsystem.DisengageBrake")
-            // Filler code TODO: must be changed when migrating to mikey
             .onInitialize( () -> {
                 m_elevatorBrake.set( Constants.ElevatorSubsystem.kServoDisenagedPos );
             });
@@ -285,11 +271,9 @@ public class ElevatorSubsystem extends CSubsystem {
 
     public CCommand ElevatorDoUp() {
         return cCommand_( "ElevatorSubsystem.ElevatorDoUp")
-            // Filler code TODO: must be changed when migrating to mikey
             .onExecute( () -> {
                 isManual = true;
-                // Limit Switches are reversed
-                if ( m_topLimitSwitch.get() ) {
+                if ( !topLimitPressed() ) {
                     m_elevatorMotor.set( Constants.ElevatorSubsystem.kElevaotrManualSpeed);
                 } else {
                     m_elevatorMotor.stopMotor();
@@ -302,11 +286,9 @@ public class ElevatorSubsystem extends CSubsystem {
     
     public CCommand ElevatorDoDown() {
         return cCommand_( "ElevatorSubsystem.ElevaotrDoDown")
-            // Filler code TODO: must be changed when migrating to mikey
             .onInitialize( () -> {
                 isManual = true;
-                // LIMIT SWITCHES ARE REVERSED
-                if ( m_bottomLimitSwitch.get() ) {
+                if ( !bottomLimitPressed() ) {
                     m_elevatorMotor.set( -Constants.ElevatorSubsystem.kElevaotrManualSpeed);
                 } else { 
                     m_elevatorMotor.stopMotor();
