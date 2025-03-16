@@ -32,16 +32,6 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
     //limit switch values are reversed    
     private final DigitalInput s_frontLimitSwitch = new DigitalInput( Constants.HorzontalExtenderSubsystem.kFrontLimitSwitch );
     private final DigitalInput s_backLimitSwitch = new DigitalInput( Constants.HorzontalExtenderSubsystem.kBackLimitSwitch );
-
-    /**
-     * Checks if the robot should be in slow mode based on the horizontal extender
-     */
-    public final BooleanSupplier extenderSlowCheck = () -> {
-        //limit switch values are reversed
-        return s_frontLimitSwitch.get(); // Will only enter slow mode if the front limit switch is pressed
-        // return !s_backLimitSwitch.get(); // Will only enter slow mode if the back limit switch is not pressed
-    };
-
     public static BooleanSupplier isBucketBlocking = () -> { return true; };
 
     /**
@@ -82,7 +72,7 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
      */
     public Boolean frontLimitSwitchPressing() {
         //limit switch values are reversed
-        return s_frontLimitSwitch.get();
+        return !s_frontLimitSwitch.get();
     }
 
     /**
@@ -92,7 +82,7 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
      */
     public Boolean backLimitSwitchPressing() {
         //limit switch values are reversed
-        return s_backLimitSwitch.get();
+        return !s_backLimitSwitch.get();
     }
 
     public void setIsBucketBlocking(BooleanSupplier isBucketBlocking) {
@@ -104,7 +94,6 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
         //limit switch values are reversed
         SmartDashboard.putBoolean("allIn", backLimitSwitchPressing());
         SmartDashboard.putBoolean("allOut", frontLimitSwitchPressing());
-        SmartDashboard.putBoolean("ExtenderSlow", extenderSlowCheck.getAsBoolean());
     }
 
     /**
@@ -119,7 +108,7 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
                 SmartDashboard.putBoolean( "moveOut", true );
                 if ( Constants.HorzontalExtenderSubsystem.extederMode.equals( "Press" )) {
                     //limit switch values are reversed
-                    while( ( frontLimitSwitchPressing())) {
+                    while( ( !frontLimitSwitchPressing())) {
                         m_horizontalExtenderMotor.set( Constants.HorzontalExtenderSubsystem.kExtendSpeed);
                     }
                 }
@@ -128,7 +117,7 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
             .onExecute( () -> {
                 if ( Constants.HorzontalExtenderSubsystem.extederMode.equals( "Hold" )) {
                     //limit switch values are reversed
-                    if ( !frontLimitSwitchPressing() ) {
+                    if ( frontLimitSwitchPressing() ) {
                         m_horizontalExtenderMotor.stopMotor();
                     } else {
                        m_horizontalExtenderMotor.set( Constants.HorzontalExtenderSubsystem.kExtendSpeed );
@@ -141,7 +130,7 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
                 m_horizontalExtenderMotor.stopMotor();
             })
             // Limit switch values are reversed
-            .isFinished( () -> { return !s_frontLimitSwitch.get(); });
+            .isFinished( () -> { return frontLimitSwitchPressing(); });
     }
 
 
@@ -157,7 +146,7 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
                 SmartDashboard.putBoolean( "moveIn", true );
                 if ( Constants.HorzontalExtenderSubsystem.extederMode.equals( "Press" )) {
                     //limit switch values are reversed
-                    while( ( backLimitSwitchPressing())) {
+                    while( ( !backLimitSwitchPressing())) {
                         m_horizontalExtenderMotor.set( -Constants.HorzontalExtenderSubsystem.kExtendSpeed);
                     }
                 }
@@ -166,7 +155,7 @@ public class HorizontalExtenderSubsystem extends CSubsystem {
             .onExecute( () -> {
                 if ( Constants.HorzontalExtenderSubsystem.extederMode.equals( "Hold" )) {
                     //limit switch values are reversed
-                    if ( !backLimitSwitchPressing() ) {
+                    if ( backLimitSwitchPressing() ) {
                         m_horizontalExtenderMotor.stopMotor();
                         return;
                     }
