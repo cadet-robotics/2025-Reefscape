@@ -6,17 +6,15 @@ import frc.robot.lib.custom.CSubsystem;
 import frc.robot.Configs;
 import frc.robot.Constants;
 
-import java.util.function.BooleanSupplier;
-
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 //Press Square on CODRIVER CONTROLLER to manually move the bucket backward
@@ -27,25 +25,18 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class BucketSubsystem extends CSubsystem {
 
-    // Creating a sparkmax to control the motor
     // Snowblower motors must be set as "kBrushed"
     private final SparkMax m_snowblowerMotor = new SparkMax( Constants.BucketSubsystem.kSnowblowerMotor, MotorType.kBrushed );
 
-    // Creating the Encoder
     // private DutyCycleEncoder s_snowblowerEncoder = new DutyCycleEncoder( 4 );
     private SparkAbsoluteEncoder s_snowblowerEncoder;
 
-    // TODO: Values need to be tuned on Mikey
     private PIDController m_PidController = new PIDController(1, 0, 0);
 
     private static int positionIndex = 0;
 
     // Wiether the bucket is being moved manually
     private static boolean isManual = false;
-
-    public  BooleanSupplier isBucketBlocking = () -> {
-        return ( s_snowblowerEncoder.getPosition() < Constants.BucketSubsystem.kBlockingExenderPosition );
-    };
 
     /**
     * Create an instace of the BucketSubsystem
@@ -61,11 +52,12 @@ public class BucketSubsystem extends CSubsystem {
             PersistMode.kPersistParameters 
         );
         s_snowblowerEncoder = m_snowblowerMotor.getAbsoluteEncoder();
-        // s_snowblowerEncoder.setAssumedFrequency(975.6);
-        // s_snowblowerEncoder.setDutyCycleRange(1, 1024);
-        // s_snowblowerEncoder.
     }
 
+    /**
+     * Function called when the robot is disabled
+     * This is used for safety and ensures the motors don't run on enable.
+     */
     public void OnDisable() {
         isManual = true;
         m_snowblowerMotor.stopMotor();
@@ -108,20 +100,26 @@ public class BucketSubsystem extends CSubsystem {
         double attempt = m_PidController.calculate( Math.abs( 1 - s_snowblowerEncoder.getPosition() ) , 1 - Constants.BucketSubsystem.bucketPositionArray[positionIndex]);
         SmartDashboard.putNumber( "MoveTargetState", attempt );
         // PID + Feedforward
-        m_snowblowerMotor.set( attempt * 3.0 + (( 1 - s_snowblowerEncoder.getPosition() < 0.1 )?0.1:0 ));
+        m_snowblowerMotor.set(  
+            attempt * 3.0 + 
+            (( 1 - s_snowblowerEncoder.getPosition() < 0.1 )?0.1:0 
+        ));
     }
     
     /**
-     * peridically calls `goToDesiredState`
+     * peridically calls `goToDesiredState` and writes the encoder value to the dashboard
      */
     public void periodic ()
     {
+        SmartDashboard.putNumber( "Bucket Encoder", s_snowblowerEncoder.getPosition());
         if ( !isManual ) {
             goToDesiredState();
         }
-
-        SmartDashboard.putNumber( "Bucket Encoder", s_snowblowerEncoder.getPosition());
     }
+
+    //
+    //                  Automatic Movement
+    //
 
     /**
      * Sets the position index to the bucket to the start position
@@ -132,7 +130,8 @@ public class BucketSubsystem extends CSubsystem {
             .onInitialize( () -> {
                 isManual = false;
                 positionIndex = 0;
-            });
+            })
+            .isFinished( s_snowblowerEncoder.getPosition() == Constants.BucketSubsystem.bucketPositionArray[1] );
     }
 
     /** 
@@ -150,6 +149,10 @@ public class BucketSubsystem extends CSubsystem {
             });
     }
 
+    /** 
+     * Sets the position index to the bucket to the top dump position
+     * BucketSubsystem
+    */
     public CCommand BucketTopDump() {
         return cCommand_( "BucketSubsystem.BucketTopDump" )
             .onInitialize( () -> {
@@ -170,8 +173,15 @@ public class BucketSubsystem extends CSubsystem {
             .onInitialize( () -> {
                 isManual = false;
                 positionIndex = 2;
-            });
+            })
+            .isFinished( 
+                s_snowblowerEncoder.getPosition() == Constants.BucketSubsystem.bucketPositionArray[3]
+            );
     }
+
+    //
+    //                  Manual Movement
+    //
 
     public CCommand BucketForward() {
         return cCommand_( "BucketSubsystem.BucketForward")
