@@ -86,7 +86,6 @@ public class DriveSubsystem extends CSubsystem {
 
   // The functions for if the drive subsystem should be in slow mode
   private static BooleanSupplier elevatorSlowCheck = ()->{return true;}; // Setting the default values in case it never gets inintalized
-  private static BooleanSupplier extenderSlowCheck = ()->{return true;};
 
   // This value determines if the `limeLightDriveCommand` is actively being called
   private boolean limeLightDriving = false;
@@ -171,18 +170,13 @@ public class DriveSubsystem extends CSubsystem {
         .whileTrue(
             LimeLightAdjustLeftPost());
 
-    // Slow Down Button
-    // new JoystickButton(driverPS4Controller, Button.kR2.value)
-    //     .whileTrue(
-    //         slowDown());
   }
 
   /**
    * Sets the functions that the drive subsystem will use to check if slow mode should be enabled
    */
-  public static void setSlowFunctions( BooleanSupplier elevatorFunction, BooleanSupplier extenderFunction) {
+  public static void setSlowFunctions( BooleanSupplier elevatorFunction ) {
     elevatorSlowCheck = elevatorFunction;
-    extenderSlowCheck = extenderFunction;
   }
   
   @Override
@@ -192,7 +186,7 @@ public class DriveSubsystem extends CSubsystem {
 
       slowMultiplier = DriveConstants.kSlowerMultiplier;
 
-    } else if ( driverPS4Controller.getRawButtonPressed(Constants.DriverControls.slowButton) || extenderSlowCheck.getAsBoolean()  ) {
+    } else if ( driverPS4Controller.getRawButtonPressed(Constants.DriverControls.slowButton) ) {
 
       slowMultiplier = DriveConstants.kSlowMultiplier;
       SmartDashboard.putBoolean("slowmode", true);
@@ -305,7 +299,7 @@ public class DriveSubsystem extends CSubsystem {
   // if your limelight and target are mounted at the same or similar heights,use
   // "ta" (area) for target ranging rather than "ty"
   double limelight_range_proportional() {
-    double kP = .1;
+    // double kP = .1;
     // double targetingForwardSpeed = LimelightHelpers.getTA("limelight") * kP;
     // double targetingForwardSpeed = 1 - LimelightHelpers.getTA("limelight");
     double targetingForwardSpeed = 1;
