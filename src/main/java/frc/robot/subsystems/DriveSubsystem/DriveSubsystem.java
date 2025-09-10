@@ -7,43 +7,36 @@ package frc.robot.subsystems.DriveSubsystem;
 import java.io.IOException;
 import java.util.function.BooleanSupplier;
 
-import org.json.simple.parser.ParseException;
-
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
-
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS4Controller;
-
-import frc.robot.Constants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.lib.Limelight.LimelightHelpers;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.lib.Limelight.LimelightHelpers;
 import frc.robot.lib.custom.CCommand;
 import frc.robot.lib.custom.CSubsystem;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 //Press L1 on DRIVER CONTROLLER to go slower than slowdown
 //Press R1 on DRIVER CONTROLLER to slow down
@@ -98,13 +91,11 @@ public class DriveSubsystem extends CSubsystem {
   public DriveSubsystem() {
     // Setting up PathPlanner
 
-    try {
-      RobotConfig.fromGUISettings();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }
+    // try {
+    //   RobotConfig.fromGUISettings();
+    // } catch (IOException e) {
+    //   e.printStackTrace();
+    // }
 
     // Usage reporting for MAXSwerve template
     gyroAHRS.reset();
@@ -464,6 +455,7 @@ public class DriveSubsystem extends CSubsystem {
     return cCommand_("DriveSubsystem.GyroReset")
         .onExecute(() -> {
           // resetOdometry(getPose());
+          this.gyroAHRS.reset();
           zeroHeading();
           // resetEncoders();
         });
@@ -484,6 +476,7 @@ public class DriveSubsystem extends CSubsystem {
 
       final var forward_limelight = limelight_range_proportional();
       double xSpeed = forward_limelight;
+
 
       // final var sideways_limelight = limelight_side_proportional();
       // double ySpeed = sideways_limelight;
