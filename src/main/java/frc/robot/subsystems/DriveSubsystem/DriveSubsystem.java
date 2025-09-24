@@ -481,7 +481,7 @@ public class DriveSubsystem extends CSubsystem {
       // final var sideways_limelight = limelight_side_proportional();
       // double ySpeed = sideways_limelight;
 
-      // while using Limelight, turn off field-relative driving.
+      // while using Limelight, tur
       boolean fieldRelative = false;
 
       this.drive(xSpeed, ySpeed, rotationalSpeed, fieldRelative, useLimeLight );
